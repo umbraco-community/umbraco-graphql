@@ -1,0 +1,6 @@
+/App_Data/
+/Media/**
+!/Media/web.config
+/umbraco/
+/umbraco_client/
+Web.config
