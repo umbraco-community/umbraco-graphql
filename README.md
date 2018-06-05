@@ -3,7 +3,9 @@
 ## What is this
 An experimental implementation of [GraphQL](https://graphql.org) for Umbraco using [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet).
 
-Please note this **should not be used in production**, since there a **no security** and all you data will be **publicly available**.
+If you're interested in getting GraphQL into Umbraco Core please join the discussion on [Our](https://our.umbraco.org/forum/extending-umbraco-and-using-the-api/92236-getting-graphql-into-umbraco) and on the [issue tracker](http://issues.umbraco.org/issue/U4-11389).
+
+Please note this **should not be used in production**, since there are **no security** and all you data will be **publicly available**.
 
 ## How does it work
 An Owin middleware exposes Umbraco Published Content as a GraphQL endpoint.
@@ -17,7 +19,7 @@ There are also two generic fields `content(id: ID!)` and `contentAtRoot` which c
 ## Getting started
 Clone the repository and run the Website (F5 in Visual Studio), install Umbraco with the starter kit and start exploring the API using GraphiQL by opening `/umbraco/graphiql`.
 
-There's also a [downloaded](https://drive.google.com/file/d/1L67kZV7u6tXy45zknLih421Rlbrx3fh3/view) which contains a prebuilt website with some sample data based on the starter kit. Login `admin@example.org`/`1234567890`. It's based on the Umbraco starter kit, where `People`, `Products` and `Blog` has been moved to the root of the tree.
+There's also a [download](https://drive.google.com/file/d/1L67kZV7u6tXy45zknLih421Rlbrx3fh3/view) which contains a prebuilt website with some sample data based on the starter kit. Login `admin@example.org`/`1234567890`. It's based on the Umbraco starter kit, where `People`, `Products` and `Blog` has been moved to the root of the tree.
 
 ### Urls
 | Url | Description |
