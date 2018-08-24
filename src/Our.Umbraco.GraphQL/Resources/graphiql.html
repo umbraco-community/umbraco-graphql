@@ -35,7 +35,11 @@
     <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
     <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
     <script src="//unpkg.com/graphiql@0.11.11/graphiql.min.js"></script>
-
+    <script>
+    var umb_settings = {
+        debugEnabled: ${debugEnabled}
+        };
+    </script>
 </head>
   <body>
     <div id="graphiql">Loading...</div>
@@ -114,8 +118,13 @@
           body: JSON.stringify(graphQLParams),
           credentials: 'include',
         }).then(function (response) {
+            if (umb_settings.debugEnabled) {
+                console.log("DEBUG ENABLED!");
+                console.log("Last request took: ", response.headers['took']);
+            }
           return response.text();
-        }).then(function (responseBody) {
+            }).then(function (responseBody) {
+
           try {
             return JSON.parse(responseBody);
           } catch (error) {
