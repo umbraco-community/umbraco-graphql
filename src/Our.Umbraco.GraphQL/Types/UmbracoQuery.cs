@@ -14,7 +14,7 @@ namespace Our.Umbraco.GraphQL.Types
                 .Resolve(context =>
                 {
                     var userContext = (UmbracoGraphQLContext)context.UserContext;
-                    var id = context.GetArgument<string>("id");
+                    var id = context.GetArgument<int>("id");
                     return userContext.Umbraco.TypedContent(id);
                 });
 

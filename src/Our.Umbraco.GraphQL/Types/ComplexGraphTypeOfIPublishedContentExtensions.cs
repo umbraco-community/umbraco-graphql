@@ -132,7 +132,7 @@ namespace Our.Umbraco.GraphQL.Types
             if (context.Arguments.TryGetValue("filter", out object filterArg) && filterArg != null)
             {
                 var rootFilter = ((IDictionary<string, object>)filterArg).First();
-                var filterType = (IComplexGraphType)context.FieldDefinition.Arguments.Find(x => x.Name == "filter").ResolvedType;
+                var filterType = (IComplexGraphType)context.FieldDefinition.Arguments.Find("filter").ResolvedType;
                 var filter = ResolveFilter(filterType, rootFilter, context.ParentType, executionContext);
 
                 source = source.Where(x => filter.IsSatisfiedBy(x));
