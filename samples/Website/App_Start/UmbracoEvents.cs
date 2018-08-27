@@ -9,7 +9,11 @@ namespace Website.App_Start
     {
         protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            UmbracoDefaultOwinStartup.MiddlewareConfigured += (sender, e) => e.AppBuilder.UseUmbracoGraphQL(applicationContext);
+            UmbracoDefaultOwinStartup.MiddlewareConfigured += (sender, e) => e.AppBuilder.UseUmbracoGraphQL(applicationContext, new GraphQLServerOptions()
+            {
+                EnableMetrics = true,
+                Debug = true
+            });
         }
     }
 }
