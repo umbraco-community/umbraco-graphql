@@ -60,6 +60,7 @@ namespace Our.Umbraco.GraphQL.Types
             return new Connection<TSource>
             {
                 Edges = edges,
+                TotalCount = totalCount,
                 PageInfo = new PageInfo
                 {
                     EndCursor = edges.LastOrDefault()?.Cursor,
