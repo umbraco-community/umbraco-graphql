@@ -20,7 +20,7 @@ namespace Our.Umbraco.GraphQL.Types
         public static Connection<TSource> ToConnection<TSource, TParent>(this IEnumerable<TSource> source,
             ResolveConnectionContext<TParent> context, int totalCount)
         {
-            var items = source.ToList();
+            var items = source as List<TSource> ?? source.ToList();
 
             var after = context.After;
             var before = context.Before;
