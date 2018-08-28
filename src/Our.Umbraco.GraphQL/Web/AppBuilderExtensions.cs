@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Microsoft.Owin.Cors;
 using Owin;
@@ -48,12 +47,6 @@ namespace Our.Umbraco.GraphQL.Web
                 {
                     using (var reader = new StreamReader(stream))
                     {
-                        var htmlStr = reader.ReadToEnd();
-                        htmlStr = htmlStr.ReplaceMany(new Dictionary<string, string>()
-                        {
-                            {"${endpointURL}", graphQLPath },
-                            {"${debugEnabled}", options.Debug.ToString() }
-                        });
                         html = reader.ReadToEnd().Replace("${endpointURL}", graphQLPath);
                     }
                 }

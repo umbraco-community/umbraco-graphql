@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL;
@@ -31,13 +30,6 @@ namespace Our.Umbraco.GraphQL.Web
 
         public override async Task Invoke(IOwinContext context)
         {
-            Stopwatch stopwatch = null;
-            if (_options.Debug)
-            {
-                stopwatch = new Stopwatch();
-                stopwatch.Start();
-            }
-
             try
             {
                 var schema = _applicationContext.ApplicationCache.RuntimeCache.GetCacheItem<UmbracoSchema>(
@@ -69,7 +61,7 @@ namespace Our.Umbraco.GraphQL.Web
                             await context.Response.WriteAsync("Server supports only POST requests.");
                             return;
                     }
-                   
+
                     IEnumerable<Task<ExecutionResult>> requests = request.Select(requestParams =>
                     {
                         try
@@ -143,11 +135,6 @@ namespace Our.Umbraco.GraphQL.Web
                 {
                     await context.Response.WriteAsync("Internal server error");
                 }
-            }
-            if (_options.Debug)
-            {
-                stopwatch.Stop();
-                context.Response.Headers.Append("took", stopwatch.ElapsedMilliseconds.ToString());
             }
         }
     }
