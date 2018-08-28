@@ -1,0 +1,29 @@
+{
+  "name": "umb-graphiql",
+  "version": "0.0.1",
+  "description": "graphiql frontend with umbraco goodies",
+  "main": "index.js",
+  "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-jest": "^19.0.0",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-react-remove-prop-types": "^0.2.9",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-react": "^6.23.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "graphql": "^0.13.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "transform-object-rest-spread": "^7.0.0",
+    "webpack": "^2.5.1",
+    "webpack-bundle-analyzer": "^2.9.1"
+  },
+  "dependencies": {
+    "graphiql": "^0.11.11"
+  },
+  "scripts": {
+    "build": "webpack --mode production"
+  },
+  "author": "",
+  "license": "ISC"
+}
