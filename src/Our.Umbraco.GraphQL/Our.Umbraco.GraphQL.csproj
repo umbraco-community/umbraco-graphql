@@ -251,6 +251,7 @@
     <Compile Include="Filters\NotFilter.cs" />
     <Compile Include="Filters\OrFilter.cs" />
     <Compile Include="Filters\StartsWithFilter.cs" />
+    <Compile Include="Instrumentation\MiniProfilerFieldsMiddleware.cs" />
     <Compile Include="Schema\Conventions.cs" />
     <Compile Include="Types\ConnectionExtensions.cs" />
     <Compile Include="Types\ConnectionWithFilterBuilder.cs" />

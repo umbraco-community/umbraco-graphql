@@ -8,6 +8,10 @@ using GraphQL.Http;
 using GraphQL.Instrumentation;
 using GraphQL.Utilities;
 using Microsoft.Owin;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Schema;
 using StackExchange.Profiling;
 using Umbraco.Core;
@@ -75,7 +79,7 @@ namespace Our.Umbraco.GraphQL.Web
                         Inputs variables = requestParams.Variables;
 
                         var start = DateTime.Now;
-
+                        MiniProfiler.Start();
                         var result = await _documentExecutor
                             .ExecuteAsync(x =>
                             {
@@ -86,6 +90,7 @@ namespace Our.Umbraco.GraphQL.Web
                                 {
                                     x.EnableMetrics = true;
                                     x.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                                    x.FieldMiddleware.Use<MiniProfilerFieldsMiddleware>();
                                 }
                                 x.FieldNameConverter = new DefaultFieldNameConverter();
                                 x.Inputs = variables;
@@ -104,7 +109,14 @@ namespace Our.Umbraco.GraphQL.Web
                         if (_options.EnableMetrics && result.Errors == null)
                         {
                             result.EnrichWithApolloTracing(start);
+
+                            if (result.Extensions == null)
+                            {
+                                result.Extensions = new Dictionary<string, object>();
+                            }
+                            result.Extensions["miniProfiler"] = JObject.FromObject(MiniProfiler.Current, new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() });
                         }
+                        MiniProfiler.Stop();
 
                         return result;
                     });
