@@ -5,9 +5,15 @@ using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Conversion;
 using GraphQL.Http;
+using GraphQL.Instrumentation;
 using GraphQL.Utilities;
 using Microsoft.Owin;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Schema;
+using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Web;
@@ -18,6 +24,8 @@ namespace Our.Umbraco.GraphQL.Web
     {
         private readonly ApplicationContext _applicationContext;
         private readonly GraphQLServerOptions _options;
+        private readonly DocumentExecuter _documentExecutor;
+        private readonly DocumentWriter _documentWriter;
 
         public GraphQLMiddleware(
             OwinMiddleware next,
@@ -26,6 +34,8 @@ namespace Our.Umbraco.GraphQL.Web
         {
             _applicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            _documentExecutor = new DocumentExecuter();
+            _documentWriter = new DocumentWriter();
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -62,54 +72,67 @@ namespace Our.Umbraco.GraphQL.Web
                             return;
                     }
 
-                    IEnumerable<Task<ExecutionResult>> requests = request.Select(requestParams =>
+                    IEnumerable<Task<ExecutionResult>> requests = request.Select(async requestParams =>
                     {
-                        try
-                        {
-                            string query = requestParams.Query;
-                            string operationName = requestParams.OperationName;
-                            Inputs variables = requestParams.Variables;
-                            
-                            return new DocumentExecuter()
-                                .ExecuteAsync(x =>
+                        string query = requestParams.Query;
+                        string operationName = requestParams.OperationName;
+                        Inputs variables = requestParams.Variables;
+
+                        var start = DateTime.Now;
+                        MiniProfiler.Start();
+                        var result = await _documentExecutor
+                            .ExecuteAsync(x =>
+                            {
+                                x.CancellationToken = context.Request.CallCancelled;
+                                //x.ComplexityConfiguration = new ComplexityConfiguration();
+                                x.ExposeExceptions = _options.Debug;
+                                if (_options.EnableMetrics)
                                 {
-                                    x.CancellationToken = context.Request.CallCancelled;
-                                    //x.ComplexityConfiguration = new ComplexityConfiguration();
-                                    x.ExposeExceptions = _options.Debug;
-                                    //x.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-                                    x.FieldNameConverter = new DefaultFieldNameConverter();
-                                    x.Inputs = variables;
-                                    x.OperationName = operationName;
-                                    x.Query = query;
-                                    //x.Root = 
-                                    x.Schema = schema;
-                                    x.UserContext = new UmbracoGraphQLContext(
-                                        context.Request.Uri,
-                                        _applicationContext,
-                                        UmbracoContext.Current,
-                                        _options
-                                    );
-                                });
-                        }
-                        catch (Exception)
+                                    x.EnableMetrics = true;
+                                    x.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
+                                    x.FieldMiddleware.Use<MiniProfilerFieldsMiddleware>();
+                                }
+                                x.FieldNameConverter = new DefaultFieldNameConverter();
+                                x.Inputs = variables;
+                                x.OperationName = operationName;
+                                x.Query = query;
+                                //x.Root = 
+                                x.Schema = schema;
+                                x.UserContext = new UmbracoGraphQLContext(
+                                    context.Request.Uri,
+                                    _applicationContext,
+                                    UmbracoContext.Current,
+                                    _options
+                                );
+                            });
+
+                        if (_options.EnableMetrics && result.Errors == null)
                         {
-                            throw;
+                            result.EnrichWithApolloTracing(start);
+
+                            if (result.Extensions == null)
+                            {
+                                result.Extensions = new Dictionary<string, object>();
+                            }
+                            result.Extensions["miniProfiler"] = JObject.FromObject(MiniProfiler.Current, new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() });
                         }
+                        MiniProfiler.Stop();
+
+                        return result;
                     });
 
                     var responses = await Task.WhenAll(requests);
 
                     context.Response.ContentType = "application/json";
 
-                    var writer = new DocumentWriter();
                     if (false == request.IsBatched)
                     {
-                        var response = writer.Write(responses[0]);
+                        var response = _documentWriter.Write(responses[0]);
                         await context.Response.WriteAsync(response);
                     }
                     else
                     {
-                        var response = writer.Write(responses);
+                        var response = _documentWriter.Write(responses);
                         await context.Response.WriteAsync(response);
                     }
                 }

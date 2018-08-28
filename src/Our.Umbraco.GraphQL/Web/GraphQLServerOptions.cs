@@ -49,7 +49,7 @@ namespace Our.Umbraco.GraphQL.Web
         public bool Debug { get; set; }
         //public bool ExposeGraphiQL { get; set; } = true;
         //public bool EnableLogin { get; set; } = false;
-        //public bool EnableMetrics { get; set; } = false;
+        public bool EnableMetrics { get; set; } = false;
         //public bool ExposeSchema { get; set; } = true;
         public Func<IContentTypeBase, string> PublishedContentNameResolver { get; set; } = Conventions.NameResolvers.PascalCase;
     }

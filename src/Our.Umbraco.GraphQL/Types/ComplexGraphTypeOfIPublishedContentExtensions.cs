@@ -116,24 +116,11 @@ namespace Our.Umbraco.GraphQL.Types
         {
             var orderByArg = context.GetArgument<IEnumerable<object>>("orderBy")?.OfType<OrderBy>();
 
-            var executionContext = new ExecutionContext
-            {
-                Schema = context.Schema,
-                CancellationToken = context.CancellationToken,
-                Document = context.Document,
-                Errors = context.Errors,
-                Fragments = context.Fragments,
-                Metrics = context.Metrics,
-                Operation = context.Operation,
-                RootValue = context.RootValue,
-                UserContext = context.UserContext,
-                Variables = context.Variables
-            };
             if (context.Arguments.TryGetValue("filter", out object filterArg) && filterArg != null)
             {
                 var rootFilter = ((IDictionary<string, object>)filterArg).First();
-                var filterType = (IComplexGraphType)context.FieldDefinition.Arguments.Find(x => x.Name == "filter").ResolvedType;
-                var filter = ResolveFilter(filterType, rootFilter, context.ParentType, executionContext);
+                var filterType = (IComplexGraphType)context.FieldDefinition.Arguments.Find("filter").ResolvedType;
+                var filter = ResolveFilter(filterType, rootFilter, context);
 
                 source = source.Where(x => filter.IsSatisfiedBy(x));
             }
@@ -145,6 +132,7 @@ namespace Our.Umbraco.GraphQL.Types
 
                     object KeySelector(TSource item)
                     {
+                        var path = (context.Path ?? new[] { "order" }).Concat(new[] { fieldType.Name });
                         var value = fieldType.Resolver.Resolve(new ResolveFieldContext
                         {
                             FieldName = order.Field,
@@ -162,6 +150,7 @@ namespace Our.Umbraco.GraphQL.Types
                             CancellationToken = context.CancellationToken,
                             Metrics = context.Metrics,
                             Errors = context.Errors,
+                            Path = path
                         });
                         if (value is Task<object> task)
                         {
@@ -188,31 +177,33 @@ namespace Our.Umbraco.GraphQL.Types
             return source;
         }
 
-        internal static IFilter ResolveFilter(
+        internal static IFilter ResolveFilter<TParentType>(
             this IComplexGraphType filterType,
             KeyValuePair<string, object> value,
-            IObjectGraphType parentType,
-            ExecutionContext executionContext)
+            ResolveFieldContext<TParentType> context)
         {
+            var path = (context.Path ?? new[] { "filter" }).Concat(new[] { value.Key });
             var field = filterType.Fields.First(x => x.Name == value.Key);
+
             return (IFilter)field.Resolver.Resolve(
                 new ResolveFieldContext
                 {
                     FieldName = field.Name,
                     FieldAst = new Field(null, new NameNode(field.Name)),
                     FieldDefinition = field,
-                    ParentType = parentType,
+                    ParentType = context.ParentType,
                     Source = value.Value,
-                    Schema = executionContext.Schema,
-                    Document = executionContext.Document,
-                    Fragments = executionContext.Fragments,
-                    RootValue = executionContext.RootValue,
-                    UserContext = executionContext.UserContext,
-                    Operation = executionContext.Operation,
-                    Variables = executionContext.Variables,
-                    CancellationToken = executionContext.CancellationToken,
-                    Metrics = executionContext.Metrics,
-                    Errors = executionContext.Errors,
+                    Schema = context.Schema,
+                    Document = context.Document,
+                    Fragments = context.Fragments,
+                    RootValue = context.RootValue,
+                    UserContext = context.UserContext,
+                    Operation = context.Operation,
+                    Variables = context.Variables,
+                    CancellationToken = context.CancellationToken,
+                    Metrics = context.Metrics,
+                    Errors = context.Errors,
+                    Path = path,
                 }
             );
         }
@@ -488,6 +479,7 @@ namespace Our.Umbraco.GraphQL.Types
                 {
                     object ResolveValue(object source)
                     {
+                        var path = (context.Path ?? new [] { "filter" }).Concat(new[] { fieldType.Name });
                         var value = fieldType.Resolver.Resolve(
                             new ResolveFieldContext
                             {
@@ -506,6 +498,7 @@ namespace Our.Umbraco.GraphQL.Types
                                 CancellationToken = context.CancellationToken,
                                 Metrics = context.Metrics,
                                 Errors = context.Errors,
+                                Path = path
                             }
                         );
 
@@ -533,20 +526,6 @@ namespace Our.Umbraco.GraphQL.Types
                 description,
                 resolve: context =>
                 {
-                    var executionContext = new ExecutionContext
-                    {
-                        Schema = context.Schema,
-                        CancellationToken = context.CancellationToken,
-                        Document = context.Document,
-                        Errors = context.Errors,
-                        Fragments = context.Fragments,
-                        Metrics = context.Metrics,
-                        Operation = context.Operation,
-                        RootValue = context.RootValue,
-                        UserContext = context.UserContext,
-                        Variables = context.Variables
-                    };
-
                     var value = (IEnumerable<object>)context.Source;
                     var subFilters = new List<IFilter>();
                     foreach (var obj in value)
@@ -554,7 +533,7 @@ namespace Our.Umbraco.GraphQL.Types
                         var dict = (IDictionary<string, object>)obj;
                         foreach (KeyValuePair<string, object> pair in dict)
                         {
-                            subFilters.Add(this.ResolveFilter(pair, (IObjectGraphType)parentType, executionContext));
+                            subFilters.Add(this.ResolveFilter(pair, context));
                         }
                     }
                     return resolveFilter(subFilters);
