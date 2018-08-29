@@ -82,6 +82,8 @@ import {CustomGraphiQL} from './CustomGraphiQL.jsx';
             });
         }
         
+        var mountNode = document.getElementById('graphiql');
+        console.log("mounting to ", mountNode);
 ReactDOM.render(
   <CustomGraphiQL fetcher ={graphQLFetcher}
   query={parameters.query}
@@ -90,5 +92,5 @@ ReactDOM.render(
   onEditQuery={ onEditQuery}
   onEditVariables={onEditVariables}
   onEditOperationName={ onEditOperationName} />,
-  document.getElementById('graphiql')
+  mountNode
 );

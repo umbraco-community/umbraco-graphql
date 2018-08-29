@@ -79,31 +79,16 @@ export class CustomGraphiQL extends React.Component {
     const prettyText = print(parse(currentText));
     editor.setValue(prettyText);
   }
-
+  handleHistoryButton(event) {
+    this.graphiql.handleToggleHistory(event);
+  }
   render() {
     return (
       <GraphiQL ref={c => { this.graphiql = c; }} {...this.state}>
         <GraphiQL.Logo>
-          Custom Logo
+          Umbraco Graphql
         </GraphiQL.Logo>
-        <GraphiQL.Toolbar>
-          <GraphiQL.Button
-            onClick={this.handleClickPrettifyButton}
-            label="Prettify"
-            title="Prettify Query (Shift-Ctrl-P)"
-          />
-           <ToolbarButton
-            onClick={this.graphiql.handleToggleHistory}
-            title="Show History"
-            label="History"
-          />
-
-          <GraphiQL.Menu label="File" title="File">
-            <GraphiQL.MenuItem label="Save" title="Save"/>
-          </GraphiQL.Menu>
-
-
-        </GraphiQL.Toolbar>
+       
         <GraphiQL.Footer>
 		footer
         </GraphiQL.Footer>
