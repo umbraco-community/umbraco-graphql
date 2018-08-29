@@ -92,6 +92,11 @@ export class CustomGraphiQL extends React.Component {
             label="Prettify"
             title="Prettify Query (Shift-Ctrl-P)"
           />
+           <ToolbarButton
+            onClick={this.graphiql.handleToggleHistory}
+            title="Show History"
+            label="History"
+          />
 
           <GraphiQL.Menu label="File" title="File">
             <GraphiQL.MenuItem label="Save" title="Save"/>
