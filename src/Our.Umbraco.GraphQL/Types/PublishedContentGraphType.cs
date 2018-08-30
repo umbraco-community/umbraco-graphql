@@ -12,4 +12,14 @@ namespace Our.Umbraco.GraphQL.Types
             this.AddUmbracoBuiltInProperties();
         }
     }
+
+    public class BuildInContentDataGraphType : ObjectGraphType<IPublishedContent>
+    {
+        public BuildInContentDataGraphType()
+        {
+            Name = "ContentData";
+
+            this.AddContentDataProperties();
+        }
+    }
 }
