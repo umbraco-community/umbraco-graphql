@@ -17,7 +17,7 @@ namespace Our.Umbraco.GraphQL.Types
     {
         public PublishedContentDataGraphType()
         {
-            Name = "ContentData";
+            Name = "PublishedContentData";
 
             this.AddContentDataProperties();
         }
