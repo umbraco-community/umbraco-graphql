@@ -13,9 +13,9 @@ namespace Our.Umbraco.GraphQL.Types
         }
     }
 
-    public class BuildInContentDataGraphType : ObjectGraphType<IPublishedContent>
+    public class PublishedContentDataGraphType : ObjectGraphType<IPublishedContent>
     {
-        public BuildInContentDataGraphType()
+        public PublishedContentDataGraphType()
         {
             Name = "ContentData";
 
