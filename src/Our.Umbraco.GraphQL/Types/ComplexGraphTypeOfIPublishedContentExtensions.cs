@@ -112,6 +112,9 @@ namespace Our.Umbraco.GraphQL.Types
                             : resolver.Resolve(publishedPropertyType, publishedProperty.Value);
                     }
                 );
+
+                // TODO: Permissions for mutations
+                graphType.RequirePermission($"{publishedContentType.Alias}:{property.Alias.ToCamelCase()}:{property}can_read");
             }
             return graphType;
         }
