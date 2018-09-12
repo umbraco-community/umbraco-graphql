@@ -6,15 +6,14 @@
 *.bak
 *.orig
 *.zip
-
 .vs/
 .idea/
-
 /build/
 /packages/
 /artifacts/
 bower_components/
 node_modules/
-
 [Bb]in/
 [Oo]bj/
+CurrentSettings.vssettings
+Visual Studio 2017/*
