@@ -19,6 +19,14 @@ namespace Our.Umbraco.GraphQL.Types
     {
         public static ComplexGraphType<IPublishedContent> AddUmbracoBuiltInProperties(this ComplexGraphType<IPublishedContent> graphType)
         {
+            // TODO: set this field name as a reserved property alias
+            graphType.Field<PublishedContentDataGraphType>("_contentData", "Built in published content data.", resolve: context => context.Source);
+
+            return graphType;
+        }
+
+        public static ComplexGraphType<IPublishedContent> AddContentDataProperties(this ComplexGraphType<IPublishedContent> graphType)
+        {
             //TODO: black/whitelist properties
             graphType.Field<NonNullGraphType<DateGraphType>>("createDate", "Create date of the content.");
             graphType.Field<NonNullGraphType<StringGraphType>>("creatorName", "Name of the content creator.");
@@ -47,13 +55,13 @@ namespace Our.Umbraco.GraphQL.Types
                         ? context.Source.AncestorsOrSelf()
                         : context.Source.Ancestors()).Filter(context).ToConnection(context)
                 );
-            
+
             graphType.FilteredConnection<PublishedContentGraphType, IPublishedContent>()
                 .Name("siblings")
                 .Description("Siblings of the content.")
                 .Bidirectional()
                 .Resolve(context => context.Source.Siblings().Filter(context).ToConnection(context));
-            
+
             graphType.FilteredConnection<PublishedContentGraphType, IPublishedContent>()
                 .Name("children")
                 .Description("Children of the content.")
