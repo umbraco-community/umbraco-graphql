@@ -255,6 +255,8 @@
     <Compile Include="Schema\Conventions.cs" />
     <Compile Include="Types\ConnectionExtensions.cs" />
     <Compile Include="Types\ConnectionWithFilterBuilder.cs" />
+    <Compile Include="Types\PublishedContentAtRootQuery.cs" />
+    <Compile Include="Types\PublishedContentQuery.cs" />
     <Compile Include="Web\AppBuilderExtensions.cs" />
     <Compile Include="Web\GraphQLServerOptions.cs" />
     <Compile Include="Web\GraphQLMiddleware.cs" />

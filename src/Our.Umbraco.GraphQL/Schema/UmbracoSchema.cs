@@ -76,29 +76,7 @@ namespace Our.Umbraco.GraphQL.Schema
             RegisterTypes(mediaTypes.ToArray());
             // RegisterTypes(memberTypeService.GetAll().CreateGraphTypes(PublishedItemType.Member, resolveName).ToArray());
 
-            var query = new UmbracoQuery();
-
-
-
-            foreach (var type in documentTypes.FindAll(x => x.GetMetadata<bool>("allowedAtRoot")))
-            {
-                string documentTypeAlias = type.GetMetadata<string>("documentTypeAlias");
-
-                query.AddField(
-                    new FieldType
-                    {
-                        Name = type.GetMetadata<string>("documentTypeAlias"),
-                        ResolvedType = new ListGraphType(type),
-                        Resolver = new FuncFieldResolver<object>(context =>
-                        {
-                            var userContext = (UmbracoGraphQLContext)context.UserContext;
-                            return userContext.Umbraco.TypedContentAtXPath($"/root/{documentTypeAlias}");
-                        })
-                    }
-                );
-            }
-
-            Query = query;
+            Query = new UmbracoQuery(documentTypes);
         }
 
         public static IEnumerable<IGraphType> CreateGraphTypes(
