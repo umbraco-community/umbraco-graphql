@@ -1,13 +1,10 @@
-using Migrations.Models;
 using Our.Umbraco.GraphQL.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using System;
 
 namespace Our.Umbraco.GraphQL.Migrations
 {
@@ -52,10 +49,40 @@ namespace Our.Umbraco.GraphQL.Migrations
                 Create.Table<Account>();
             }
 
-            if (tables.InvariantContains(accountSettingsTableName))
+            if (!tables.InvariantContains(accountSettingsTableName))
             {
                 Logger.Info<CreateInitialTables>("Creating AccountSettings Table");
                 Create.Table<AccountSettings>();
             }
+
+            var account = new Account()
+            {
+                AccessToken = Guid.NewGuid(),
+                CreatedBy = 0,
+                CreatedOn = DateTime.Now,
+                UpdatedOn = DateTime.Now,
+                IsEnabled = true,
+                Name = "Pete Test",
+                Notes = "Just as test account setup in the create initial tables migration"
+            };
+
+            var db = ApplicationContext.Current.DatabaseContext.Database;
+
+            db.Insert(account);
+
+            var accountSetting = new AccountSettings()
+            {
+                AccountId = account.Id,
+                DocTypeAlias = "navigationBase",
+                PropertyTypeAlias = "seoMetaDescription",
+                Permission = Permissions.Read,
+                CreatedOn = DateTime.Now,
+                UpdatedOn = DateTime.Now,
+                Notes = ""
+            };
+
+            db.Insert(accountSetting);
+            
         }
+    }
 }

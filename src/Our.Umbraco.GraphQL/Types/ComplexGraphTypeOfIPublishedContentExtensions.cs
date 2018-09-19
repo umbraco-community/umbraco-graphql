@@ -114,7 +114,7 @@ namespace Our.Umbraco.GraphQL.Types
                 );
 
                 // TODO: Permissions for mutations
-                graphType.RequirePermission($"{publishedContentType.Alias}:{property.Alias.ToCamelCase()}:{property}can_read");
+               // PETE graphType.RequirePermission($"{publishedContentType.Alias}:{property.Alias.ToCamelCase()}:{property}can_read");
             }
             return graphType;
         }

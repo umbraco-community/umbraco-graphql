@@ -49,7 +49,6 @@ namespace Our.Umbraco.GraphQL.Models
         /// <summary>
         /// A notes field to keep track of the history of this account
         /// </summary>
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Notes { get; set; }
     }
 }

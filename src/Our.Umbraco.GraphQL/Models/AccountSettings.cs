@@ -26,8 +26,8 @@ namespace Our.Umbraco.GraphQL.Models
         /// <summary>
         /// The account that this setting belongs to
         /// </summary>
-        [ForeignKey(typeof(Account), Name = "FK_AccountSettings_Account")]
-        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_AccountId")]
+        [ForeignKey(typeof(Account), Name = "FK_AccountSettings_Account", Column = "id", Type = typeof(Account))]
+        [Index(IndexTypes.NonClustered, Name = "IX_AccountId")]
         public int AccountId { get; set; }
 
         /// <summary>
@@ -41,9 +41,31 @@ namespace Our.Umbraco.GraphQL.Models
         public string PropertyTypeAlias { get; set; }
 
         /// <summary>
-        /// What access rights does this account have for this field?
+        /// What access rights does this account have for this field? In the database we store this as an Int, use Permission to get the enum version of this in your code.
+        /// <seealso cref="Permission"/>
         /// </summary>
-        public Permissions Permission { get; set; }
+        [Column("permission")]
+        public int PermissionAsInt { get; set; }
+
+        /// <summary>
+        /// The actual permissions the account has for this setting
+        /// </summary>
+        [Ignore]
+        public Permissions Permission {
+            get {
+                var permission = Permissions.None;
+                if (Enum.IsDefined(typeof(Permissions), PermissionAsInt))
+                {
+                    permission = (Permissions)PermissionAsInt;
+                }
+
+                return permission;
+            }
+
+            set {
+                PermissionAsInt = (int) value;
+            }
+        }
 
         /// <summary>
         /// The unique "hash" for this setting, this will be used when we build up the "Claims" that this user has
@@ -59,7 +81,17 @@ namespace Our.Umbraco.GraphQL.Models
         /// <summary>
         /// Notes about this field for this acccount (ie "hiding this as its sensitive information")
         /// </summary>
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Notes { get; set; }
+
+        /// <summary>
+        /// Data and time this account setting was created
+        /// </summary>
+        public DateTime CreatedOn { get; set; }
+
+        /// <summary>
+        /// Date and time this account setting was last saved
+        /// </summary>
+        public DateTime UpdatedOn { get; set; }
+
     }
 }

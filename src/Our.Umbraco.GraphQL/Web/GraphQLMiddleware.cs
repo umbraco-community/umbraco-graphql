@@ -76,10 +76,12 @@ namespace Our.Umbraco.GraphQL.Web
                     {
                         string query = requestParams.Query;
                         string operationName = requestParams.OperationName;
+                        string accessToken = context.Request.Query["accessToken"];
                         Inputs variables = requestParams.Variables;
 
                         var start = DateTime.Now;
                         MiniProfiler.Start();
+                        var errors = new ExecutionErrors();
                         var result = await _documentExecutor
                             .ExecuteAsync(x =>
                             {
@@ -102,9 +104,24 @@ namespace Our.Umbraco.GraphQL.Web
                                     context.Request.Uri,
                                     _applicationContext,
                                     UmbracoContext.Current,
-                                    _options
+                                    _options,
+                                    accessToken,
+                                    out errors
                                 );
                             });
+
+                        // Save any of our errors reported by our authentication stuff in UserContext
+                        if (errors.Any())
+                        {
+                            if (result.Errors != null)
+                            {
+                                result.Errors.Concat(errors);
+                            }
+                            else
+                            {
+                                result.Errors = errors;
+                            }
+                        }
 
                         if (_options.EnableMetrics && result.Errors == null)
                         {
