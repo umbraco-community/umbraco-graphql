@@ -126,9 +126,12 @@ namespace Our.Umbraco.GraphQL.Schema
                     Description = contentType.Description,
                     Metadata =
                     {
-                        ["documentTypeAlias"] = contentType.Alias
+                        ["documentTypeAlias"] = contentType.Alias,
                     }
                 };
+
+                // TODO: Permissions for mutations
+                graphType.RequirePermission($"{contentType.Alias:can_read}");
 
                 graphType.AddUmbracoContentPropeties(contentType, publishedItemType);
 
@@ -147,9 +150,12 @@ namespace Our.Umbraco.GraphQL.Schema
                     {
                         ["documentTypeAlias"] = contentType.Alias,
                         ["allowedAtRoot"] = contentType.AllowedAsRoot,
-                        ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray()
+                        ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
                     }
                 };
+
+                // TODO: Permissions for mutations and maybe relocate where we generate the name to a single class
+                graphType.RequirePermission($"{contentType.Alias:can_read}");
 
                 graphType.Interface<PublishedContentGraphType>();
                 foreach (var composition in contentType.ContentTypeComposition)

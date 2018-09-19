@@ -251,6 +251,7 @@
     <Compile Include="Filters\NotFilter.cs" />
     <Compile Include="Filters\OrFilter.cs" />
     <Compile Include="Filters\StartsWithFilter.cs" />
+    <Compile Include="GraphQLAuthenticationExtensions.cs" />
     <Compile Include="Instrumentation\MiniProfilerFieldsMiddleware.cs" />
     <Compile Include="Schema\Conventions.cs" />
     <Compile Include="Types\ConnectionExtensions.cs" />
@@ -301,7 +302,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\graphiql.html" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\graphiql.js" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
 </Project>
