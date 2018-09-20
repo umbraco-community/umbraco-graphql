@@ -5,35 +5,38 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
 using System;
+using Umbraco.Core.Persistence;
 
 namespace Our.Umbraco.GraphQL.Migrations
 {
     [Migration("1.0.0", 1, "GraphQL")]
     public class CreateInitialTables : MigrationBase
     {
-        public string accountsTableName = "Accounts";
-        public string accountSettingsTableName = "AccountSettings";
+        public const string accountsTableName = "Accounts";
+        public const string accountSettingsTableName = "AccountSettings";
+
+        private readonly UmbracoDatabase _database = ApplicationContext.Current.DatabaseContext.Database;
+        private readonly DatabaseSchemaHelper _schemaHelper;
 
         public CreateInitialTables(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         {
+            _schemaHelper = new DatabaseSchemaHelper(_database, logger, sqlSyntax);
         }
 
         public override void Down()
         {
             Logger.Info<CreateInitialTables>("1.0.0: Running Migration Down");
-
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
-
-            if (tables.InvariantContains(accountsTableName))
+            
+            if (_schemaHelper.TableExist(accountsTableName))
             {
                 Logger.Info<CreateInitialTables>("Deleting Accounts Table");
-                Delete.Table(accountsTableName);
+                _schemaHelper.DropTable(accountsTableName);
             }
-            if (tables.InvariantContains(accountSettingsTableName))
+            if (_schemaHelper.TableExist(accountSettingsTableName))
             {
                 Logger.Info<CreateInitialTables>("Deleting AccountSettings Table");
-                Delete.Table(accountSettingsTableName);
+                _schemaHelper.DropTable(accountSettingsTableName);
             }
         }
 
@@ -41,18 +44,16 @@ namespace Our.Umbraco.GraphQL.Migrations
         {
             Logger.Info<CreateInitialTables>("1.0.0: Running Migration Up");
 
-            var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
-
-            if (!tables.InvariantContains(accountsTableName))
+            if (!_schemaHelper.TableExist(accountsTableName))
             {
                 Logger.Info<CreateInitialTables>("Creation Accounts Table");
-                Create.Table<Account>();
+                _schemaHelper.CreateTable<Account>();
             }
 
-            if (!tables.InvariantContains(accountSettingsTableName))
+            if (!_schemaHelper.TableExist(accountSettingsTableName))
             {
                 Logger.Info<CreateInitialTables>("Creating AccountSettings Table");
-                Create.Table<AccountSettings>();
+                _schemaHelper.CreateTable<AccountSettings>();
             }
 
             var account = new Account()
@@ -66,9 +67,7 @@ namespace Our.Umbraco.GraphQL.Migrations
                 Notes = "Just as test account setup in the create initial tables migration"
             };
 
-            var db = ApplicationContext.Current.DatabaseContext.Database;
-
-            db.Insert(account);
+            _database.Insert(account);
 
             var accountSetting = new AccountSettings()
             {
@@ -81,8 +80,7 @@ namespace Our.Umbraco.GraphQL.Migrations
                 Notes = ""
             };
 
-            db.Insert(accountSetting);
-            
+            _database.Insert(accountSetting);
         }
     }
 }
