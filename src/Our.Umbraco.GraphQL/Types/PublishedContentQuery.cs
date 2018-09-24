@@ -20,6 +20,11 @@ namespace Our.Umbraco.GraphQL.Types
                 });
 
             Field<NonNullGraphType<PublishedContentAtRootQuery>>()
+                .Name("byType")
+                .Resolve(context => context.ReturnType)
+                .Type(new NonNullGraphType(new PublishedContentByTypeQuery(documentGraphTypes)));
+
+            Field<NonNullGraphType<PublishedContentAtRootQuery>>()
                 .Name("atRoot")
                 .Resolve(context => context.ReturnType)
                 .Type(new NonNullGraphType(new PublishedContentAtRootQuery(documentGraphTypes)));
