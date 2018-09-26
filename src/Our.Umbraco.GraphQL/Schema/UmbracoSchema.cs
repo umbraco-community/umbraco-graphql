@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL;
 using GraphQL.Conversion;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -130,9 +131,6 @@ namespace Our.Umbraco.GraphQL.Schema
                     }
                 };
 
-                // TODO: Permissions for mutations
-                graphType.RequirePermission($"{contentType.Alias}:can_read");
-
                 graphType.AddUmbracoContentPropeties(contentType, publishedItemType);
 
                 yield return graphType;
@@ -153,9 +151,6 @@ namespace Our.Umbraco.GraphQL.Schema
                         ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
                     }
                 };
-
-                // TODO: Permissions for mutations and maybe relocate where we generate the name to a single class
-                graphType.RequirePermission($"{contentType.Alias}:can_read");
 
                 graphType.Interface<PublishedContentGraphType>();
                 foreach (var composition in contentType.ContentTypeComposition)

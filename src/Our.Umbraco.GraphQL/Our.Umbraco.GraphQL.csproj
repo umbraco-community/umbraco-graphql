@@ -261,6 +261,7 @@
     <Compile Include="Schema\Conventions.cs" />
     <Compile Include="Types\ConnectionExtensions.cs" />
     <Compile Include="Types\ConnectionWithFilterBuilder.cs" />
+    <Compile Include="ValidationRules\RequiresAuthValidationRule.cs" />
     <Compile Include="Web\AppBuilderExtensions.cs" />
     <Compile Include="Web\Claims.cs" />
     <Compile Include="Web\GraphQLServerOptions.cs" />
@@ -314,8 +315,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetDir)$(TargetFileName)" "$(SolutionDir)\..\demo-site\bin\$(TargetFileName)"
-
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

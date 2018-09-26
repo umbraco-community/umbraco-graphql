@@ -74,7 +74,7 @@ namespace Our.Umbraco.GraphQL.Models
         [Ignore]
         public string PermissionClaimHash {
             get {
-                return String.Format("{0}:{1}:{2}", DocTypeAlias, PropertyTypeAlias, Permission);
+                return $"{DocTypeAlias}:{PropertyTypeAlias}:{Permission}";
             }
         }
 

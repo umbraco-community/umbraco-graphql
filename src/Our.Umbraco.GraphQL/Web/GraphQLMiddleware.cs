@@ -7,12 +7,14 @@ using GraphQL.Conversion;
 using GraphQL.Http;
 using GraphQL.Instrumentation;
 using GraphQL.Utilities;
+using GraphQL.Validation;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Schema;
+using Our.Umbraco.GraphQL.ValidationRules;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -78,6 +80,7 @@ namespace Our.Umbraco.GraphQL.Web
                         string operationName = requestParams.OperationName;
                         string accessToken = context.Request.Query["accessToken"];
                         Inputs variables = requestParams.Variables;
+                        var validationRules = new List<IValidationRule> { new RequiresAuthValidationRule() };
 
                         var start = DateTime.Now;
                         MiniProfiler.Start();
@@ -108,6 +111,7 @@ namespace Our.Umbraco.GraphQL.Web
                                     accessToken,
                                     out errors
                                 );
+                                x.ValidationRules = validationRules;
                             });
 
                         // Save any of our errors reported by our authentication stuff in UserContext

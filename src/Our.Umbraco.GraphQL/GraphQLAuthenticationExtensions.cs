@@ -1,3 +1,4 @@
+using GraphQL;
 using GraphQL.Builders;
 using GraphQL.Types;
 using System;
@@ -36,11 +37,6 @@ namespace Our.Umbraco.GraphQL
             return permissions.Any(x => string.Equals(x, permission));
         }
 
-        /// <summary>
-        /// Will check if the field or type has the passed in permission set on it or not. If not then this field won't be accessible
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="permission"></param>
         public static void RequirePermission(this IProvideMetadata type, string permission)
         {
             var permissions = type.GetMetadata<List<string>>(PermissionsKey);
@@ -52,6 +48,19 @@ namespace Our.Umbraco.GraphQL
             }
 
             permissions.Add(permission);
+        }
+
+        public static void SetPermissions(this FieldType type, GraphType graphType, bool isBuiltInProperty = false)
+        {
+            // The graph type should have the doc type alias set in the meta data so we're accessing it from that
+            var doctypeAlias = graphType.GetMetadata<string>("documentTypeAlias");
+            var propertyAlias = type.Name;
+
+            // If its a built in Umbraco property, add an additional flag to the key so it doesn't clash with any custom properties we set
+            var readPermissionKey = isBuiltInProperty ?
+                $"{doctypeAlias}:builtInProperty:{propertyAlias}:Read" : $"{doctypeAlias}:{propertyAlias}:Read";
+
+            type.RequirePermission(readPermissionKey);
         }
 
         public static FieldBuilder<TSourceType, TReturnType> RequirePermission<TSourceType, TReturnType>(
