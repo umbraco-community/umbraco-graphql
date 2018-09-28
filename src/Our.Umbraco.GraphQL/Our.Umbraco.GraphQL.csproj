@@ -259,12 +259,13 @@
     <Compile Include="Migrations\CreateInitialTables.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\AccountSettings.cs" />
+    <Compile Include="Models\ApiModels\AccountPermissions.cs" />
+    <Compile Include="Models\ApiModels\SetAccountPermissionsRequest.cs" />
     <Compile Include="Schema\Conventions.cs" />
     <Compile Include="Types\ConnectionExtensions.cs" />
     <Compile Include="Types\ConnectionWithFilterBuilder.cs" />
     <Compile Include="ValidationRules\RequiresAuthValidationRule.cs" />
     <Compile Include="Web\AppBuilderExtensions.cs" />
-    <Compile Include="Web\Claims.cs" />
     <Compile Include="Web\GraphQLServerOptions.cs" />
     <Compile Include="Web\GraphQLMiddleware.cs" />
     <Compile Include="Web\GraphQLQuery.cs" />

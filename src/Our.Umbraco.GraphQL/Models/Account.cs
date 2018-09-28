@@ -10,7 +10,7 @@ namespace Our.Umbraco.GraphQL.Models
 {
     [TableName("GraphQL_Accounts")]
     [PrimaryKey("id", autoIncrement = true)]
-    class Account
+    public class Account
     {
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = true)]

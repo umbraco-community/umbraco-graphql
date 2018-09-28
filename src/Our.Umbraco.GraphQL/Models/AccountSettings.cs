@@ -17,7 +17,7 @@ namespace Our.Umbraco.GraphQL.Models
 
     [TableName("GraphQL_AccountSettings")]
     [PrimaryKey("id", autoIncrement = true)]
-    class AccountSettings
+    public class AccountSettings
     {
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = true)]
@@ -56,8 +56,10 @@ namespace Our.Umbraco.GraphQL.Models
         /// The actual permissions the account has for this setting
         /// </summary>
         [Ignore]
-        public Permissions Permission {
-            get {
+        public Permissions Permission
+        {
+            get
+            {
                 var permission = Permissions.None;
                 if (Enum.IsDefined(typeof(Permissions), PermissionAsInt))
                 {
@@ -67,8 +69,9 @@ namespace Our.Umbraco.GraphQL.Models
                 return permission;
             }
 
-            set {
-                PermissionAsInt = (int) value;
+            set
+            {
+                PermissionAsInt = (int)value;
             }
         }
 
@@ -77,9 +80,16 @@ namespace Our.Umbraco.GraphQL.Models
         /// by checking each field to see if there is a claim for it using this hash
         /// </summary>
         [Ignore]
-        public string PermissionClaimHash {
-            get {
-                return $"{DocTypeAlias}:{PropertyTypeAlias}:{Permission}";
+        public string PermissionClaimHash
+        {
+            get
+            {
+                // If its a built in Umbraco property eg Id, createDate, creatorName etc 
+                // then add "builtInProperty" to the key to ensure it doesn't clash with any custom property types  
+
+                return IsBuiltInProperty ?
+                    $"{DocTypeAlias}:builtInProperty:{PropertyTypeAlias}:{Permission}" :
+                    $"{DocTypeAlias}:{PropertyTypeAlias}:{Permission}";
             }
         }
 
@@ -97,6 +107,5 @@ namespace Our.Umbraco.GraphQL.Models
         /// Date and time this account setting was last saved
         /// </summary>
         public DateTime UpdatedOn { get; set; }
-
     }
 }
