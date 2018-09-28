@@ -27,7 +27,35 @@ namespace Our.Umbraco.GraphQL.Migrations
         public override void Down()
         {
             Logger.Info<CreateInitialTables>("1.0.0: Running Migration Down");
-            
+
+            DropTables();
+        }
+
+        public override void Up()
+        {
+            Logger.Info<CreateInitialTables>("1.0.0: Running Migration Up");
+
+            CreateTables();
+            InsertData();
+        }
+
+        private void CreateTables()
+        {
+            if (!_schemaHelper.TableExist(accountsTableName))
+            {
+                Logger.Info<CreateInitialTables>("Creation Accounts Table");
+                _schemaHelper.CreateTable<Account>();
+            }
+
+            if (!_schemaHelper.TableExist(accountSettingsTableName))
+            {
+                Logger.Info<CreateInitialTables>("Creating AccountSettings Table");
+                _schemaHelper.CreateTable<AccountSettings>();
+            }
+        }
+
+        private void DropTables()
+        {
             if (_schemaHelper.TableExist(accountsTableName))
             {
                 Logger.Info<CreateInitialTables>("Deleting Accounts Table");
@@ -40,31 +68,18 @@ namespace Our.Umbraco.GraphQL.Migrations
             }
         }
 
-        public override void Up()
+        private void InsertData()
         {
-            Logger.Info<CreateInitialTables>("1.0.0: Running Migration Up");
-
-            if (!_schemaHelper.TableExist(accountsTableName))
-            {
-                Logger.Info<CreateInitialTables>("Creation Accounts Table");
-                _schemaHelper.CreateTable<Account>();
-            }
-
-            if (!_schemaHelper.TableExist(accountSettingsTableName))
-            {
-                Logger.Info<CreateInitialTables>("Creating AccountSettings Table");
-                _schemaHelper.CreateTable<AccountSettings>();
-            }
-
             var account = new Account()
             {
-                AccessToken = Guid.NewGuid(),
+                //AccessToken = Guid.NewGuid(),
+                AccessToken = new Guid("6bd10bc4-1d31-478a-8abc-78560086286b"),
                 CreatedBy = 0,
                 CreatedOn = DateTime.Now,
                 UpdatedOn = DateTime.Now,
                 IsEnabled = true,
                 Name = "Pete Test",
-                Notes = "Just as test account setup in the create initial tables migration"
+                Notes = "Just as test account setup in the create initial tables migration",
             };
 
             _database.Insert(account);
@@ -72,8 +87,9 @@ namespace Our.Umbraco.GraphQL.Migrations
             var accountSetting = new AccountSettings()
             {
                 AccountId = account.Id,
-                DocTypeAlias = "navigationBase",
-                PropertyTypeAlias = "seoMetaDescription",
+                DocTypeAlias = "home",
+                PropertyTypeAlias = "sitename",
+                IsBuiltInProperty = false,
                 Permission = Permissions.Read,
                 CreatedOn = DateTime.Now,
                 UpdatedOn = DateTime.Now,

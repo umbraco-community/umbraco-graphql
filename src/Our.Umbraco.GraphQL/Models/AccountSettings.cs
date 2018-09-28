@@ -41,6 +41,11 @@ namespace Our.Umbraco.GraphQL.Models
         public string PropertyTypeAlias { get; set; }
 
         /// <summary>
+        /// Flags if the property is built in like "createDate" or if it is custom
+        /// </summary>
+        public bool IsBuiltInProperty { get; set; }
+
+        /// <summary>
         /// What access rights does this account have for this field? In the database we store this as an Int, use Permission to get the enum version of this in your code.
         /// <seealso cref="Permission"/>
         /// </summary>

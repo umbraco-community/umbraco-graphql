@@ -238,6 +238,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\GraphQLPermissionsController.cs" />
     <Compile Include="Events\BuildSchemaEventHandler.cs" />
     <Compile Include="Events\MigrationEventHandler.cs" />
     <Compile Include="Filters\AndFilter.cs" />
