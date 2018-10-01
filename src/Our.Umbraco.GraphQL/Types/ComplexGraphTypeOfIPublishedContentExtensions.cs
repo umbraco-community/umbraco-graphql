@@ -20,7 +20,7 @@ namespace Our.Umbraco.GraphQL.Types
         public static ComplexGraphType<IPublishedContent> AddUmbracoBuiltInProperties(this ComplexGraphType<IPublishedContent> graphType)
         {
             // TODO: set this field name as a reserved property alias
-            graphType.Field<PublishedContentDataGraphType>("_contentData", "Built in published content data.", resolve: context => context.Source);
+            graphType.Field<PublishedContentDataGraphType>("_contentData", "Built in published content data.", resolve: context => context.Source).SetDoctypeMetadata(graphType.GetMetadata<string>("documentTypeAlias"));
 
             return graphType;
         }
