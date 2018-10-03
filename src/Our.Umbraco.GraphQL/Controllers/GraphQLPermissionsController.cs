@@ -48,6 +48,10 @@ namespace Our.Umbraco.GraphQL.Controllers
                 entries.Add(accountSettingEntry);
             }
 
+            // Clear existing settings
+            var sql = new Sql("DELETE FROM GraphQL_AccountSettings WHERE AccountId=@0", accountPermissions.AccountId);
+            _database.Execute(sql);
+
             // Insert in bulk so it's handled within a single query
             _database.BulkInsertRecords(entries, ApplicationContext.Current.DatabaseContext.SqlSyntax);
         }
@@ -62,7 +66,7 @@ namespace Our.Umbraco.GraphQL.Controllers
         [HttpGet]
         public string GetPermissions(int accountId)
         {
-            var sql = new Sql("SELECT * FROM GraphQL_AccountSettings WHERE Id=@0", accountId);
+            var sql = new Sql("SELECT * FROM GraphQL_AccountSettings WHERE AccountId=@0", accountId);
             var settings = _database.Query<AccountSettings>(sql);
 
             if (settings != null)
