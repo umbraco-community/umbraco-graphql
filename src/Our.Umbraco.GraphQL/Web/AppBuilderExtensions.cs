@@ -36,18 +36,16 @@ namespace Our.Umbraco.GraphQL.Web
 
             //TODO: Make GraphiQL endpoint configurable
             var graphiQLPath = $"/{GlobalSettings.UmbracoMvcArea}/graphiql";
-            var graphiQLJSPath = $"/{GlobalSettings.UmbracoMvcArea}/graphiqljs";
             var graphQLPath = $"/{GlobalSettings.UmbracoMvcArea}/graphql";
 
-            
+
             return app.Map(graphiQLPath, subApp =>
             {
-                
                 string html;
 
                 using (var stream = typeof(AppBuilderExtensions).Assembly.GetManifestResourceStream("Our.Umbraco.GraphQL.Resources.graphiql.html"))
                 {
-                    using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
+                    using (var reader = new StreamReader(stream))
                     {
                         html = reader.ReadToEnd().Replace("${endpointURL}", graphQLPath);
                     }
@@ -56,23 +54,6 @@ namespace Our.Umbraco.GraphQL.Web
                 {
                     ctx.Response.ContentType = "text/html";
                     await ctx.Response.WriteAsync(html);
-                });
-            }).Map(graphiQLJSPath, subApp =>
-            {
-                string js;
-
-                using (var stream = typeof(AppBuilderExtensions).Assembly.GetManifestResourceStream("Our.Umbraco.GraphQL.Resources.graphiql.js"))
-                {
-                    using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8))
-                    {
-                        js = reader.ReadToEnd();
-                    }
-                }
-                subApp.Run(async ctx =>
-                {
-                    
-                    ctx.Response.ContentType = "application/javascript";
-                    await ctx.Response.WriteAsync(js);
                 });
             })
             .Map(graphQLPath, subApp =>
