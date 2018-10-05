@@ -19,6 +19,31 @@ namespace Our.Umbraco.GraphQL.Types
                     return userContext.Umbraco.TypedContent(id);
                 });
 
+            Field<PublishedContentGraphType>()
+                .Name("byUrl")
+                .Argument<NonNullGraphType<StringGraphType>>("url", "The relative content url")
+                .Resolve(context =>
+                {
+                    var userContext = context.UmbracoUserContext();
+                    var url = context.GetArgument<string>("url");
+                    
+                    var pcr = new PublishedContentRequest(
+                        new Uri(userContext.RequestUri, url),
+                        userContext.UmbracoContext.RoutingContext,
+                        UmbracoConfig.For.UmbracoSettings().WebRouting,
+                        null
+                    );
+
+                    pcr.Prepare();
+
+                    if (pcr.IsRedirect || pcr.IsRedirectPermanent || pcr.Is404)
+                    {
+                        return null;
+                    }
+                    
+                    return pcr.PublishedContent;
+                });
+
             Field<NonNullGraphType<PublishedContentAtRootQuery>>()
                 .Name("byType")
                 .Resolve(context => context.ReturnType)
