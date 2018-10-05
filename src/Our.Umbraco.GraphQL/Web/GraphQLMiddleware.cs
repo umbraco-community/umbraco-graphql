@@ -7,12 +7,14 @@ using GraphQL.Conversion;
 using GraphQL.Http;
 using GraphQL.Instrumentation;
 using GraphQL.Utilities;
+using GraphQL.Validation;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Schema;
+using Our.Umbraco.GraphQL.ValidationRules;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -76,10 +78,13 @@ namespace Our.Umbraco.GraphQL.Web
                     {
                         string query = requestParams.Query;
                         string operationName = requestParams.OperationName;
+                        string accessToken = context.Request.Query["accessToken"];
                         Inputs variables = requestParams.Variables;
+                        var validationRules = new List<IValidationRule> { new RequiresAuthValidationRule() };
 
                         var start = DateTime.Now;
                         MiniProfiler.Start();
+                        var errors = new ExecutionErrors();
                         var result = await _documentExecutor
                             .ExecuteAsync(x =>
                             {
@@ -102,9 +107,25 @@ namespace Our.Umbraco.GraphQL.Web
                                     context.Request.Uri,
                                     _applicationContext,
                                     UmbracoContext.Current,
-                                    _options
+                                    _options,
+                                    accessToken,
+                                    out errors
                                 );
+                                x.ValidationRules = validationRules;
                             });
+
+                        // Save any of our errors reported by our authentication stuff in UserContext
+                        if (errors.Any())
+                        {
+                            if (result.Errors != null)
+                            {
+                                result.Errors.Concat(errors);
+                            }
+                            else
+                            {
+                                result.Errors = errors;
+                            }
+                        }
 
                         if (_options.EnableMetrics && result.Errors == null)
                         {

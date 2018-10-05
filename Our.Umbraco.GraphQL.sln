@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Website", "samples\Website\Website.csproj", "{C2001952-0774-4BFA-AF30-043B3B16D275}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BE019E17-BF39-443C-8D62-74940D3B6560}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Website\Web.config.template = samples\Website\Web.config.template
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL", "src\Our.Umbraco.GraphQL\Our.Umbraco.GraphQL.csproj", "{59294783-3A17-479B-90C5-A3A2967176DE}"
 EndProject
