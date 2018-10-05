@@ -38,7 +38,7 @@ namespace Our.Umbraco.GraphQL.ValidationRules
                         }
                     }
 
-                    if (fieldDef.RequiresPermissions() && (!fieldDef.CanAccess(currentDoctype, userContext.Claims)))
+                    if (fieldDef.RequiresPermissions() && (!fieldDef.HasPermission(currentDoctype, userContext.Claims)))
                     {
                         context.ReportError(new ValidationError(
                             context.OriginalQuery,

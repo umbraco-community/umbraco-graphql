@@ -25,7 +25,7 @@ namespace Our.Umbraco.GraphQL
             return permissions.Any();
         }
 
-        public static bool CanAccess(this IProvideMetadata type, string docTypeAlias, IEnumerable<string> claims)
+        public static bool HasPermission(this IProvideMetadata type, string docTypeAlias, IEnumerable<string> claims)
         {
             var permissionsData = type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>());
             var permissions = new List<string>();
@@ -47,16 +47,10 @@ namespace Our.Umbraco.GraphQL
             return permissions.All(x => claims?.Contains(x) ?? false);
         }
 
-        public static bool CanAccess(this IProvideMetadata type, IEnumerable<string> claims)
+        public static bool HasPermission(this IProvideMetadata type, IEnumerable<string> claims)
         {
             var permissions = type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>());
             return permissions.All(x => claims?.Contains(x) ?? false);
-        }
-
-        public static bool HasPermission(this IProvideMetadata type, string permission)
-        {
-            var permissions = type.GetMetadata<IEnumerable<string>>(PermissionsKey, new List<string>());
-            return permissions.Any(x => string.Equals(x, permission));
         }
 
         public static void RequirePermission(this IProvideMetadata type, string permission)
