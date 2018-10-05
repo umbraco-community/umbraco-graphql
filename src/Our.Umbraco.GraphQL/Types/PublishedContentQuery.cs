@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using GraphQL.Types;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.Routing;
 
 namespace Our.Umbraco.GraphQL.Types
 {
@@ -24,7 +27,7 @@ namespace Our.Umbraco.GraphQL.Types
                 .Argument<NonNullGraphType<StringGraphType>>("url", "The relative content url")
                 .Resolve(context =>
                 {
-                    var userContext = context.UmbracoUserContext();
+                    var userContext = (UmbracoGraphQLContext)context.UserContext;
                     var url = context.GetArgument<string>("url");
                     
                     var pcr = new PublishedContentRequest(
