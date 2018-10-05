@@ -44,7 +44,7 @@ namespace Our.Umbraco.GraphQL
             if (account == null)
             {
                 // Fall back to the default permissions
-                errors.Add(new ExecutionError("Unknown Access Token, please check, falling back to Default permissions"));
+                //errors.Add(new ExecutionError("Unknown Access Token, please check, falling back to Default permissions"));
                 account = db.SingleOrDefault<Account>("WHERE AccessToken =  @0", defaultAccessToken);
             }
 
