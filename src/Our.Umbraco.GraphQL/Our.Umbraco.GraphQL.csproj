@@ -15,9 +15,22 @@
         <TargetFramework>net452</TargetFramework>
         <AssemblyName>Our.Umbraco.GraphQL</AssemblyName>
         <RootNamespace>Our.Umbraco.GraphQL</RootNamespace>
+        <UIRoot>Web\UI\</UIRoot>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="$(FrontendRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**" Pack="false" />
+    </ItemGroup>
+
+    <Target Name="RunUIBuild" BeforeTargets="Compile" Condition=" '$(Configuration)' == 'Release' ">
+        <Exec WorkingDirectory="$(UIRoot)" Command="npm install" />
+        <Exec WorkingDirectory="$(UIRoot)" Command="npm run build" />
+    </Target>
+
+    <ItemGroup>
+        <None Include="tools\**" Pack="True" PackagePath="tools\" />
+        <None Include="$(UIRoot)dist\**" Pack="True" PackagePath="content\" />
         <None Include="content\**" Pack="True" PackagePath="content\" />
     </ItemGroup>
 

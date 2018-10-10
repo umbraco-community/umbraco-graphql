@@ -21,6 +21,10 @@
     "type": "git",
     "url": "https://github.com/rasmusjp/umbraco-graphql"
   },
+  "scripts": {
+    "clean": "grunt clean",
+    "build": "npm run clean && grunt"
+  },
   "devDependencies": {
     "grunt-msbuild": "^0.4.4",
     "grunt-string-replace": "^1.3.1",
