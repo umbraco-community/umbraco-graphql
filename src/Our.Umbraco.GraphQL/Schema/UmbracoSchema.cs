@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL;
 using GraphQL.Conversion;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -104,7 +105,7 @@ namespace Our.Umbraco.GraphQL.Schema
                     Description = contentType.Description,
                     Metadata =
                     {
-                        ["documentTypeAlias"] = contentType.Alias
+                        ["documentTypeAlias"] = contentType.Alias,
                     }
                 };
 
@@ -125,7 +126,7 @@ namespace Our.Umbraco.GraphQL.Schema
                     {
                         ["documentTypeAlias"] = contentType.Alias,
                         ["allowedAtRoot"] = contentType.AllowedAsRoot,
-                        ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray()
+                        ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
                     }
                 };
 
