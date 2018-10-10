@@ -1,0 +1,9 @@
+{
+    "javascript" : [
+        "/app_plugins/GraphQLForUmbraco/js/graphql.for.umbraco.js"
+    ],
+    "css" : [
+        "/app_plugins/GraphQLForUmbraco/css/graphql.for.umbraco.css"
+    ]
+
+}

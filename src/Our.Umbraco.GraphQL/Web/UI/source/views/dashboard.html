@@ -1,0 +1,83 @@
+<div id="graphQLForUmbracoDashboard" ng-controller="graphql.for.umbraco.dashboardcontroller">
+    <h3>GraphQL For Umbraco</h3>
+    <p>Cupcake ipsum dolor sit amet. Carrot cake jelly-o sugar plum carrot cake. Jelly-o dessert gummies dessert candy canes. Tootsie roll sweet roll halvah liquorice. Candy canes croissant icing jujubes pie cake muffin. Jelly beans dessert danish gingerbread liquorice lollipop bear claw jelly beans. Marshmallow tootsie roll wafer chocolate cake. Sugar plum brownie brownie halvah sesame snaps candy fruitcake cake. Topping pie tootsie roll jelly-o cake gummies apple pie. Gingerbread lemon drops wafer ice cream tart toffee apple pie. Sugar plum toffee pie cheesecake jelly. Pudding candy canes candy muffin cheesecake. Cupcake gingerbread marzipan jelly beans cupcake. Topping oat cake jujubes donut</p>
+    <div class="gql4u--box box-gray">
+        <h4 class="gql4u--warning">Be Cautious!</h4>
+        <p>This package currently is intended for development-level testing right now. Any doctypes and member properties that you expose to GraphQL are accessible via the GraphQL endpoint by <i>anyone</i>, as permissions and other security features aren't yet present. Don't use this on any data you need to keep protected.</p>
+    </div>
+    <div ng-if="!isDocTypeSelected()">
+        <h4>Select DocType</h4>
+        <p>Select a docType to choose which properties within it will be visible to GraphQL. If a docType has no visible properties, the docType itself will also not be visible to GraphQL.</p>
+        <!-- Table of DocTypes -->
+        <div class="gql4u-table">
+            <!-- Head -->
+            <div class="head row">
+                <div class="cell span2">Name</div>
+                <div class="cell span1">ID</div>
+                <div class="cell span2">Alias</div>
+                <div class="cell span7">Visible Properties</div>
+            </div>
+            <!-- Body -->
+            <div class="body">
+                <div class="row" ng-repeat="type in docTypes">
+                    <div class="cell span2"><a 
+                        class="gql4u-link" 
+                        href="#{{type.id}}"
+                        ng-click="onDocTypeClick($event)"
+                        data-id={{type.id}}
+                        data-alias={{type.alias}}
+                        data-name={{type.name}}
+                    >{{type.name}}</a></div>
+                    <div class="cell span1">{{type.id}}</div>
+                    <div class="cell span2"><i>{{type.alias}}</i></div>
+                    <div class="cell span7"><i>{{listVisibleProperties(type.alias)}}</i></div>
+                </div>
+            </div>
+        </div>
+        <!-- End Table -->
+    </div>
+    <div ng-if="isDocTypeSelected()">
+        <h4>Select Visible Properties For <i>{{selectedDocTypeName}}</i></h4>
+        <p><a class="gql4u-link" ng-click="onChangeDocTypeClick($event)" href="#change-doc-type">Change DocType</a></p>
+        <p>Select which properties you would like to have visible to GraphQL within the selected docType.</p>
+        <div ng-repeat="group in groups">
+            <h5>{{group.name}}</h5>
+            <!-- Table of Properties -->
+            <div class="gql4u-table">
+                <div class="head row">
+                    <div class="cell span1 text-center">Visible</div>
+                    <div class="cell span2">Name</div>
+                    <div class="cell span2">Alias</div>
+                    <div class="cell span7"></div>
+                </div>
+                <div class="body">
+                    <div class="row" ng-repeat="property in group.properties">
+                        <div class="cell span1 text-center">
+                            <input 
+                                type="checkbox" 
+                                ng-checked="isPropertyVisible(selectedDocTypeAlias, property.alias)"
+                                ng-click="onPropertyVisibilityChange($event)"
+                                data-alias={{property.alias}}
+                            />
+                        </div>
+                        <div class="cell span2">{{property.name}}</div>
+                        <div class="cell span2"><em>{{property.alias}}</em></div>
+                        <div class="cell span7"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Table -->
+        </div>
+        <br/>
+        <div class="row">
+            <div class="span10">
+                <button 
+                    class="btn umb-button__button btn-success umb-button--" 
+                    type="button"
+                    ng-click="onSaveClick($event)"
+                >Save</button>
+            </div>
+        </div>
+        <br/><br/>
+    </div>
+</div>

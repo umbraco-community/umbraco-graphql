@@ -1,0 +1,1 @@
+For more info or to log issues visit https://github.com/rasmusjp/umbraco-graphql.
