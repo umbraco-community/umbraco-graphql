@@ -1,0 +1,45 @@
+.gql4u--warning {
+    color: red;
+}
+
+.gql4u--box {
+    border: solid 1px #d8d7d9;
+    padding: 15px 20px;
+    margin: 10px 0;
+    &.box-gray {
+        background: #f3f3f5;
+        color: #303033;
+    }
+}
+
+
+.gql4u-link {
+    color: #35c786;
+}
+
+.gql4u-table {
+    border: solid 2px black;
+    .row {
+        display: flex;
+        align-items: stretch;
+    }
+    .head { 
+        background: #ddd;
+        .cell {
+            //text-shadow: 0.5px 0 0 black;
+        }
+    }
+    .body {
+        .row {
+            border-top: solid 1px black;
+        }
+    }
+    .cell {
+        padding: 4px;
+        border-left: solid 1px black;
+        &:first-child,
+        &.no-border {
+            border-left: none;
+        }
+    }
+}
