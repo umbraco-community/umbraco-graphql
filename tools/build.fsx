@@ -27,16 +27,25 @@ Target.create "Clean" (fun _ ->
 )
 
 Target.create "Build" (fun _ ->
+  let setMSBuildParams (defaults:MSBuild.CliArguments) =
+        { defaults with
+            Properties =
+                [
+                    "Version_Suffix", if buildVersion.IsSome then buildVersion.Value else ""
+                ]
+         }
+
   DotNet.build (fun c ->
     { c with
         Configuration = DotNet.BuildConfiguration.Release
-        OutputPath = Some artifactsDir
+        MSBuildParams = setMSBuildParams c.MSBuildParams
     }) solutionFile
 )
 
 Target.create "Package" (fun _ ->
   DotNet.pack (fun c ->
     { c with
+        NoBuild = true
         Configuration = DotNet.BuildConfiguration.Release
         OutputPath = Some artifactsDir
         VersionSuffix = buildVersion
@@ -52,6 +61,7 @@ open Fake.Core.TargetOperators
   ==> "Default"
 
 "Clean"
+  ==> "Build"
   ==> "Package"
 
 // start build
