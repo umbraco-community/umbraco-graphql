@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dashBoard>
+    <section alias="GraphQLForUmbraco">
+        <areas>
+            <area>developer</area>
+        </areas>
+        <tab caption="GraphQL">
+            <control>
+                /App_Plugins/GraphQLForUmbraco/views/dashboard.html
+            </control>
+        </tab>
+    </section>
+</dashBoard>
