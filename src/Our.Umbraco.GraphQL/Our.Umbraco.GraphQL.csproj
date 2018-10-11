@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <title>Umbraco GraphQL</title>
-        <authors>rasmusjp</authors>
-        <description>GraphQL for Umbraco</description>
+        <authors>Rasmus John Pedersen, Offroadcode</authors>
+        <owners>rasmusjp, Offroadcode</owners>
+        <description>A GraphQL server for Umbraco</description>
         <packageLicenseUrl>https://github.com/rasmusjp/umbraco-graphql/raw/master/LICENSE</packageLicenseUrl>
         <packageProjectUrl>https://github.com/rasmusjp/umbraco-graphql</packageProjectUrl>
         <packageTags>umbraco umbracocms graphql</packageTags>
