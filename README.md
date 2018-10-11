@@ -1,4 +1,5 @@
 # GraphQL for Umbraco
+[![NuGet release](https://img.shields.io/nuget/v/Our.Umbraco.GraphQL.svg)](https://www.nuget.org/packages/Our.Umbraco.GraphQL)
 
 ## What is this
 An experimental implementation of [GraphQL](https://graphql.org) for Umbraco using [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet).
@@ -12,12 +13,22 @@ An Owin middleware exposes Umbraco Published Content as a GraphQL endpoint.
 
 GraphQL types are dynamically generated for all Umbraco document types (content and media), with all the properties as fields. They all implement an interface `PublishedContent` which implements the generic Umbraco properties as fields.
 
+## Installation
 
+The preferred way to install GraphQL for Umbraco is through NuGet
 
-## Getting started
+### Option 1: NuGet
+
+GraphQL for Umbraco is available as a NuGet [package](https://www.nuget.org/packages/Our.Umbraco.GraphQL).
+
+To install run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
+
+```powershell
+PM> Install-Package Our.Umbraco.GraphQL
+```
+
+### Option 2: From source
 Clone the repository and run the Website (F5 in Visual Studio), install Umbraco with the starter kit and start exploring the API using GraphiQL by opening `/umbraco/graphiql`.
-
-There's also a [download](https://drive.google.com/file/d/1L67kZV7u6tXy45zknLih421Rlbrx3fh3/view) which contains a prebuilt website with some sample data based on the starter kit. Login `admin@example.org`/`1234567890`. It's based on the Umbraco starter kit, where `People`, `Products` and `Blog` has been moved to the root of the tree.
 
 ### Urls
 | Url | Description |
