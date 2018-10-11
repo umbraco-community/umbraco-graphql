@@ -20,6 +20,7 @@
 
     <ItemGroup>
         <None Include="content\**" Pack="True" PackagePath="content\" />
+        <None Include="readme.txt" Pack="True" PackagePath="" />
     </ItemGroup>
 
     <ItemGroup>
