@@ -1,4 +1,4 @@
-# Umbraco GraphQL
+# GraphQL for Umbraco
 
 ## What is this
 An experimental implementation of [GraphQL](https://graphql.org) for Umbraco using [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet).
@@ -12,9 +12,7 @@ An Owin middleware exposes Umbraco Published Content as a GraphQL endpoint.
 
 GraphQL types are dynamically generated for all Umbraco document types (content and media), with all the properties as fields. They all implement an interface `PublishedContent` which implements the generic Umbraco properties as fields.
 
-If a document type is alloweded at root, a field on the query is generated with the same name as the document type alias.
 
-There are also two generic fields `content(id: ID!)` and `contentAtRoot` which can be used to query by `id` or getting all root content.
 
 ## Getting started
 Clone the repository and run the Website (F5 in Visual Studio), install Umbraco with the starter kit and start exploring the API using GraphiQL by opening `/umbraco/graphiql`.
@@ -29,87 +27,123 @@ There's also a [download](https://drive.google.com/file/d/1L67kZV7u6tXy45zknLih4
 | /umbraco/graphql/schema | The generated schema |
 
 ### Querying
-Query examples based on the download above
-
+Query examples based on The Starter Kit
 ```graphql
 {
-  people {
-    pageTitle
-    children {
-      items {
-        ... on Person {
-          name
-          department
-          photo {
-            url
+  content {
+    byType {
+      People(id: "1116") {
+        pageTitle
+        _contentData {
+          children {
+            items {
+              ... on Person {
+                _contentData {
+                  name
+                }
+                department
+                photo {
+                  _contentData {
+                    url
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   }
 }
+
 ```
 
 We can also do some simple filtering and sorting, ([Inspired by the Grahpcool filtering](https://www.graph.cool/docs/reference/graphql-api/query-api-nia9nushae#query-arguments)) like geting all children of people that starts with the letter `J`
 ```graphql
 {
-  people {
-    pageTitle
-    peopleStartsWithJ:children(filter: { name_starts_with:"J"}, orderBy: name_ASC) {
-      items {
-        ... on Person {
-          name
-          department
-          photo {
-            url
+  content {
+    byType {
+      People(id: "1116") {
+        pageTitle
+        _contentData {
+          peopleStartsWithJ: children(filter: {name_starts_with: "J"}, orderBy: name_ASC) {
+            items {
+              ... on Person {
+                _contentData {
+                  name
+                }
+                department
+                photo {
+                  _contentData {
+                    url
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   }
 }
+
 ```
 
-And even query for multiple roots at the same time
+And even query for multiple types at the same time
 ```graphql
 {
-  people {
-    pageTitle
-    peopleStartsWithJ: children(filter: {name_starts_with: "J"}, orderBy: name_ASC) {
-      items {
-        ...SimplePerson
+  content {
+    byType {
+      People(id: "1116") {
+        pageTitle
+        _contentData {
+          peopleStartsWithJ: children(filter: {name_starts_with: "J"}, orderBy: name_ASC) {
+            items {
+              ...SimplePerson
+            }
+          }
+        }
       }
-    }
-  }
-  products {
-    pageTitle
-    defaultCurrency
-    featuredProducts {
-      ...SimpleProduct
-    }
-    children {
-      items {
-        ...SimpleProduct
+      Products(id: "1107") {
+        pageTitle
+        defaultCurrency
+        featuredProducts {
+          ...SimpleProduct
+        }
+        _contentData {
+          children {
+            items {
+              ...SimpleProduct
+            }
+          }
+        }
       }
     }
   }
 }
 
 fragment SimplePerson on Person {
-  name
+  _contentData {
+    name
+  }
   department
   photo {
-    url
+    _contentData {
+      url
+    }
   }
 }
 
 fragment SimpleProduct on Product {
-  name
+  _contentData {
+    name
+  }
   price
   sku
   photos {
-    url
+    _contentData {
+      url
+    }
   }
 }
-
 ```

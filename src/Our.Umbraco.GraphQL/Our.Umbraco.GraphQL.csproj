@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <title>Umbraco GraphQL</title>
+        <title>GraphQL for Umbraco</title>
         <authors>Rasmus John Pedersen, Offroadcode</authors>
         <owners>rasmusjp, Offroadcode</owners>
         <description>A GraphQL server for Umbraco</description>
