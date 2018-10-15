@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <title>Umbraco GraphQL</title>
-        <authors>rasmusjp</authors>
-        <description>GraphQL for Umbraco</description>
+        <title>GraphQL for Umbraco</title>
+        <authors>Rasmus John Pedersen, Offroadcode</authors>
+        <owners>rasmusjp, Offroadcode</owners>
+        <description>A GraphQL server for Umbraco</description>
         <packageLicenseUrl>https://github.com/rasmusjp/umbraco-graphql/raw/master/LICENSE</packageLicenseUrl>
         <packageProjectUrl>https://github.com/rasmusjp/umbraco-graphql</packageProjectUrl>
         <packageTags>umbraco umbracocms graphql</packageTags>
@@ -32,6 +33,7 @@
         <None Include="tools\**" Pack="True" PackagePath="tools\" />
         <None Include="$(UIRoot)dist\**" Pack="True" PackagePath="content\" />
         <None Include="content\**" Pack="True" PackagePath="content\" />
+        <None Include="readme.txt" Pack="True" PackagePath="" />
     </ItemGroup>
 
     <ItemGroup>
