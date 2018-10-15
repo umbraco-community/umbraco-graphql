@@ -50,7 +50,7 @@ angular.module("umbraco.resources").factory("graphQLForUmbracoApiResource", func
                     return {
                         doctypeAlias: item.DoctypeAlias,
                         propertyAlias: item.PropertyAlias,
-                        isBuiltInProperty: item.IsBuildInProperty,
+                        isBuiltInProperty: item.IsBuiltInProperty,
                         notes: item.Notes,
                         permission: item.Permission
                     };

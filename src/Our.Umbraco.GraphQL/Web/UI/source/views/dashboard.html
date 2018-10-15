@@ -40,6 +40,33 @@
         <h4>Select Visible Properties For <i>{{selectedDocTypeName}}</i></h4>
         <p><a class="gql4u-link" ng-click="onChangeDocTypeClick($event)" href="#change-doc-type">Change DocType</a></p>
         <p>Select which properties you would like to have visible to GraphQL within the selected docType.</p>
+        <div>
+            <h5>Built In Properties</h5>
+            <!-- Table of Properties -->
+            <div class="gql4u-table">
+                <div class="head row">
+                    <div class="cell span1 text-center">Visible</div>
+                    <div class="cell span2">Name</div>
+                    <div class="cell span2">Alias</div>
+                    <div class="cell span7"></div>
+                </div>
+                <div class="body">
+                    <div class="row" ng-repeat="property in builtInProperties">
+                        <div class="cell span1 text-center">
+                            <input type="checkbox"
+                                   ng-checked="isPropertyVisible(selectedDocTypeAlias, property.alias, true)"
+                                   ng-click="onPropertyVisibilityChange($event)"
+                                   data-alias={{property.alias}}
+                                   data-isBuiltInProperty="true" />
+                        </div>
+                        <div class="cell span2">{{property.name}}</div>
+                        <div class="cell span2"><em>{{property.alias}}</em></div>
+                        <div class="cell span7"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Table -->
+        </div>
         <div ng-repeat="group in groups">
             <h5>{{group.name}}</h5>
             <!-- Table of Properties -->
@@ -55,9 +82,10 @@
                         <div class="cell span1 text-center">
                             <input 
                                 type="checkbox" 
-                                ng-checked="isPropertyVisible(selectedDocTypeAlias, property.alias)"
+                                ng-checked="isPropertyVisible(selectedDocTypeAlias, property.alias, false)"
                                 ng-click="onPropertyVisibilityChange($event)"
                                 data-alias={{property.alias}}
+                                data-isBuiltInProperty="false"
                             />
                         </div>
                         <div class="cell span2">{{property.name}}</div>

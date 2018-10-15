@@ -26,6 +26,14 @@ angular.module("umbraco").controller("graphql.for.umbraco.dashboardcontroller", 
         $scope.selectedDocType = false;
         $scope.selectedDocTypeAlias = '';
         $scope.selectedDocTypeName = '';
+
+        // TODO: pull from API?
+        $scope.builtInProperties = [{ name: "Id", alias: "id" }, { name: "Name", alias: "name" }, { name: "Url", alias: "url" }, 
+            { name: "Url Absolute", alias: "urlAbsolute" }, { name: "Creator Name", alias: "creatorName" }, { name: "Writer Name", alias: "writerName" },
+            { name: "Create Date", alias: "createDate" }, { name: "Update Date", alias: "updateDate" },
+            { name: "Document Type Alias", alias: "documentTypeAlias" }, { name: "Is Visible", alias: "isVisible" },
+            { name: "Index", alias: "index" }, { name: "Level", alias: "level" }, { name: "Parent", alias: "parent" },
+            { name: "Sort Order", alias: "sortOrder" }, { name: "Is First", alias: "isFirst" }, { name: "Is Last", alias: "isLast" }];
     };
 
     /**
@@ -150,15 +158,18 @@ angular.module("umbraco").controller("graphql.for.umbraco.dashboardcontroller", 
      * with the matching `propertyAlias`.
      * @param {string} docTypeAlias 
      * @param {string} propertyAlias 
+     * @param {boolean} isBuiltInProperty 
      * @returns {boolean}
      */
-    $scope.isPropertyVisible = function(docTypeAlias, propertyAlias) { 
+    $scope.isPropertyVisible = function(docTypeAlias, propertyAlias, isBuiltInProperty) { 
         var isVisible = false;
         $scope.pendingPermissions.forEach(function(permission) {
             if (permission.alias === docTypeAlias) {
                 permission.properties.forEach(function(property) {
                     if (property.alias === propertyAlias) {
-                        isVisible = true;
+                        if (property.isBuiltInProperty === isBuiltInProperty) {
+                            isVisible = true;
+                        }
                     }
                 })
             }
@@ -228,6 +239,7 @@ angular.module("umbraco").controller("graphql.for.umbraco.dashboardcontroller", 
      */
     $scope.onPropertyVisibilityChange = function(e) {
         var propertyAlias = e.target.getAttribute('data-alias');
+        var isBuiltInProperty = e.target.getAttribute('data-isBuiltInProperty');
         var isChecked = e.target.checked;
         var doesDocTypeHavePermissions = false;
         var doesPropertyPermissionExist = false;
@@ -243,7 +255,7 @@ angular.module("umbraco").controller("graphql.for.umbraco.dashboardcontroller", 
                 if (!doesPropertyPermissionExist) {
                     permission.properties.push({
                         alias: propertyAlias,
-                        isBuiltInProperty: false, // TODO: Need to know how to get true value for this.
+                        isBuiltInProperty: isBuiltInProperty,
                         notes: '',
                         permission: 'Read'                       
                     });
@@ -255,7 +267,7 @@ angular.module("umbraco").controller("graphql.for.umbraco.dashboardcontroller", 
                 alias: $scope.selectedDocTypeAlias,
                 properties: [{
                     alias: propertyAlias,
-                    isBuiltInProperty: false,  // TODO: Need to know how to get true value for this.
+                    isBuiltInProperty: isBuiltInProperty,
                     notes: '',
                     permission: 'Read'                      
                 }]
