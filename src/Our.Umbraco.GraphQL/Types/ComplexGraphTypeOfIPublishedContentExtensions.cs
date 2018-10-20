@@ -1,10 +1,8 @@
 using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.ValueResolvers;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
 
 namespace Our.Umbraco.GraphQL.Types
 {
@@ -20,8 +18,8 @@ namespace Our.Umbraco.GraphQL.Types
             foreach (var property in contentType.CompositionPropertyTypes)
             {
                 //TODO: black/whitelist properties
-                if (property.PropertyEditorAlias == Constants.PropertyEditors.ListViewAlias ||
-                    property.PropertyEditorAlias == Constants.PropertyEditors.FolderBrowserAlias ||
+                if (property.PropertyEditorAlias == global::Umbraco.Core.Constants.PropertyEditors.ListViewAlias ||
+                    property.PropertyEditorAlias == global::Umbraco.Core.Constants.PropertyEditors.FolderBrowserAlias ||
                     property.Alias.StartsWith("umbracoMember"))
                 {
                     continue;

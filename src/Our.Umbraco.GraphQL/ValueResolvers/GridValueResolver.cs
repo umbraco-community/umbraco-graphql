@@ -1,6 +1,5 @@
 using System;
 using Our.Umbraco.GraphQL.Types;
-using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
@@ -14,7 +13,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
 
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.GridAlias;
+            return propertyType.PropertyEditorAlias == global::Umbraco.Core.Constants.PropertyEditors.GridAlias;
         }
     }
 }

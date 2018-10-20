@@ -20,7 +20,7 @@ namespace Our.Umbraco.GraphQL.Events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             // Update the version number as we deploy new DB changes to run any new Migrations
-            ApplyMigrations(applicationContext, "GraphQL", new SemVersion(1, 0, 0));
+            ApplyMigrations(applicationContext, Constants.ProductName, new SemVersion(0, 1, 0));
         }
 
         private void ApplyMigrations(ApplicationContext applicationContext, string productName, SemVersion targetVersion)
