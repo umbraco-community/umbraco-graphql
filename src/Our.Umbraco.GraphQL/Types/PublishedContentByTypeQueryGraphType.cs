@@ -3,9 +3,9 @@ using GraphQL.Types;
 
 namespace Our.Umbraco.GraphQL.Types
 {
-    public class PublishedContentByTypeQuery : ObjectGraphType
+    public class PublishedContentByTypeQueryGraphType : ObjectGraphType
     {
-        public PublishedContentByTypeQuery(IEnumerable<IGraphType> documentGraphTypes)
+        public PublishedContentByTypeQueryGraphType(IEnumerable<IGraphType> documentGraphTypes)
         {
             Name = "PublishedContentByTypeQuery";
 
@@ -13,7 +13,7 @@ namespace Our.Umbraco.GraphQL.Types
             {
                 string documentTypeAlias = type.GetMetadata<string>("documentTypeAlias");
 
-                Field<PublishedContentGraphType>()
+                Field<PublishedContentInterfaceGraphType>()
                     .Name(type.Name)
                     .Argument<NonNullGraphType<IdGraphType>>("id", "The unique content id")
                     .Type(type)

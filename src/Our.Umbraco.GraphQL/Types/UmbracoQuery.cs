@@ -7,10 +7,10 @@ namespace Our.Umbraco.GraphQL.Types
     {
         public UmbracoQuery(IEnumerable<IGraphType> documentTypes)
         {
-            Field<NonNullGraphType<PublishedContentQuery>>()
+            Field<NonNullGraphType<PublishedContentQueryGraphType>>()
                 .Name("content")
                 .Resolve(context => context.ReturnType)
-                .Type(new NonNullGraphType(new PublishedContentQuery(documentTypes)));
+                .Type(new NonNullGraphType(new PublishedContentQueryGraphType(documentTypes)));
         }
     }
 }

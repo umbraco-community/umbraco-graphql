@@ -130,7 +130,7 @@ namespace Our.Umbraco.GraphQL.Schema
                     }
                 };
 
-                graphType.Interface<PublishedContentGraphType>();
+                graphType.Interface<PublishedContentInterfaceGraphType>();
                 foreach (var composition in contentType.ContentTypeComposition)
                 {
                     if (interfaceGraphTypes.TryGetValue(composition.Alias, out IInterfaceGraphType interfaceType))
