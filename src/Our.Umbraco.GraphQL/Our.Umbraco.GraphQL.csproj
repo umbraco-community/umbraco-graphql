@@ -21,7 +21,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="$(FrontendRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**" Pack="false" />
+        <None Include="$(UIRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**" Pack="false" />
     </ItemGroup>
 
     <Target Name="RunUIBuild" BeforeTargets="Compile" Condition=" '$(Configuration)' == 'Release' ">
