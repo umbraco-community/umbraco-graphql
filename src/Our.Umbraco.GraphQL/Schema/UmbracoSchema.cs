@@ -27,9 +27,8 @@ namespace Our.Umbraco.GraphQL.Schema
 
             FieldNameConverter = new DefaultFieldNameConverter();
 
-            var resolveName = options.PublishedContentNameResolver;
-            var documentTypes = CreateGraphTypes(contentTypeService.GetAllContentTypes(), PublishedItemType.Content, resolveName).ToList();
-            var mediaTypes = CreateGraphTypes(contentTypeService.GetAllMediaTypes(), PublishedItemType.Media, resolveName);
+            var documentTypes = CreateGraphTypes(contentTypeService.GetAllContentTypes(), PublishedItemType.Content).ToList();
+            var mediaTypes = CreateGraphTypes(contentTypeService.GetAllMediaTypes(), PublishedItemType.Media).ToList();
 
             //foreach (var documentType in documentTypes.OfType<ComplexGraphType<IPublishedContent>>())
             //{
@@ -82,14 +81,8 @@ namespace Our.Umbraco.GraphQL.Schema
 
         public static IEnumerable<IGraphType> CreateGraphTypes(
            IEnumerable<IContentTypeComposition> contentTypes,
-           PublishedItemType publishedItemType,
-           Func<IContentTypeBase, string> resolveName = null)
+           PublishedItemType publishedItemType)
         {
-            if (resolveName == null)
-            {
-                resolveName = Conventions.NameResolvers.PascalCase;
-            }
-
             var interfaceGraphTypes = new Dictionary<string, IInterfaceGraphType>();
 
             //TODO: Whitelist/blacklist content types
@@ -99,49 +92,15 @@ namespace Our.Umbraco.GraphQL.Schema
 
             foreach (var contentType in compositions)
             {
-                var graphType = new InterfaceGraphType<IPublishedContent>
-                {
-                    Name = resolveName(contentType),
-                    Description = contentType.Description,
-                    Metadata =
-                    {
-                        ["documentTypeAlias"] = contentType.Alias,
-                    }
-                };
 
-                graphType.AddUmbracoContentPropeties(contentType, publishedItemType);
-
+                var graphType = new PublishedContentCompositionGraphType(contentType, publishedItemType);
                 yield return graphType;
                 interfaceGraphTypes.Add(contentType.Alias, graphType);
             }
 
             foreach (var contentType in contentTypeList.Except(compositions))
             {
-                var graphType = new ObjectGraphType<IPublishedContent>
-                {
-                    Name = resolveName(contentType),
-                    Description = contentType.Description,
-                    IsTypeOf = content => ((IPublishedContent) content).DocumentTypeAlias == contentType.Alias,
-                    Metadata =
-                    {
-                        ["documentTypeAlias"] = contentType.Alias,
-                        ["allowedAtRoot"] = contentType.AllowedAsRoot,
-                        ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
-                    }
-                };
-
-                graphType.Interface<PublishedContentInterfaceGraphType>();
-                foreach (var composition in contentType.ContentTypeComposition)
-                {
-                    if (interfaceGraphTypes.TryGetValue(composition.Alias, out IInterfaceGraphType interfaceType))
-                    {
-                        graphType.AddResolvedInterface(interfaceType);
-                    }
-                }
-
-                graphType.AddUmbracoBuiltInProperties();
-                graphType.AddUmbracoContentPropeties(contentType, publishedItemType);
-
+                var graphType = new PublishedContentGraphType(contentType, publishedItemType, interfaceGraphTypes);
                 yield return graphType;
             }
         }

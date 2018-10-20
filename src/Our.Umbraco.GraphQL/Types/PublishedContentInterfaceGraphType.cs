@@ -9,7 +9,12 @@ namespace Our.Umbraco.GraphQL.Types
         {
             Name = "PublishedContent";
 
-            this.AddUmbracoBuiltInProperties();
+            // TODO: set this field name as a reserved property alias
+            Field<NonNullGraphType<PublishedContentDataGraphType>>()
+                .Name("_contentData")
+                .Description("Built in published content data.")
+                .Resolve(context => context.Source)
+                .SetDoctypeMetadata(GetMetadata<string>("documentTypeAlias"));
         }
     }
 }
