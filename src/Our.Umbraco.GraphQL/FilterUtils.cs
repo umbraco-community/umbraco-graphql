@@ -1,13 +1,13 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
+﻿using GraphQL.Language.AST;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Filters;
 using Our.Umbraco.GraphQL.Models;
-using Umbraco.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Our.Umbraco.GraphQL.Types
+namespace Our.Umbraco.GraphQL
 {
     internal static class FilterUtils
     {

@@ -1,18 +1,14 @@
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Models;
-using Our.Umbraco.GraphQL.Models.ApiModels;
+using Our.Umbraco.GraphQL.Web.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.WebApi;
 
-namespace Our.Umbraco.GraphQL.Controllers
+namespace Our.Umbraco.GraphQL.Web.Controllers
 {
     public class GraphQLPermissionsController : UmbracoAuthorizedApiController
     {
