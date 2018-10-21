@@ -94,6 +94,13 @@ namespace Our.Umbraco.GraphQL
             }
         }
 
+        public static FieldBuilder<TSourceType, TReturnType> SetDoctypeMetadata<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder, string doctypeAlias)
+        {
+            SetDoctypeMetadata(builder.FieldType, doctypeAlias);
+            return builder;
+        }
+
         public static FieldBuilder<TSourceType, TReturnType> RequirePermission<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string permission)
         {

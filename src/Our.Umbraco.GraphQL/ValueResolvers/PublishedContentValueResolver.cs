@@ -26,8 +26,8 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
         public override Type GetGraphQLType(PublishedPropertyType propertyType)
         {
             return IsMultiPicker(propertyType.DataTypeId)
-                ? typeof(ListGraphType<PublishedContentGraphType>)
-                : typeof(PublishedContentGraphType);
+                ? typeof(ListGraphType<PublishedContentInterfaceGraphType>)
+                : typeof(PublishedContentInterfaceGraphType);
         }
 
         public override object Resolve(PublishedPropertyType propertyType, object value)

@@ -5,13 +5,13 @@ using GraphQL.Types;
 
 namespace Our.Umbraco.GraphQL.Types
 {
-    public class PublishedContentAtRootQuery : ObjectGraphType
+    public class PublishedContentAtRootQueryGraphType : ObjectGraphType
     {
-        public PublishedContentAtRootQuery(IEnumerable<IGraphType> documentGraphTypes)
+        public PublishedContentAtRootQueryGraphType(IEnumerable<IGraphType> documentGraphTypes)
         {
             Name = "PublishedContentAtRootQuery";
 
-            Field<NonNullGraphType<ListGraphType<PublishedContentGraphType>>>()
+            Field<NonNullGraphType<ListGraphType<PublishedContentInterfaceGraphType>>>()
                 .Name("all")
                 .Resolve(context =>
                 {

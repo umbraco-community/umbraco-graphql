@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence;
 
 namespace Our.Umbraco.GraphQL.Migrations
 {
-    [Migration("1.0.0", 1, "GraphQL")]
+    [Migration("0.1.0", 1, Constants.ProductName)]
     public class CreateInitialTables : MigrationBase
     {
         public const string accountsTableName = "Accounts";
