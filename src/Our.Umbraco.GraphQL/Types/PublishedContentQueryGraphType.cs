@@ -1,8 +1,5 @@
-using System;
+﻿using GraphQL.Types;
 using System.Collections.Generic;
-using GraphQL.Types;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Routing;
 
 namespace Our.Umbraco.GraphQL.Types
 {
@@ -19,43 +16,18 @@ namespace Our.Umbraco.GraphQL.Types
                 {
                     var userContext = (UmbracoGraphQLContext)context.UserContext;
                     var id = context.GetArgument<int>("id");
-                    return userContext.Umbraco.TypedContent(id);
+                    return userContext.UmbracoContext.ContentCache.GetById(id);
                 });
 
-            Field<PublishedContentInterfaceGraphType>()
-                .Name("byUrl")
-                .Argument<NonNullGraphType<StringGraphType>>("url", "The relative content url")
-                .Resolve(context =>
-                {
-                    var userContext = (UmbracoGraphQLContext)context.UserContext;
-                    var url = context.GetArgument<string>("url");
-
-                    var pcr = new PublishedContentRequest(
-                        new Uri(userContext.RequestUri, url),
-                        userContext.UmbracoContext.RoutingContext,
-                        UmbracoConfig.For.UmbracoSettings().WebRouting,
-                        null
-                    );
-
-                    pcr.Prepare();
-
-                    if (pcr.IsRedirect || pcr.IsRedirectPermanent || pcr.Is404)
-                    {
-                        return null;
-                    }
-
-                    return pcr.PublishedContent;
-                });
-
-            Field<NonNullGraphType<PublishedContentAtRootQueryGraphType>>()
+            Field<NonNullGraphType<PublishedContentByTypeQueryGraphType>>()
+                .Type(new NonNullGraphType(new PublishedContentByTypeQueryGraphType(documentGraphTypes)))
                 .Name("byType")
-                .Resolve(context => context.ReturnType)
-                .Type(new NonNullGraphType(new PublishedContentByTypeQueryGraphType(documentGraphTypes)));
+                .Resolve(context => context.ReturnType);
 
             Field<NonNullGraphType<PublishedContentAtRootQueryGraphType>>()
+                .Type(new NonNullGraphType(new PublishedContentAtRootQueryGraphType(documentGraphTypes)))
                 .Name("atRoot")
-                .Resolve(context => context.ReturnType)
-                .Type(new NonNullGraphType(new PublishedContentAtRootQueryGraphType(documentGraphTypes)));
+                .Resolve(context => context.ReturnType);
         }
     }
 }

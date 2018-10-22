@@ -11,9 +11,9 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
             return typeof(GridGraphType);
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias == global::Umbraco.Core.Constants.PropertyEditors.GridAlias;
+            return propertyType.DataType.EditorAlias == global::Umbraco.Core.Constants.PropertyEditors.Aliases.Grid;
         }
     }
 }

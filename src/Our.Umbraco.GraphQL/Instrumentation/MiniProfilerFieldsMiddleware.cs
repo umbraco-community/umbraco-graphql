@@ -9,7 +9,7 @@ namespace Our.Umbraco.GraphQL.Instrumentation
     {
         public Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
         {
-            using (MiniProfiler.Current.Step($"[GraphQL] Resolving {string.Join(".", context.Path)}", ProfileLevel.Info))
+            using (MiniProfiler.Current.Step($"[GraphQL] Resolving {string.Join(".", context.Path)}"))
             {
                 return next(context);
             }

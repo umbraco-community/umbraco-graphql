@@ -1,7 +1,6 @@
 using System;
 using System.Web.Cors;
 using Microsoft.Owin.Cors;
-using Our.Umbraco.GraphQL.Schema;
 using Umbraco.Core.Models;
 using Task = System.Threading.Tasks.Task;
 

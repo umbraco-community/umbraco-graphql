@@ -3,36 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Types;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
+using Umbraco.Web.PropertyEditors;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public class PublishedContentValueResolver : GraphQLValueResolver
     {
-        private readonly IDataTypeService _dataTypeService;
-
-        public PublishedContentValueResolver() : this(ApplicationContext.Current.Services.DataTypeService)
-        {
-        }
-
-        public PublishedContentValueResolver(IDataTypeService dataTypeService)
-        {
-            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
-        }
-
         public override Type GetGraphQLType(PublishedPropertyType propertyType)
         {
-            return IsMultiPicker(propertyType.DataTypeId)
+            return IsMultiPicker(propertyType.DataType)
                 ? typeof(ListGraphType<PublishedContentInterfaceGraphType>)
                 : typeof(PublishedContentInterfaceGraphType);
         }
 
-        public override object Resolve(PublishedPropertyType propertyType, object value)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
-            var isMultiPicker = IsMultiPicker(propertyType.DataTypeId);
+            return propertyType.ClrType == typeof(IPublishedContent) ||
+                   propertyType.ClrType == typeof(IEnumerable<IPublishedContent>);
+        }
+
+        public override object Resolve(IPublishedElement owner, PublishedPropertyType propertyType, object value)
+        {
+            var isMultiPicker = IsMultiPicker(propertyType.DataType);
 
             switch (value)
             {
@@ -43,31 +37,30 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
                     return publishedContents.FirstOrDefault();
                 case IPublishedContent content:
                     if (isMultiPicker)
-                        return new[] {content};
+                        return new[] { content };
                     return content;
+                default:
+                    return null;
             }
-
-            return null;
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        protected virtual bool IsMultiPicker(PublishedDataType dataType)
         {
-            return propertyType.ClrType == typeof(IPublishedContent) ||
-                   propertyType.ClrType == typeof(IEnumerable<IPublishedContent>);
-        }
+            var configuration = dataType.Configuration;
 
-        protected virtual bool IsMultiPicker(int dataTypeId)
-        {
-            var preValues = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
-
-            if (preValues.PreValuesAsDictionary.TryGetValue("multiPicker", out var preValue))
-                return preValue.Value.TryConvertTo<bool>().Result;
-            if (preValues.PreValuesAsDictionary.TryGetValue("maxNumber", out preValue) ||
-                preValues.PreValuesAsDictionary.TryGetValue("maxItems", out preValue))
+            if(configuration is MultiNodePickerConfiguration mnpc)
             {
-                var attempt = preValue.Value.TryConvertTo<int>();
-                return false == attempt.Success || attempt.Result != 1;
+                return mnpc.MaxNumber != 1;
             }
+            if(configuration is NestedContentConfiguration ncc)
+            {
+                return ncc.MaxItems != 1;
+            }
+            if(configuration is MediaPickerConfiguration mpc)
+            {
+                return mpc.Multiple;
+            }
+            // TODO: Check other types
 
             return false;
         }

@@ -1,6 +1,6 @@
 using GraphQL;
 using GraphQL.Types;
-using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.Types
 {
@@ -11,12 +11,10 @@ namespace Our.Umbraco.GraphQL.Types
         {
             Name = "PublishedContent";
 
-            // TODO: set this field name as a reserved property alias
             Field<NonNullGraphType<PublishedContentDataGraphType>>()
                 .Name("_contentData")
                 .Description("Built in published content data.")
-                .Resolve(context => context.Source)
-                .SetDoctypeMetadata(GetMetadata<string>(Constants.Metadata.ContentTypeAlias));
+                .Resolve(context => context.Source);
         }
     }
 }

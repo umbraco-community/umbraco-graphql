@@ -1,15 +1,11 @@
+using NPoco;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Our.Umbraco.GraphQL.Models
 {
     [TableName("GraphQL_Accounts")]
-    [PrimaryKey("id", autoIncrement = true)]
+    [PrimaryKey("id", AutoIncrement =true)]
     public class Account
     {
         [Column("id")]

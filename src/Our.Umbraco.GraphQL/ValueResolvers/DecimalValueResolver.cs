@@ -5,6 +5,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public class DecimalValueResolver : GraphQLValueResolver
     {
         public override Type GetGraphQLType(PublishedPropertyType propertyType)
@@ -15,7 +16,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
                 : typeof(ListGraphType<DecimalGraphType>);
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(decimal) ||
                    propertyType.ClrType == typeof(double) ||

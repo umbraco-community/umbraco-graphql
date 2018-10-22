@@ -6,16 +6,19 @@ namespace Our.Umbraco.GraphQL.Types
 {
     public class PublishedContentCompositionGraphType : PublishedContentInterfaceGraphType
     {
-        public PublishedContentCompositionGraphType(IContentTypeComposition contentType, PublishedItemType itemType)
+        public PublishedContentCompositionGraphType(IContentTypeComposition contentType, IPublishedContentGraphTypeBuilder graphTypeBuilder)
         {
             Name = contentType.Alias.ToPascalCase();
             Description = contentType.Description;
             Metadata = new Dictionary<string, object>
             {
-                ["contentTypeAlias"] = contentType.Alias,
+                [Constants.Metadata.ContentTypeAlias] = contentType.Alias,
             };
 
-            this.AddUmbracoContentPropeties(contentType, itemType);
+            foreach(var field in graphTypeBuilder.BuildContentPropertyFieldTypes(contentType))
+            {
+                AddField(field)/*.SetPermissions(this, true)*/;
+            }
         }
     }
 }

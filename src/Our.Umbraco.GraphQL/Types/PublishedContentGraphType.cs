@@ -3,12 +3,13 @@ using GraphQL.Types;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.Types
 {
     public class PublishedContentGraphType : ObjectGraphType<IPublishedContent>
     {
-        public PublishedContentGraphType(IContentTypeComposition contentType, PublishedItemType itemType, IDictionary<string, IInterfaceGraphType> interfaceGraphTypes)
+        public PublishedContentGraphType(IContentTypeComposition contentType, IDictionary<string, IInterfaceGraphType> interfaceGraphTypes, IPublishedContentGraphTypeBuilder graphTypeBuilder)
         {
             Name = contentType.Alias.ToPascalCase();
             Description = contentType.Description;
@@ -30,14 +31,15 @@ namespace Our.Umbraco.GraphQL.Types
                 }
             }
 
-            // TODO: set this field name as a reserved property alias
             Field<NonNullGraphType<PublishedContentDataGraphType>>()
                 .Name("_contentData")
                 .Description("Built in published content data.")
-                .Resolve(context => context.Source)
-                .SetDoctypeMetadata(GetMetadata<string>(Constants.Metadata.ContentTypeAlias));
+                .Resolve(context => context.Source);
 
-            this.AddUmbracoContentPropeties(contentType, itemType);
+            foreach (var field in graphTypeBuilder.BuildContentPropertyFieldTypes(contentType))
+            {
+                AddField(field)/*.SetPermissions(this, true)*/;
+            }
         }
     }
 }

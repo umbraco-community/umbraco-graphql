@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
 using GraphQL;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
-namespace Our.Umbraco.GraphQL
+namespace Our.Umbraco.GraphQL.Web
 {
     internal class InputConverter : JsonConverter
     {
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override bool CanConvert(Type objectType)
         {
-            throw new NotSupportedException();
+            return objectType == typeof(Inputs);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
@@ -23,10 +23,9 @@ namespace Our.Umbraco.GraphQL
 
             return new Inputs(dict ?? new Dictionary<string, object>());
         }
-
-        public override bool CanConvert(Type objectType)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            return objectType == typeof(Inputs);
+            throw new NotSupportedException();
         }
     }
 }

@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net452</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <AssemblyName>Our.Umbraco.GraphQL</AssemblyName>
         <RootNamespace>Our.Umbraco.GraphQL</RootNamespace>
         <UIRoot>Web\UI\</UIRoot>
@@ -42,8 +42,9 @@
 
     <ItemGroup>
         <PackageReference Include="GraphQL" Version="2.1.0" />
-        <PackageReference Include="Microsoft.Owin.Cors" Version="3.1.0" />
-        <PackageReference Include="UmbracoCms.Core" Version="[7.7,8.0.0)" />
+        <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.0" />
+        <PackageReference Include="UmbracoCms.Core" Version="8.0.0-alpha.52" />
+        <PackageReference Include="UmbracoCms.Web" Version="8.0.0-alpha.52" />
     </ItemGroup>
 
     <ItemGroup>

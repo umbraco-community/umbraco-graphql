@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
@@ -7,11 +7,11 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     {
         public abstract Type GetGraphQLType(PublishedPropertyType propertyType);
 
-        public virtual object Resolve(PublishedPropertyType propertyType, object value)
+        public abstract bool IsResolver(PublishedPropertyType propertyType);
+
+        public virtual object Resolve(IPublishedElement owner, PublishedPropertyType propertyType, object value)
         {
             return value;
         }
-
-        public abstract bool IsConverter(PublishedPropertyType propertyType);
     }
 }

@@ -5,6 +5,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public class IntValueResolver : GraphQLValueResolver
     {
         public override Type GetGraphQLType(PublishedPropertyType propertyType)
@@ -16,7 +17,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
                 : typeof(ListGraphType<IntGraphType>);
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(short) ||
                    propertyType.ClrType == typeof(int) ||
