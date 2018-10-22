@@ -11,7 +11,7 @@ namespace Our.Umbraco.GraphQL.Types
 
             foreach (var type in documentGraphTypes)
             {
-                string documentTypeAlias = type.GetMetadata<string>("documentTypeAlias");
+                string documentTypeAlias = type.GetMetadata<string>(Constants.Metadata.ContentTypeAlias);
 
                 Field<PublishedContentInterfaceGraphType>()
                     .Name(type.Name)

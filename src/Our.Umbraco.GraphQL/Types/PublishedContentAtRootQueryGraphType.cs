@@ -19,9 +19,9 @@ namespace Our.Umbraco.GraphQL.Types
                     return userContext.Umbraco.TypedContentAtRoot();
                 });
 
-            foreach (var type in documentGraphTypes.Where(x => x.GetMetadata<bool>("allowedAtRoot")))
+            foreach (var type in documentGraphTypes.Where(x => x.GetMetadata<bool>(Constants.Metadata.AllowedAtRoot)))
             {
-                string documentTypeAlias = type.GetMetadata<string>("documentTypeAlias");
+                string documentTypeAlias = type.GetMetadata<string>(Constants.Metadata.ContentTypeAlias);
 
                 this.AddField(
                     new FieldType

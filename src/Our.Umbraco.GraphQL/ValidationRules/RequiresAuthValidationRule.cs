@@ -31,7 +31,7 @@ namespace Our.Umbraco.GraphQL.ValidationRules
                     // As a workaround this is set on the parent _conentData field and we use that when working out permissions
                     if (fieldDef.Name == "_contentData")
                     {
-                        var doctype = fieldDef.GetMetadata<string>("documentTypeAlias");
+                        var doctype = fieldDef.GetMetadata<string>(Constants.Metadata.ContentTypeAlias);
                         if (!string.IsNullOrEmpty(doctype))
                         {
                             currentDoctype = doctype;

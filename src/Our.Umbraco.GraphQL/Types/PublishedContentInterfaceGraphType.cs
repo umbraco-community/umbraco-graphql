@@ -16,7 +16,7 @@ namespace Our.Umbraco.GraphQL.Types
                 .Name("_contentData")
                 .Description("Built in published content data.")
                 .Resolve(context => context.Source)
-                .SetDoctypeMetadata(GetMetadata<string>("documentTypeAlias"));
+                .SetDoctypeMetadata(GetMetadata<string>(Constants.Metadata.ContentTypeAlias));
         }
     }
 }

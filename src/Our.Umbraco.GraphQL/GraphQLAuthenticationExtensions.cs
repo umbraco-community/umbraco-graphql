@@ -80,17 +80,17 @@ namespace Our.Umbraco.GraphQL
         public static void SetPermissions(this FieldType type, GraphType graphType, bool isBuiltInProperty = false)
         {
             // The graph type should have the doc type alias set in the meta data so we're accessing it from that
-            var doctypeAlias = graphType.GetMetadata<string>("documentTypeAlias");
+            var doctypeAlias = graphType.GetMetadata<string>(Constants.Metadata.ContentTypeAlias);
             type.SetPermissions(doctypeAlias, isBuiltInProperty);
         }
 
         public static void SetDoctypeMetadata(this FieldType type, string doctypeAlias)
         {
-            var currentAlias = type.GetMetadata<List<string>>("documentTypeAlias");
+            var currentAlias = type.GetMetadata<List<string>>(Constants.Metadata.ContentTypeAlias);
 
             if (currentAlias == null)
             {
-                type.Metadata["documentTypeAlias"] = doctypeAlias;
+                type.Metadata[Constants.Metadata.ContentTypeAlias] = doctypeAlias;
             }
         }
 

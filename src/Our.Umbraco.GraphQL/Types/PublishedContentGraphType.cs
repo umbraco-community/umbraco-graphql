@@ -15,9 +15,9 @@ namespace Our.Umbraco.GraphQL.Types
             IsTypeOf = content => ((IPublishedContent)content).ContentType.Alias == contentType.Alias;
             Metadata = new Dictionary<string, object>
             {
-                ["contentTypeAlias"] = contentType.Alias,
-                ["allowedAtRoot"] = contentType.AllowedAsRoot,
-                ["allowedChildren"] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
+                [Constants.Metadata.ContentTypeAlias] = contentType.Alias,
+                [Constants.Metadata.AllowedAtRoot] = contentType.AllowedAsRoot,
+                [Constants.Metadata.AllowedChildren] = contentType.AllowedContentTypes.Select(x => x.Alias).ToArray(),
             };
 
             Interface<PublishedContentInterfaceGraphType>();
@@ -35,7 +35,7 @@ namespace Our.Umbraco.GraphQL.Types
                 .Name("_contentData")
                 .Description("Built in published content data.")
                 .Resolve(context => context.Source)
-                .SetDoctypeMetadata(GetMetadata<string>("documentTypeAlias"));
+                .SetDoctypeMetadata(GetMetadata<string>(Constants.Metadata.ContentTypeAlias));
 
             this.AddUmbracoContentPropeties(contentType, itemType);
         }
