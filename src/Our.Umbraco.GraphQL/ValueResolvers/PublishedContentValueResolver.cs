@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public class PublishedContentValueResolver : GraphQLValueResolver
     {
         private readonly IDataTypeService _dataTypeService;
@@ -50,7 +51,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
             return null;
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(IPublishedContent) ||
                    propertyType.ClrType == typeof(IEnumerable<IPublishedContent>);

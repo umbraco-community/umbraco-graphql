@@ -4,6 +4,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public class GridValueResolver : GraphQLValueResolver
     {
         public override Type GetGraphQLType(PublishedPropertyType propertyType)
@@ -11,7 +12,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
             return typeof(GridGraphType);
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
             return propertyType.PropertyEditorAlias == global::Umbraco.Core.Constants.PropertyEditors.GridAlias;
         }

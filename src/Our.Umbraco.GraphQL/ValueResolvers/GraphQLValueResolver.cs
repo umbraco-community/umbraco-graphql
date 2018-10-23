@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.ValueResolvers
 {
+    [DefaultGraphQLValueResolver]
     public abstract class GraphQLValueResolver : IGraphQLValueResolver
     {
         public abstract Type GetGraphQLType(PublishedPropertyType propertyType);
@@ -12,6 +13,6 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
             return value;
         }
 
-        public abstract bool IsConverter(PublishedPropertyType propertyType);
+        public abstract bool IsResolver(PublishedPropertyType propertyType);
     }
 }

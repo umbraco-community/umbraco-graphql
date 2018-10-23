@@ -16,7 +16,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
             return typeof(StringGraphType);
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsResolver(PublishedPropertyType propertyType)
         {
             return false;
         }
