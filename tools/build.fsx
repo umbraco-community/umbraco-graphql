@@ -42,6 +42,14 @@ Target.create "Build" (fun _ ->
     }) solutionFile
 )
 
+Target.create "Test" (fun _ ->
+  DotNet.test (fun c ->
+    { c with
+        NoBuild = true
+        Configuration = DotNet.BuildConfiguration.Release
+    }) solutionFile
+)
+
 Target.create "Package" (fun _ ->
   DotNet.pack (fun c ->
     { c with
@@ -58,10 +66,12 @@ open Fake.Core.TargetOperators
 
 "Clean"
   ==> "Build"
+  ==> "Test"
   ==> "Default"
 
 "Clean"
   ==> "Build"
+  ==> "Test"
   ==> "Package"
 
 // start build
