@@ -24,10 +24,10 @@
         <None Include="$(UIRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**" Pack="false" />
     </ItemGroup>
 
-    <Target Name="RunUIBuild" BeforeTargets="Compile" Condition=" '$(Configuration)' == 'Release' ">
+    <!--<Target Name="RunUIBuild" BeforeTargets="Compile" Condition=" '$(Configuration)' == 'Release' ">
         <Exec WorkingDirectory="$(UIRoot)" Command="npm install" />
         <Exec WorkingDirectory="$(UIRoot)" Command="npm run build" />
-    </Target>
+    </Target>-->
 
     <ItemGroup>
         <None Include="tools\**" Pack="True" PackagePath="tools\" />
