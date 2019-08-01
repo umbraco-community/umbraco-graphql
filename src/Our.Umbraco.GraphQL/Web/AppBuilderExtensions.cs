@@ -4,17 +4,19 @@ using Microsoft.Owin.Cors;
 using Our.Umbraco.GraphQL.Web.Middleware;
 using Owin;
 using System.IO;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Our.Umbraco.GraphQL.Web
 {
     public static class AppBuilderExtensions
     {
-        public static IAppBuilder UseUmbracoGraphQL(this IAppBuilder app, string rootPath, IServiceContainer container)
+        public static IAppBuilder UseUmbracoGraphQL(this IAppBuilder app, string rootPath, IFactory factory)
         {
-            return UseUmbracoGraphQL(app, rootPath, container, new GraphQLServerOptions());
+            return UseUmbracoGraphQL(app, rootPath, factory, new GraphQLServerOptions());
         }
 
-        public static IAppBuilder UseUmbracoGraphQL(this IAppBuilder app, string rootPath, IServiceContainer container, GraphQLServerOptions options)
+        public static IAppBuilder UseUmbracoGraphQL(this IAppBuilder app, string rootPath, IFactory factory, GraphQLServerOptions options)
         {
             string graphiQLPath = $"/{rootPath}/graphiql";
             string graphQLPath = $"/{rootPath}/graphql";
@@ -45,9 +47,9 @@ namespace Our.Umbraco.GraphQL.Web
 
 
                     subApp.UseCors(corsOptions)
-                        .Use<LightInjectMiddleware>(container)
-                        .Use((ctx, next) => ctx.Get<Scope>("lightinject:scope").GetInstance<GraphQLRequestParserMiddleware>().Invoke(ctx, next))
-                        .Use((ctx, next) => ctx.Get<Scope>("lightinject:scope").GetInstance<GraphQLMiddleware>().Invoke(ctx, options));
+                        .Use<FactoryMiddleware>(factory)
+                        .Use((ctx, next) => ctx.Get<IFactory>("umbraco:factory").GetInstance<GraphQLRequestParserMiddleware>().Invoke(ctx, next))
+                        .Use((ctx, next) => ctx.Get<IFactory>("umbraco:factory").GetInstance<GraphQLMiddleware>().Invoke(ctx, options));
                 });
         }
     }

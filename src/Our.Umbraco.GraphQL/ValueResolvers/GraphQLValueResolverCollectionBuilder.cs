@@ -5,9 +5,9 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
 {
     public class GraphQLValueResolverCollectionBuilder : OrderedCollectionBuilderBase<GraphQLValueResolverCollectionBuilder, GraphQLValueResolverCollection, IGraphQLValueResolver>
     {
-        public GraphQLValueResolverCollectionBuilder(IServiceContainer container)
-            : base(container)
-        { }
+        public GraphQLValueResolverCollectionBuilder()
+        {
+        }
 
         protected override GraphQLValueResolverCollectionBuilder This => this;
     }

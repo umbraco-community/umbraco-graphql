@@ -1,4 +1,4 @@
-﻿using GraphQL;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.ValueResolvers;
@@ -11,9 +11,9 @@ namespace Our.Umbraco.GraphQL.Types
 {
     public class PublishedPropertyFieldType : FieldType
     {
-        public PublishedPropertyFieldType(PublishedContentType contentType, PropertyType propertyType, GraphQLValueResolverCollection graphQLValueResolvers)
+        public PublishedPropertyFieldType(IPublishedContentType contentType, PropertyType propertyType, GraphQLValueResolverCollection graphQLValueResolvers)
         {
-            PublishedPropertyType publishedPropertyType = contentType.GetPropertyType(propertyType.Alias);
+            IPublishedPropertyType publishedPropertyType = contentType.GetPropertyType(propertyType.Alias);
             IGraphQLValueResolver foundResolver = GetValueResolver(contentType, propertyType, publishedPropertyType, graphQLValueResolvers);
 
             Type propertyGraphType = foundResolver.GetGraphQLType(publishedPropertyType);
@@ -34,7 +34,7 @@ namespace Our.Umbraco.GraphQL.Types
             });
         }
 
-        private static IGraphQLValueResolver GetValueResolver(PublishedContentType contentType, PropertyType propertyType, PublishedPropertyType publishedPropertyType, GraphQLValueResolverCollection graphQLValueResolvers)
+        private static IGraphQLValueResolver GetValueResolver(IPublishedContentType contentType, PropertyType propertyType, IPublishedPropertyType publishedPropertyType, GraphQLValueResolverCollection graphQLValueResolvers)
         {
             IGraphQLValueResolver foundResolver = null;
             bool isDefault = false;

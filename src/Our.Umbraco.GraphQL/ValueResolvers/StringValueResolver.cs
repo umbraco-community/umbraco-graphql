@@ -8,14 +8,14 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     [DefaultGraphQLValueResolver]
     public class StringValueResolver : GraphQLValueResolver
     {
-        public override Type GetGraphQLType(PublishedPropertyType propertyType)
+        public override Type GetGraphQLType(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(string) 
                 ? typeof(StringGraphType)
                 : typeof(ListGraphType<StringGraphType>);
         }
 
-        public override bool IsResolver(PublishedPropertyType propertyType)
+        public override bool IsResolver(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(string) ||
                    propertyType.ClrType == typeof(IEnumerable<string>);

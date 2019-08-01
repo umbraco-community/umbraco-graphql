@@ -5,11 +5,11 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
 {
     public abstract class GraphQLValueResolver : IGraphQLValueResolver
     {
-        public abstract Type GetGraphQLType(PublishedPropertyType propertyType);
+        public abstract Type GetGraphQLType(IPublishedPropertyType propertyType);
 
-        public abstract bool IsResolver(PublishedPropertyType propertyType);
+        public abstract bool IsResolver(IPublishedPropertyType propertyType);
 
-        public virtual object Resolve(IPublishedElement owner, PublishedPropertyType propertyType, object value)
+        public virtual object Resolve(IPublishedElement owner, IPublishedPropertyType propertyType, object value)
         {
             return value;
         }

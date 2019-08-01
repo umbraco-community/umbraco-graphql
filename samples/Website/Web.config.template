@@ -8,15 +8,10 @@
   -->
 
     <configSections>
-        <section name="microsoft.scripting" type="Microsoft.Scripting.Hosting.Configuration.Section, Microsoft.Scripting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" requirePermission="false" />
         <section name="clientDependency" type="ClientDependency.Core.Config.ClientDependencySection, ClientDependency.Core" requirePermission="false" />
-        <section name="Examine" type="Examine.Config.ExamineSettings, Examine" requirePermission="false" />
-        <section name="ExamineLuceneIndexSets" type="Umbraco.Examine.Config.IndexSets, Umbraco.Examine" requirePermission="false" />
 
         <sectionGroup name="umbracoConfiguration">
             <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" />
-            <section name="FileSystemProviders" type="Umbraco.Core.Configuration.FileSystemProvidersSection, Umbraco.Core" requirePermission="false" />
-            <section name="dashBoard" type="Umbraco.Core.Configuration.Dashboard.DashboardSection, Umbraco.Core" requirePermission="false" />
             <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" />
         </sectionGroup>
 
@@ -29,26 +24,20 @@
 
     <umbracoConfiguration>
         <settings configSource="config\umbracoSettings.config" />
-        <FileSystemProviders configSource="config\FileSystemProviders.config" />
-        <dashBoard configSource="config\Dashboard.config" />
         <HealthChecks configSource="config\HealthChecks.config" />
     </umbracoConfiguration>
 
-    <microsoft.scripting configSource="config\scripting.config" />
     <clientDependency configSource="config\ClientDependency.config" />
-    <Examine configSource="config\ExamineSettings.config" />
-    <ExamineLuceneIndexSets configSource="config\ExamineIndex.config" />
 
     <appSettings>
-        <add key="umbracoConfigurationStatus" value="" />
-        <add key="umbracoReservedUrls" value="~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd,~/.well-known" />
-        <add key="umbracoReservedPaths" value="~/umbraco,~/install/" />
-        <add key="umbracoPath" value="~/umbraco" />
-        <add key="umbracoHideTopLevelNodeFromPath" value="true" />
-        <add key="umbracoUseDirectoryUrls" value="true" />
-        <add key="umbracoTimeOutInMinutes" value="20" />
-        <add key="umbracoDefaultUILanguage" value="en-US" />
-        <add key="umbracoUseHttps" value="false" />
+        <add key="Umbraco.Core.ConfigurationStatus" value="" />
+        <add key="Umbraco.Core.ReservedUrls" value="" />
+        <add key="Umbraco.Core.ReservedPaths" value="" />
+        <add key="Umbraco.Core.Path" value="~/umbraco" />
+        <add key="Umbraco.Core.HideTopLevelNodeFromPath" value="true" />
+        <add key="Umbraco.Core.TimeOutInMinutes" value="20" />
+        <add key="Umbraco.Core.DefaultUILanguage" value="en-US" />
+        <add key="Umbraco.Core.UseHttps" value="false" />
 
         <add key="ValidationSettings:UnobtrusiveValidationMode" value="None" />
         <add key="webpages:Enabled" value="false" />
@@ -75,16 +64,19 @@
         <DbProviderFactories>
             <remove invariant="System.Data.SqlServerCe.4.0" />
             <add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe" />
-            <remove invariant="MySql.Data.MySqlClient" />
-            <add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" />
         </DbProviderFactories>
     </system.data>
 
     <system.net>
         <mailSettings>
+            <!--
+            If you need Umbraco to send out system mails (like reset password and invite user),
+            you must configure your SMTP host here - for example:
+
             <smtp from="noreply@example.com">
                 <network host="127.0.0.1" userName="username" password="password" />
             </smtp>
+            -->
         </mailSettings>
     </system.net>
 
@@ -94,18 +86,6 @@
         <trace enabled="false" requestLimit="10" pageOutput="false" traceMode="SortByTime" localOnly="true" />
 
         <httpRuntime requestValidationMode="2.0" enableVersionHeader="false" targetFramework="4.7.2" maxRequestLength="51200" fcnMode="Single" />
-
-        <pages enableEventValidation="false">
-            <controls>
-                <add tagPrefix="asp" namespace="System.Web.UI" assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
-                <add tagPrefix="umbraco" namespace="umbraco.presentation.templateControls" assembly="Umbraco.Web" />
-                <add tagPrefix="asp" namespace="System.Web.UI.WebControls" assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
-            </controls>
-            <namespaces>
-                <add namespace="Umbraco.Core" />
-                <add namespace="Umbraco.Core.Services" />
-            </namespaces>
-        </pages>
 
         <httpModules>
             <add name="ScriptModule" type="System.Web.Handlers.ScriptModule, System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
@@ -122,7 +102,7 @@
             <add verb="*" path="DependencyHandler.axd" type="ClientDependency.Core.CompositeFiles.CompositeDependencyHandler, ClientDependency.Core " />
         </httpHandlers>
 
-        <compilation defaultLanguage="c#" debug="false" batch="true" targetFramework="4.7.2" numRecompilesBeforeAppRestart="50" />
+        <compilation defaultLanguage="c#" debug="true" batch="true" targetFramework="4.7.2" numRecompilesBeforeAppRestart="50" />
 
         <authentication mode="Forms">
             <forms name="yourAuthCookie" loginUrl="login.aspx" protection="All" path="/" />
@@ -148,12 +128,6 @@
                 <add name="UmbracoRoleProvider" type="Umbraco.Web.Security.Providers.MembersRoleProvider" />
             </providers>
         </roleManager>
-
-        <siteMap>
-            <providers>
-                <remove name="MySqlSiteMapProvider" />
-            </providers>
-        </siteMap>
 
     </system.web>
 
@@ -241,23 +215,23 @@
         <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
             <dependentAssembly>
                 <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+                <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-11.0.0.0" newVersion="11.0.0.0" />
+                <bindingRedirect oldVersion="0.0.0.0-12.0.0.0" newVersion="12.0.0.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
@@ -265,76 +239,20 @@
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
             </dependentAssembly>
             <dependentAssembly>
                 <assemblyIdentity name="System.ValueTuple" publicKeyToken="cc7b13ffcd2ddd51" culture="neutral" />
                 <bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
             </dependentAssembly>
             <dependentAssembly>
-                <assemblyIdentity name="System.Web.Cors" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
+                <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" />
+                <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
             </dependentAssembly>
-            <!--<dependentAssembly>
-                <assemblyIdentity name="System.Runtime" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.IO" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Runtime.InteropServices" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Reflection" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Runtime.Extensions" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.IO.FileSystem" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Linq" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Security.Cryptography.Algorithms" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.3.0.0" newVersion="4.3.0.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Security.Cryptography.Primitives" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.2.0" newVersion="4.0.2.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.IO.FileSystem.Primitives" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Xml.ReaderWriter" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.1.0" newVersion="4.1.1.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.IO.Compression" publicKeyToken="b77a5c561934e089" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.2.0.0" newVersion="4.2.0.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Xml.XPath.XDocument" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.0.0" newVersion="4.1.0.0" />
-            </dependentAssembly>
-            <dependentAssembly>
-                <assemblyIdentity name="System.Linq.Expressions" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-4.1.2.0" newVersion="4.1.2.0" />
-            </dependentAssembly>-->
         </assemblyBinding>
     </runtime>
 
@@ -357,8 +275,8 @@
 
     <system.codedom>
         <compilers>
-            <compiler language="c#;cs;csharp" extension=".cs" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:7 /nowarn:1659;1699;1701" />
-            <compiler language="vb;vbs;visualbasic;vbscript" extension=".vb" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:14 /nowarn:41008 /define:_MYTYPE=\&quot;Web\&quot; /optionInfer+" />
+            <compiler language="c#;cs;csharp" extension=".cs" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:7 /nowarn:1659;1699;1701" />
+            <compiler language="vb;vbs;visualbasic;vbscript" extension=".vb" type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" warningLevel="4" compilerOptions="/langversion:14 /nowarn:41008 /define:_MYTYPE=\&quot;Web\&quot; /optionInfer+" />
         </compilers>
     </system.codedom>
 

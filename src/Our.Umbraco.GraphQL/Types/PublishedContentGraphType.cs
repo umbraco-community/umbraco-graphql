@@ -32,7 +32,10 @@ namespace Our.Umbraco.GraphQL.Types
             }
 
             this.AddUmbracoBuiltInProperties();
-            this.AddUmbracoContentPropeties(contentType, itemType);
+            foreach (var field in graphTypeBuilder.BuildContentPropertyFieldTypes(contentType))
+            {
+                AddField(field);
+            }
         }
     }
 }

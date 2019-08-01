@@ -1,4 +1,4 @@
-﻿using GraphQL;
+using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Our.Umbraco.GraphQL.Types
                 .Resolve(context =>
                 {
                     var userContext = (UmbracoGraphQLContext)context.UserContext;
-                    return userContext.UmbracoContext.ContentCache.GetAtRoot();
+                    return userContext.UmbracoContext.Content.GetAtRoot();
                 });
 
             foreach (var type in documentGraphTypes.Where(x => x.GetMetadata<bool>(Constants.Metadata.AllowedAtRoot)))
@@ -30,7 +30,7 @@ namespace Our.Umbraco.GraphQL.Types
                     .Resolve(context =>
                     {
                         var userContext = (UmbracoGraphQLContext)context.UserContext;
-                        return userContext.UmbracoContext.ContentCache.GetByXPath($"/root/{contentTypeAlias}");
+                        return userContext.UmbracoContext.Content.GetByXPath($"/root/{contentTypeAlias}");
                     });
             }
         }

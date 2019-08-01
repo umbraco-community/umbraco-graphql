@@ -96,7 +96,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                             Inputs variables = requestParams.Variables;
 
                             DateTime start = DateTime.Now;
-                            MiniProfiler.Start();
+                            var miniProfiler = MiniProfiler.StartNew();
                             ExecutionResult result = await _documentExecuter
                                 .ExecuteAsync(x =>
                                 {
@@ -132,7 +132,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                                 }
                                 result.Extensions["miniProfiler"] = JObject.FromObject(MiniProfiler.Current, new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() });
                             }
-                            MiniProfiler.Stop();
+                            miniProfiler.Stop();
 
                             return result;
                         });

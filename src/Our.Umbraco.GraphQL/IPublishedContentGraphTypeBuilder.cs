@@ -48,7 +48,7 @@ namespace Our.Umbraco.GraphQL
 
         public IEnumerable<FieldType> BuildContentPropertyFieldTypes(IContentTypeComposition contentType)
         {
-            PublishedContentType publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
+            IPublishedContentType publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
             foreach (PropertyType property in contentType.CompositionPropertyTypes)
             {
                 yield return new PublishedPropertyFieldType(publishedContentType, property, _graphQLValueResolvers);

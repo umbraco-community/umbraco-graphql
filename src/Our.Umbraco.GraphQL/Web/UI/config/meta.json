@@ -1,9 +1,0 @@
-{
-	"name": "GraphQLForUmbraco",
-	"version": "0.0.1",
-	"url": "https://github.com/rasmusjp/umbraco-graphql",
-	"author": "Rasmus John Pedersen - Offroadcode - Kyle Weems - Jack Penney - Pete Duncanson - Et. Al.",
-	"authorUrl": "https://github.com/rasmusjp/umbraco-graphql",
-	"license": "MIT",
-	"licenseUrl": "http://opensource.org/licenses/MIT"
-}

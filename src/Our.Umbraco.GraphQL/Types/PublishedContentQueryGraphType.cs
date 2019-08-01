@@ -1,4 +1,4 @@
-﻿using GraphQL.Types;
+using GraphQL.Types;
 using System.Collections.Generic;
 
 namespace Our.Umbraco.GraphQL.Types
@@ -16,7 +16,7 @@ namespace Our.Umbraco.GraphQL.Types
                 {
                     var userContext = (UmbracoGraphQLContext)context.UserContext;
                     var id = context.GetArgument<int>("id");
-                    return userContext.UmbracoContext.ContentCache.GetById(id);
+                    return userContext.UmbracoContext.Content.GetById(id);
                 });
 
             Field<NonNullGraphType<PublishedContentByTypeQueryGraphType>>()

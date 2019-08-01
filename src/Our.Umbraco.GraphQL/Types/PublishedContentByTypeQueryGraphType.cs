@@ -1,4 +1,4 @@
-﻿using GraphQL;
+using GraphQL;
 using GraphQL.Types;
 using System.Collections.Generic;
 
@@ -22,7 +22,7 @@ namespace Our.Umbraco.GraphQL.Types
                     {
                         var userContext = (UmbracoGraphQLContext)context.UserContext;
                         var id = context.GetArgument<int>("id");
-                        var result = userContext.UmbracoContext.ContentCache.GetById(id);
+                        var result = userContext.UmbracoContext.Content.GetById(id);
                         if(result != null && result.ContentType.Alias != contentTypeAlias)
                         {
                             var error = new ExecutionError($"Found content of type '{result.ContentType.Alias.ToPascalCase()}', but expected it to be '{contentTypeAlias.ToPascalCase()}'.");

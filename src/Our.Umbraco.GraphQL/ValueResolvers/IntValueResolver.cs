@@ -8,7 +8,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     [DefaultGraphQLValueResolver]
     public class IntValueResolver : GraphQLValueResolver
     {
-        public override Type GetGraphQLType(PublishedPropertyType propertyType)
+        public override Type GetGraphQLType(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(short) ||
                    propertyType.ClrType == typeof(int) ||
@@ -17,7 +17,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
                 : typeof(ListGraphType<IntGraphType>);
         }
 
-        public override bool IsResolver(PublishedPropertyType propertyType)
+        public override bool IsResolver(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(short) ||
                    propertyType.ClrType == typeof(int) ||

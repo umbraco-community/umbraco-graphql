@@ -11,20 +11,20 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     [DefaultGraphQLValueResolver]
     public class PublishedContentValueResolver : GraphQLValueResolver
     {
-        public override Type GetGraphQLType(PublishedPropertyType propertyType)
+        public override Type GetGraphQLType(IPublishedPropertyType propertyType)
         {
             return IsMultiPicker(propertyType.DataType)
                 ? typeof(ListGraphType<PublishedContentInterfaceGraphType>)
                 : typeof(PublishedContentInterfaceGraphType);
         }
 
-        public override bool IsResolver(PublishedPropertyType propertyType)
+        public override bool IsResolver(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(IPublishedContent) ||
                    propertyType.ClrType == typeof(IEnumerable<IPublishedContent>);
         }
 
-        public override object Resolve(IPublishedElement owner, PublishedPropertyType propertyType, object value)
+        public override object Resolve(IPublishedElement owner, IPublishedPropertyType propertyType, object value)
         {
             var isMultiPicker = IsMultiPicker(propertyType.DataType);
 

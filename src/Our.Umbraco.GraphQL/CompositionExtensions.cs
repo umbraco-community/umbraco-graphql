@@ -1,11 +1,10 @@
 using GraphQL;
 using GraphQL.Http;
-using LightInject;
 using Our.Umbraco.GraphQL.ValueResolvers;
 using Our.Umbraco.GraphQL.Web.Middleware;
 using System;
-using Umbraco.Core.Components;
-using global::Umbraco.Core.Composing;
+using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Our.Umbraco.GraphQL
 {
@@ -13,18 +12,18 @@ namespace Our.Umbraco.GraphQL
     {
         public static void RegisterGraphQLServices(this Composition composition)
         {
-            composition.Container.RegisterSingleton<ISchemaBuilder, UmbracoSchemaBuilder>();
-            composition.Container.RegisterSingleton<IPublishedContentGraphTypeBuilder, PublishedContentGraphTypeBuilder>();
+            composition.Register<ISchemaBuilder, UmbracoSchemaBuilder>(Lifetime.Singleton);
+            composition.Register<IPublishedContentGraphTypeBuilder, PublishedContentGraphTypeBuilder>();
 
-            composition.Container.RegisterInstance<IDependencyResolver>(new FuncDependencyResolver(t => composition.Container.TryGetInstance(t) ?? Activator.CreateInstance(t)));
-            composition.Container.RegisterSingleton<IDocumentExecuter, DocumentExecuter>();
-            composition.Container.RegisterSingleton<IDocumentWriter, DocumentWriter>();
+            composition.Register<IDependencyResolver>(factory => new FuncDependencyResolver(type => factory.TryGetInstance(type) ?? Activator.CreateInstance(type)));
+            composition.Register<IDocumentExecuter, DocumentExecuter>(Lifetime.Singleton);
+            composition.Register<IDocumentWriter, DocumentWriter>(Lifetime.Singleton);
 
-            composition.Container.RegisterSingleton<GraphQLRequestParserMiddleware>();
-            composition.Container.RegisterSingleton<GraphQLMiddleware>();
+            composition.Register<GraphQLRequestParserMiddleware>(Lifetime.Singleton);
+            composition.Register<GraphQLMiddleware>(Lifetime.Singleton);
 
-            composition.Container.RegisterCollectionBuilder<GraphQLValueResolverCollectionBuilder>()
-                .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IGraphQLValueResolver>());
+            composition.WithCollectionBuilder<GraphQLValueResolverCollectionBuilder>()
+                .Append(composition.TypeLoader.GetTypes<IGraphQLValueResolver>());
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     [DefaultGraphQLValueResolver]
     public class FloatValueResolver : GraphQLValueResolver
     {
-        public override Type GetGraphQLType(PublishedPropertyType propertyType)
+        public override Type GetGraphQLType(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(float)
                 ? typeof(FloatGraphType)
                 : typeof(ListGraphType<FloatGraphType>);
         }
 
-        public override bool IsResolver(PublishedPropertyType propertyType)
+        public override bool IsResolver(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(float) ||
                    propertyType.ClrType == typeof(IEnumerable<float>);

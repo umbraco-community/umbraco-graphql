@@ -8,7 +8,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
     [DefaultGraphQLValueResolver]
     public class DateValueResolver : GraphQLValueResolver
     {
-        public override Type GetGraphQLType(PublishedPropertyType propertyType)
+        public override Type GetGraphQLType(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(DateTime) ||
                    propertyType.ClrType == typeof(DateTimeOffset)
@@ -16,7 +16,7 @@ namespace Our.Umbraco.GraphQL.ValueResolvers
                 : typeof(ListGraphType<DateGraphType>);
         }
 
-        public override bool IsResolver(PublishedPropertyType propertyType)
+        public override bool IsResolver(IPublishedPropertyType propertyType)
         {
             return propertyType.ClrType == typeof(DateTime) ||
                    propertyType.ClrType == typeof(DateTimeOffset) ||
