@@ -41,7 +41,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="GraphQL" Version="2.1.0" />
+        <PackageReference Include="GraphQL" Version="2.4.0" />
         <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.0" />
         <PackageReference Include="UmbracoCms.Core" Version="8.1.0" />
         <PackageReference Include="UmbracoCms.Web" Version="8.1.0" />

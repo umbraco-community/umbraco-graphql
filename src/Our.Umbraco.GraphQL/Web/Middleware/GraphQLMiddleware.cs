@@ -143,13 +143,11 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
 
                         if (false == request.IsBatched)
                         {
-                            string response = _documentWriter.Write(responses[0]);
-                            await context.Response.WriteAsync(response);
+                            await _documentWriter.WriteAsync(context.Response.Body, responses[0]);
                         }
                         else
                         {
-                            string response = _documentWriter.Write(responses);
-                            await context.Response.WriteAsync(response);
+                            await _documentWriter.WriteAsync(context.Response.Body, responses);
                         }
                     }
                 }
