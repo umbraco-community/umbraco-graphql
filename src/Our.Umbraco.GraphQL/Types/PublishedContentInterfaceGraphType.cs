@@ -11,10 +11,7 @@ namespace Our.Umbraco.GraphQL.Types
         {
             Name = "PublishedContent";
 
-            Field<NonNullGraphType<PublishedContentDataGraphType>>()
-                .Name("_contentData")
-                .Description("Built in published content data.")
-                .Resolve(context => context.Source);
+            this.AddUmbracoBuiltInProperties();
         }
     }
 }

@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BE019E17-BF3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL", "src\Our.Umbraco.GraphQL\Our.Umbraco.GraphQL.csproj", "{59294783-3A17-479B-90C5-A3A2967176DE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL.Tests", "test\Our.Umbraco.GraphQL.Tests\Our.Umbraco.GraphQL.Tests.csproj", "{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{59294783-3A17-479B-90C5-A3A2967176DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59294783-3A17-479B-90C5-A3A2967176DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59294783-3A17-479B-90C5-A3A2967176DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

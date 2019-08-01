@@ -77,6 +77,14 @@ namespace Our.Umbraco.GraphQL
             type.RequirePermission(readPermissionKey);
         }
 
+        public static FieldBuilder<TSourceType, TReturnType> SetPermissions<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder, GraphType graphType, bool isBuiltInProperty = false)
+        {
+            SetPermissions(builder.FieldType, graphType, isBuiltInProperty);
+            return builder;
+        }
+
+
         public static void SetPermissions(this FieldType type, GraphType graphType, bool isBuiltInProperty = false)
         {
             // The graph type should have the doc type alias set in the meta data so we're accessing it from that

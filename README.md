@@ -45,19 +45,13 @@ Query examples based on The Starter Kit
     byType {
       People(id: "1116") {
         pageTitle
-        _contentData {
-          children {
-            items {
-              ... on Person {
-                _contentData {
-                  name
-                }
-                department
-                photo {
-                  _contentData {
-                    url
-                  }
-                }
+        _children {
+          items {
+            ... on Person {
+              _name
+              department
+              photo {
+                _url
               }
             }
           }
@@ -76,19 +70,13 @@ We can also do some simple filtering and sorting, ([Inspired by the Grahpcool fi
     byType {
       People(id: "1116") {
         pageTitle
-        _contentData {
-          peopleStartsWithJ: children(filter: {name_starts_with: "J"}, orderBy: name_ASC) {
-            items {
-              ... on Person {
-                _contentData {
-                  name
-                }
-                department
-                photo {
-                  _contentData {
-                    url
-                  }
-                }
+        peopleStartsWithJ: _children(filter: {_name_starts_with: "J"}, orderBy: _name_ASC) {
+          items {
+            ... on Person {
+              _name
+              department
+              photo {
+                _url
               }
             }
           }
@@ -107,11 +95,9 @@ And even query for multiple types at the same time
     byType {
       People(id: "1116") {
         pageTitle
-        _contentData {
-          peopleStartsWithJ: children(filter: {name_starts_with: "J"}, orderBy: name_ASC) {
-            items {
-              ...SimplePerson
-            }
+        peopleStartsWithJ: _children(filter: {_name_starts_with: "J"}, orderBy: _name_ASC) {
+          items {
+            ...SimplePerson
           }
         }
       }
@@ -121,11 +107,9 @@ And even query for multiple types at the same time
         featuredProducts {
           ...SimpleProduct
         }
-        _contentData {
-          children {
-            items {
-              ...SimpleProduct
-            }
+        _children {
+          items {
+            ...SimpleProduct
           }
         }
       }
@@ -134,27 +118,19 @@ And even query for multiple types at the same time
 }
 
 fragment SimplePerson on Person {
-  _contentData {
-    name
-  }
+  _name
   department
   photo {
-    _contentData {
-      url
-    }
+    _url
   }
 }
 
 fragment SimpleProduct on Product {
-  _contentData {
-    name
-  }
+  _name
   price
   sku
   photos {
-    _contentData {
-      url
-    }
+    _url
   }
 }
 ```

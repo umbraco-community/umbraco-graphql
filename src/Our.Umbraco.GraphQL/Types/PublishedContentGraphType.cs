@@ -31,15 +31,8 @@ namespace Our.Umbraco.GraphQL.Types
                 }
             }
 
-            Field<NonNullGraphType<PublishedContentDataGraphType>>()
-                .Name("_contentData")
-                .Description("Built in published content data.")
-                .Resolve(context => context.Source);
-
-            foreach (var field in graphTypeBuilder.BuildContentPropertyFieldTypes(contentType))
-            {
-                AddField(field)/*.SetPermissions(this, true)*/;
-            }
+            this.AddUmbracoBuiltInProperties();
+            this.AddUmbracoContentPropeties(contentType, itemType);
         }
     }
 }
