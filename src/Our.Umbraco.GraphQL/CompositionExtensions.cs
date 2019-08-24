@@ -19,7 +19,7 @@ namespace Our.Umbraco.GraphQL
             composition.Register<IDocumentExecuter, DocumentExecuter>(Lifetime.Singleton);
             composition.Register<IDocumentWriter, DocumentWriter>(Lifetime.Singleton);
 
-            composition.Register<GraphQLPlaygroundMiddleware>(Lifetime.Singleton);
+            composition.Register<GraphQLPlaygroundMiddleware>(Lifetime.Scope);
             composition.Register<GraphQLRequestParserMiddleware>(Lifetime.Singleton);
             composition.Register<GraphQLMiddleware>(Lifetime.Singleton);
 

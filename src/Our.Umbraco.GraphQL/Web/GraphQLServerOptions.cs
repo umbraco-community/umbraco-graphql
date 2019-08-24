@@ -1,7 +1,6 @@
-using System;
+using System.Collections.Generic;
 using System.Web.Cors;
 using Microsoft.Owin.Cors;
-using Umbraco.Core.Models;
 using Task = System.Threading.Tasks.Task;
 
 namespace Our.Umbraco.GraphQL.Web
@@ -46,9 +45,10 @@ namespace Our.Umbraco.GraphQL.Web
         public ICorsPolicyProvider CorsPolicyProvder { get; }
         //public ComplexityConfiguration ComplexityConfiguration { get; set; }
         public bool Debug { get; set; }
-        //public bool ExposeGraphiQL { get; set; } = true;
         //public bool EnableLogin { get; set; } = false;
         public bool EnableMetrics { get; set; } = false;
-        //public bool ExposeSchema { get; set; } = true;
+        public bool EnablePlayground { get; set; } = false;
+        public Dictionary<string, object> GraphQLConfig { get; set; }
+        public Dictionary<string, object> PlaygroundSettings { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace Our.Umbraco.GraphQL.Web
 
                     subApp.UseCors(corsOptions)
                         .Use<FactoryMiddleware>(factory)
-                        .Use((ctx, next) => ctx.Get<IFactory>("umbraco:factory").GetInstance<GraphQLPlaygroundMiddleware>().Invoke(ctx, next))
+                        .Use((ctx, next) => options.EnablePlayground ? ctx.Get<IFactory>("umbraco:factory").CreateInstance<GraphQLPlaygroundMiddleware>(options).Invoke(ctx, next) : next())
                         .Use((ctx, next) => ctx.Get<IFactory>("umbraco:factory").GetInstance<GraphQLRequestParserMiddleware>().Invoke(ctx, next))
                         .Use((ctx, next) => ctx.Get<IFactory>("umbraco:factory").GetInstance<GraphQLMiddleware>().Invoke(ctx, options));
                 });
