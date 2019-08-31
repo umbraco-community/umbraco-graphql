@@ -1,7 +1,10 @@
 using GraphQL;
+using GraphQL.Builders;
+using GraphQL.Language.AST;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.ValueResolvers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -102,22 +105,42 @@ namespace Our.Umbraco.GraphQL.Types
                 .Resolve(context =>
                     (context.GetArgument<bool?>("includeSelf") == true
                         ? context.Source.AncestorsOrSelf()
-                        : context.Source.Ancestors()).Filter(context).ToConnection(context)
+                        : context.Source.Ancestors()).RemoveUnwanted(context).Filter(context).ToConnection(context)
                 );
 
             graphType.FilteredConnection<PublishedContentInterfaceGraphType, IPublishedContent>()
                 .Name("_siblings")
                 .Description("Siblings of the content.")
                 .Bidirectional()
-                .Resolve(context => context.Source.Siblings().Filter(context).ToConnection(context));
+                .Resolve(context => context.Source.Siblings().RemoveUnwanted(context).Filter(context).ToConnection(context));
 
             graphType.FilteredConnection<PublishedContentInterfaceGraphType, IPublishedContent>()
                 .Name("_children")
                 .Description("Children of the content.")
                 .Bidirectional()
-                .Resolve(context => context.Source.Children.Filter(context).ToConnection(context));
+                .Resolve(context => context.Source.Children.RemoveUnwanted(context).Filter(context).ToConnection(context));
 
             return graphType;
+        }
+
+        static IEnumerable<IPublishedContent> RemoveUnwanted(this IEnumerable<IPublishedContent> items, ResolveConnectionContext<IPublishedContent> context)
+        {
+            var selections = context.SubFields
+                .Select(sf => sf.Value.SelectionSet)
+                .SelectMany(ss => ss.Selections);
+
+            if (!selections.All(s => s.GetType() == typeof(InlineFragment) || s.GetType() == typeof(FragmentSpread)))
+                return items;
+
+            var inlineFragments = selections.OfType<InlineFragment>()
+                .Select(inlineFragment => inlineFragment.Type.Name);
+
+            var fragmentSpreads = selections.OfType<FragmentSpread>()
+                .Select(fragmentSpread => context.Fragments.First(f => f.Name == fragmentSpread.Name).Type.Name);
+
+            var fragments = inlineFragments.Concat(fragmentSpreads);
+
+            return items.Where(i => fragments.Contains(i.ContentType.Alias.ToPascalCase())).ToList();
         }
     }
 }
