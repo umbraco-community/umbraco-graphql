@@ -10,20 +10,23 @@ namespace Our.Umbraco.GraphQL.Adapters.Resolvers
 {
     public class FieldResolver : IFieldResolver
     {
-        private readonly MemberInfo _memberInfo;
+        private readonly FieldType _fieldType;
         private readonly IDependencyResolver _dependencyResolver;
 
-        public FieldResolver(MemberInfo memberInfo, IDependencyResolver dependencyResolver)
+        public FieldResolver(FieldType fieldType, IDependencyResolver dependencyResolver)
         {
-            _memberInfo = memberInfo ?? throw new ArgumentNullException(nameof(memberInfo));
+            _fieldType = fieldType ?? throw new ArgumentNullException(nameof(fieldType));
             _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
         }
 
         public object Resolve(ResolveFieldContext context)
         {
-            var source = context.Source ?? _dependencyResolver.Resolve(_memberInfo.DeclaringType);
+            var memberInfo = _fieldType.GetMetadata<MemberInfo>(nameof(MemberInfo));
+            var source = context.Source;
+            if(source == null || memberInfo.DeclaringType.IsInstanceOfType(source) == false)
+                source = _dependencyResolver.Resolve(memberInfo.DeclaringType);
 
-            switch (_memberInfo)
+            switch (memberInfo)
             {
                 case FieldInfo fieldInfo:
                     return fieldInfo.GetValue(source);
@@ -38,23 +41,28 @@ namespace Our.Umbraco.GraphQL.Adapters.Resolvers
 
         private object CallMethod(MethodInfo methodInfo, object source,  ResolveFieldContext context)
         {
-            var arguments = methodInfo.GetParameters().ToList();
-            var parameters = new object[arguments.Count];
-            for (var i = 0; i < arguments.Count; i++)
-            {
-                var argument = arguments[i];
-                var parameterType = argument.ParameterType;
+            var parameters = methodInfo.GetParameters().ToList();
+            var arguments = new object[parameters.Count];
 
-                if (argument.GetCustomAttribute<InjectAttribute>() != null)
+            var argumentsIndex = 0;
+            for (var i = 0; i < parameters.Count; i++)
+            {
+                var parameterInfo = parameters[i];
+                var parameterType = parameterInfo.ParameterType;
+
+                if (parameterInfo.GetCustomAttribute<InjectAttribute>() != null)
                 {
-                    parameters[i] = _dependencyResolver.Resolve(parameterType);
+                    arguments[i] = _dependencyResolver.Resolve(parameterType);
                     continue;
                 }
 
-                parameters[i] = context.GetArgument(parameterType, argument.Name, argument.DefaultValue);
+                var argument = _fieldType.Arguments[argumentsIndex];
+                argumentsIndex++;
+
+                arguments[i] = context.GetArgument(parameterType, parameterInfo.Name, argument.DefaultValue);
             }
 
-            return methodInfo.Invoke(source, parameters);
+            return methodInfo.Invoke(source, arguments);
         }
     }
 }

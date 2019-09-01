@@ -105,9 +105,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Metadata.Should().ContainKey(nameof(TypeInfo)).WhichValue.Should()
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Metadata.Should().ContainKey(nameof(TypeInfo)).WhichValue.Should()
                 .Be(typeof(ClassWithoutDescription));
         }
 
@@ -116,9 +117,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (EnumerationGraphType) adapter.Adapt<EnumWithoutDescription?>();
+            var graphType = adapter.Adapt<EnumWithoutDescription?>();
 
-            graphType.Values.Should().Contain(x => x.Name == "ONE")
+            graphType.Should().BeAssignableTo<EnumerationGraphType>()
+                .Which.Values.Should().Contain(x => x.Name == "ONE")
                 .And.Contain(x => x.Name == "SEVEN")
                 .And.Contain(x => x.Name == "FORTY_TWO");
         }
@@ -131,9 +133,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (EnumerationGraphType) adapter.Adapt<EnumWithName?>();
+            var graphType = adapter.Adapt<EnumWithName?>();
 
-            graphType.Values.Should().Contain(x => x.Name == expectedName);
+            graphType.Should().BeAssignableTo<EnumerationGraphType>()
+                .Which.Values.Should().Contain(x => x.Name == expectedName);
         }
 
         [Theory]
@@ -144,9 +147,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (EnumerationGraphType) adapter.Adapt<EnumWithDescription?>();
+            var graphType = adapter.Adapt<EnumWithDescription?>();
 
-            graphType.Values.Should().Contain(x => x.Description == expectedName);
+            graphType.Should().BeAssignableTo<EnumerationGraphType>()
+                .Which.Values.Should().Contain(x => x.Description == expectedName);
         }
 
         [Theory]
@@ -157,9 +161,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (EnumerationGraphType) adapter.Adapt<EnumWithDeprecationReason?>();
+            var graphType = adapter.Adapt<EnumWithDeprecationReason?>();
 
-            graphType.Values.Should().Contain(x => x.DeprecationReason == expectedName);
+            graphType.Should().BeAssignableTo<EnumerationGraphType>()
+                .Which.Values.Should().Contain(x => x.DeprecationReason == expectedName);
         }
 
         [Fact]
@@ -167,9 +172,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicField));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicField));
         }
 
         [Fact]
@@ -177,9 +183,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<InheritedClass>();
+            var graphType = adapter.Adapt<InheritedClass>();
 
-            graphType.Fields.Should().Contain(x => x.Name == nameof(InheritedClass.PublicField));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(InheritedClass.PublicField));
         }
 
         [Fact]
@@ -187,9 +194,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == "_privateField");
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == "_privateField");
         }
 
         [Fact]
@@ -197,9 +205,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectField));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectField));
         }
 
         [Fact]
@@ -207,9 +216,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticField));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticField));
         }
 
         [Fact]
@@ -217,9 +227,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicProperty));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicProperty));
         }
 
         [Fact]
@@ -227,9 +238,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == "PrivateProperty");
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == "PrivateProperty");
         }
 
         [Fact]
@@ -237,9 +249,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.PrivateGetProperty));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.PrivateGetProperty));
         }
 
         [Fact]
@@ -247,9 +260,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.SetOnlyProperty));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.SetOnlyProperty));
         }
 
         [Fact]
@@ -257,9 +271,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticProperty));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticProperty));
         }
 
         [Fact]
@@ -267,9 +282,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectProperty));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectProperty));
         }
 
         [Fact]
@@ -277,9 +293,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicMethod));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithoutDescription.PublicMethod));
         }
 
         [Fact]
@@ -287,9 +304,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == "PrivateMethod");
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == "PrivateMethod");
         }
 
         [Fact]
@@ -297,9 +315,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticMethod));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.StaticMethod));
         }
 
         [Fact]
@@ -307,9 +326,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == $"get_{nameof(ClassWithoutDescription.PublicProperty)}");
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == $"get_{nameof(ClassWithoutDescription.PublicProperty)}");
         }
 
         [Fact]
@@ -317,9 +337,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.VoidMethod));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.VoidMethod));
         }
 
         [Fact]
@@ -327,9 +348,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectMethod));
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.ObjectMethod));
         }
 
         [Fact]
@@ -337,9 +359,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.PublicField))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.PublicField))
                 .Which.Metadata.Should().ContainKey(nameof(MemberInfo))
                 .WhichValue.Should()
                 .Be(typeof(ClassWithoutDescription).GetField(nameof(ClassWithoutDescription.PublicField)));
@@ -353,9 +376,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<ClassWithName>();
+            var graphType = adapter.Adapt<ClassWithName>();
 
-            graphType.Fields.Should().Contain(x => x.Name == expectedName);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == expectedName);
         }
 
         [Theory]
@@ -366,9 +390,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<ClassWithDescription>();
+            var graphType = adapter.Adapt<ClassWithDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Description == expectedName);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Description == expectedName);
         }
 
         [Theory]
@@ -379,9 +404,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<ClassWithDeprecationReason>();
+            var graphType = adapter.Adapt<ClassWithDeprecationReason>();
 
-            graphType.Fields.Should().Contain(x => x.DeprecationReason == expectedName);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.DeprecationReason == expectedName);
         }
 
         [Theory]
@@ -392,9 +418,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<AbstractClassWithoutDescription>();
+            var graphType = adapter.Adapt<AbstractClassWithoutDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Name == memberName);
+            graphType.Should().BeAssignableTo<IInterfaceGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == memberName);
         }
 
         [Theory]
@@ -404,9 +431,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<IInterfaceWithoutDescription>();
+            var graphType = adapter.Adapt<IInterfaceWithoutDescription>();
 
-            graphType.Fields.Should().Contain(x => x.Name == memberName);
+            graphType.Should().BeAssignableTo<IInterfaceGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == memberName);
         }
 
         [Theory]
@@ -417,28 +445,42 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().NotContain(x => x.Name == memberName);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == memberName);
+        }
+
+        [Theory]
+        [InlineData(nameof(ClassWithoutDescription.EnumWithoutDescription), typeof(NonNullGraphType<EnumerationGraphType<EnumWithoutDescription>>))]
+        [InlineData(nameof(ClassWithoutDescription.NullableEnumWithoutDescription), typeof(EnumerationGraphType<EnumWithoutDescription>))]
+        [InlineData(nameof(ClassWithoutDescription.ListOfClassWithoutDescription), typeof(ListGraphType<ObjectGraphType<ClassWithoutDescription>>))]
+        public void Adapt_Members_SetsCorrectResolvedType(string memberName, Type expectedType)
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == memberName)
+                .Which.ResolvedType.Should().BeOfType(expectedType);
         }
 
         [Theory]
         [InlineData(nameof(ClassWithoutDescription.PublicField), typeof(NonNullGraphType<IntGraphType>))]
         [InlineData(nameof(ClassWithoutDescription.PublicProperty), typeof(StringGraphType))]
         [InlineData(nameof(ClassWithoutDescription.PublicMethod), typeof(NonNullGraphType<BooleanGraphType>))]
-        [InlineData(nameof(ClassWithoutDescription.EnumWithoutDescription), typeof(NonNullGraphType<EnumerationGraphType<EnumWithoutDescription>>))]
-        [InlineData(nameof(ClassWithoutDescription.NullableEnumWithoutDescription), typeof(EnumerationGraphType<EnumWithoutDescription>))]
         [InlineData(nameof(ClassWithoutDescription.ListOfString), typeof(ListGraphType<StringGraphType>))]
-        [InlineData(nameof(ClassWithoutDescription.ListOfClassWithoutDescription), typeof(ListGraphType<ObjectGraphType<ClassWithoutDescription>>))]
         [InlineData(nameof(ClassWithoutDescription.ListOfInt), typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
-        public void Adapt_Members_SetsCorrectResolvedType(string memberName, Type expectedType)
+        public void Adapt_Members_SetsCorrectType(string memberName, Type expectedType)
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt<ClassWithoutDescription>();
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == memberName)
-                .Which.ResolvedType.Should().BeOfType(expectedType);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == memberName)
+                .Which.Type.Should().Be(expectedType);
         }
 
         [Theory]
@@ -466,24 +508,51 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == memberName)
-                .Which.ResolvedType.Should().BeOfType(expectedType);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == memberName)
+                .Which.Type.Should().Be(expectedType);
         }
 
         [Theory]
         [InlineData(nameof(ClassWithoutDescription.NonNullItemField), typeof(ListGraphType<NonNullGraphType<StringGraphType>>))]
         [InlineData(nameof(ClassWithoutDescription.NonNullItemMethod), typeof(ListGraphType<NonNullGraphType<StringGraphType>>))]
         [InlineData(nameof(ClassWithoutDescription.NonNullItemProperty), typeof(ListGraphType<NonNullGraphType<StringGraphType>>))]
-        public void Adapt_EnumerableMembersWithNonNullItemAttribute_ResolvedTypeIsNonNullType(string memberName, Type expectedType)
+        public void Adapt_EnumerableMembersWithNonNullItemAttribute_TypeIsNonNullType(string memberName, Type expectedType)
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == memberName)
-                .Which.ResolvedType.Should().BeOfType(expectedType);
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == memberName)
+                .Which.Type.Should().Be(expectedType);
+        }
+
+        [Fact]
+        public void Adapt_MembersWithNonNullAttribute_IsNonNullResolvedType()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.NonNullOfComplexTypeField))
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>();
+        }
+
+        [Fact]
+        public void Adapt_EnumerableMembersWithNonNullItemAttribute_ResolvedTypeIsNonNullType()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.NonNullItemOfComplexTypeField))
+                .Which.ResolvedType.Should().BeAssignableTo<ListGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>();
         }
 
         [Theory]
@@ -495,9 +564,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == memberName)
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == memberName)
                 .Which.DefaultValue.Should().Be(expectedDefaultValue);
         }
 
@@ -506,12 +576,41 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArguments))
-                .Which.Arguments.Should().HaveCount(1)
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArguments))
+                .Which.Arguments.Should().HaveCount(2)
                 .And.ContainSingle(x => x.Name == "name")
-                .Which.ResolvedType.Should().BeOfType<StringGraphType>();
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType<StringGraphType>>();
+        }
+
+        [Fact]
+        public void Adapt_MethodsWithValueTypeArguments_IsAddedAsArguments()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArguments))
+                .Which.Arguments.Should().HaveCount(2)
+                .And.ContainSingle(x => x.Name == "year")
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType<IntGraphType>>();
+        }
+
+        [Fact]
+        public void Adapt_MethodArgumentWithDefaultValue_ArgumentShouldNotBeNonNull()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArgumentDefaultValue))
+                .Which.Arguments.Should().HaveCount(2)
+                .And.ContainSingle(x => x.Name == "year")
+                .Which.ResolvedType.Should().NotBeAssignableTo<NonNullGraphType>();
         }
 
         [Fact]
@@ -519,9 +618,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArgumentDefaultValue))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArgumentDefaultValue))
                 .Which.Arguments.Should().HaveCount(2)
                 .And.ContainSingle(x => x.Name == "year")
                 .Which.DefaultValue.Should().Be(1970);
@@ -532,9 +632,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArgumentDefaultValue))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithArgumentDefaultValue))
                 .Which.Arguments.Should().HaveCount(2)
                 .And.ContainSingle(x => x.Name == "name")
                 .Which.DefaultValue.Should().Be("john");
@@ -547,7 +648,8 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithName).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithName.MethodWithArgument))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithName.MethodWithArgument))
                 .Which.Arguments.Should().ContainSingle(x => x.Name == "myName");
         }
 
@@ -556,9 +658,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithDescription).GetTypeInfo());
 
-            graphType.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithDescription.MethodWithArgument))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithDescription.MethodWithArgument))
                 .Which.Arguments.Should().ContainSingle(x => x.Name == "name")
                 .Which.Description.Should().Be("Argument description.");
         }
@@ -568,12 +671,26 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should()
-                .ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithComplexArgument))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithComplexArgument))
                 .Which.Arguments.Should().ContainSingle(x => x.Name == "filter")
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>()
                 .Which.ResolvedType.Should().BeAssignableTo<IInputObjectGraphType>();
+        }
+
+        [Fact]
+        public void Adapt_MethodWithEnumArgument_ArgumentIsEnumerationGraphType()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithEnumArgument))
+                .Which.Arguments.Should().ContainSingle(x => x.Name == "enumWithName")
+                .Which.ResolvedType.Should().BeAssignableTo<EnumerationGraphType>();
         }
 
         [Fact]
@@ -581,10 +698,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should()
-                .ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithInjectedArgument))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.MethodWithInjectedArgument))
                 .Which.Arguments.Should().NotContain(x => x.Name == "injected");
         }
 
@@ -593,10 +710,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         {
             var adapter = CreateSUT();
 
-            var graphType = (IComplexGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            graphType.Fields.Should()
-                .ContainSingle(x => x.Name == nameof(ClassWithoutDescription.PublicField))
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.PublicField))
                 .Which.Resolver.Should().BeOfType<FieldResolver>();
         }
 
@@ -641,8 +758,12 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             var graphType = (IObjectGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
 
-            var inputObjectGraphType = (IInputObjectGraphType) graphType.Fields.Single(x => x.Name == nameof(ClassWithoutDescription.MethodWithComplexArgument))
+            var filterFieldGraphType = graphType.Fields.Single(x => x.Name == nameof(ClassWithoutDescription.MethodWithComplexArgument))
                 .Arguments.Single(x => x.Name == "filter").ResolvedType;
+
+            var inputObjectGraphType = filterFieldGraphType.Should().BeAssignableTo<NonNullGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<IInputObjectGraphType>()
+                .Subject;
 
             visitor.Received(1).Visit(Arg.Is(inputObjectGraphType));
         }
@@ -695,6 +816,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             public string NonNullField;
 
             [NonNull]
+            public ClassWithoutDescription NonNullOfComplexTypeField;
+
+            [NonNull]
             public string NonNullProperty { get; set; }
 
             [NonNull]
@@ -709,6 +833,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             [NonNullItem]
             public IEnumerable<string> NonNullItemMethod() => null;
 
+            [NonNullItem]
+            public IEnumerable<ClassWithName> NonNullItemOfComplexTypeField;
+
             [DefaultValue("FieldDefaultValue")]
             public string FieldWithDefaultValue;
 
@@ -718,9 +845,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             [DefaultValue("MethodDefaultValue")]
             public string MethodWithDefaultValue() => null;
 
-            public string MethodWithArguments(string name) => null;
+            public string MethodWithArguments(string name, int year) => null;
             public string MethodWithArgumentDefaultValue([DefaultValue("john")] string name, int year = 1970) => null;
             public string MethodWithComplexArgument(Filter filter) => null;
+            public string MethodWithEnumArgument(EnumWithName? enumWithName) => null;
             public string MethodWithInjectedArgument([Inject]Filter injected) => null;
         }
 
