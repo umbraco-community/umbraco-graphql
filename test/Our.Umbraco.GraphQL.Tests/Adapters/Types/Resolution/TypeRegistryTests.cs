@@ -3,7 +3,10 @@ using System.Reflection;
 using FluentAssertions;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
+using Our.Umbraco.GraphQL.Types;
 using Xunit;
+using GuidGraphType = Our.Umbraco.GraphQL.Adapters.Types.GuidGraphType;
+using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
 {
@@ -70,6 +73,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
         [InlineData(typeof(DateTimeOffset), typeof(DateTimeOffsetGraphType))]
         [InlineData(typeof(TimeSpan), typeof(TimeSpanMillisecondsGraphType))]
         [InlineData(typeof(Uri), typeof(UriGraphType))]
+        [InlineData(typeof(Id), typeof(IdGraphType))]
         public void Get_Type_ReturnsRegisteredType(Type type, Type graphType)
         {
             var typeRegistry = CreateSUT();
@@ -93,6 +97,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
         [InlineData(typeof(DateTime?), typeof(DateTimeGraphType))]
         [InlineData(typeof(DateTimeOffset?), typeof(DateTimeOffsetGraphType))]
         [InlineData(typeof(TimeSpan?), typeof(TimeSpanMillisecondsGraphType))]
+        [InlineData(typeof(Id?), typeof(IdGraphType))]
         public void Get_NullableType_ReturnsRegisteredType(Type type, Type graphType)
         {
             var typeRegistry = CreateSUT();

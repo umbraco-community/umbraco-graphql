@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
       <TargetFramework>net472</TargetFramework>
-      <WarningLevel>3</WarningLevel>
+      <WarningLevel>2</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="FluentAssertions" Version="5.8.0" />

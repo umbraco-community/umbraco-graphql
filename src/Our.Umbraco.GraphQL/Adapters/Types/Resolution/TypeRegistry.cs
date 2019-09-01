@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using GraphQL;
 using GraphQL.Types;
+using Our.Umbraco.GraphQL.Types;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
 {
@@ -31,6 +32,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<DateTimeOffset, DateTimeOffsetGraphType>();
             Add<TimeSpan, TimeSpanMillisecondsGraphType>();
             Add<Uri, UriGraphType>();
+            Add<Id, IdGraphType>();
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType
