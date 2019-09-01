@@ -9,8 +9,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
 {
     public class TypeRegistryTests
     {
-        private TypeRegistry CreateSUT()
-            => new TypeRegistry();
+        private TypeRegistry CreateSUT() => new TypeRegistry();
 
         [Fact]
         public void Add_WithTypes_DoesNotThrow()

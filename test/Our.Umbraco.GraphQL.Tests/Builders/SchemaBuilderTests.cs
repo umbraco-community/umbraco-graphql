@@ -3,7 +3,9 @@ using System.Reflection;
 using FluentAssertions;
 using GraphQL.Types;
 using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using Our.Umbraco.GraphQL.Adapters;
+using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Builders;
 using Xunit;
 
@@ -11,8 +13,17 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
 {
     public class SchemaBuilderTests
     {
-        private SchemaBuilder CreateSUT(IGraphTypeAdapter graphTypeAdapter = null) =>
-            new SchemaBuilder(graphTypeAdapter ?? Substitute.For<IGraphTypeAdapter>());
+        private SchemaBuilder CreateSUT(IGraphTypeAdapter graphTypeAdapter = null, GraphVisitor visitor = null)
+        {
+            if (graphTypeAdapter == null)
+            {
+                var queryObjectGraphType = new ObjectGraphType();
+                graphTypeAdapter = Substitute.For<IGraphTypeAdapter>();
+                graphTypeAdapter.Adapt(Arg.Is(typeof(Query).GetTypeInfo())).Returns(queryObjectGraphType);
+            }
+
+            return new SchemaBuilder(graphTypeAdapter, visitor);
+        }
 
         [Fact]
         public void Build_WithNull_ThrowsException()
@@ -55,6 +66,17 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
             var schema = schemaBuilder.Build<SchemaWithQuery>();
 
             schema.Query.Should().Be(queryObjectGraphType);
+        }
+
+        [Fact]
+        public void Build_WithVisitor_CallsVisitWithSchema()
+        {
+            var visitor = Substitute.For<GraphVisitor>();
+            var schemaBuilder = CreateSUT(visitor: visitor);
+
+            var schema = schemaBuilder.Build<SchemaWithQuery>();
+
+            visitor.Received(1).Visit(Arg.Is(schema));
         }
 
         private class EmptySchema

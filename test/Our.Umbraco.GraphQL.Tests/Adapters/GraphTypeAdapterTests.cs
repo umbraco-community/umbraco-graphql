@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Types;
+using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
+using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
 using Xunit;
 
@@ -14,7 +17,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 {
     public class GraphTypeAdapterTests
     {
-        private GraphTypeAdapter CreateSUT() => new GraphTypeAdapter(new TypeRegistry(), new DefaultDependencyResolver());
+        private GraphTypeAdapter CreateSUT(GraphVisitor visitor = null) => new GraphTypeAdapter(new TypeRegistry(), new DefaultDependencyResolver(), visitor);
 
         [Fact]
         public void Adapt_Null_ThrowsArgumentNullException()
@@ -595,6 +598,53 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             graphType.Fields.Should()
                 .ContainSingle(x => x.Name == nameof(ClassWithoutDescription.PublicField))
                 .Which.Resolver.Should().BeOfType<FieldResolver>();
+        }
+
+        [Fact]
+        public void Adapt_ClassWithVisitor_CallsVisitWithGraphType()
+        {
+            var visitor = Substitute.For<GraphVisitor>();
+            var adapter = CreateSUT(visitor);
+
+            var graphType = (IObjectGraphType) adapter.Adapt(typeof(ClassWithDescription).GetTypeInfo());
+
+            visitor.Received(1).Visit(Arg.Is(graphType));
+        }
+
+        [Fact]
+        public void Adapt_AbstractClassWithVisitor_CallsVisitWithGraphType()
+        {
+            var visitor = Substitute.For<GraphVisitor>();
+            var adapter = CreateSUT(visitor);
+
+            var graphType = (IInterfaceGraphType) adapter.Adapt(typeof(AbstractClassWithoutDescription).GetTypeInfo());
+
+            visitor.Received(1).Visit(Arg.Is(graphType));
+        }
+
+        [Fact]
+        public void Adapt_InterfaceWithVisitor_CallsVisitWithGraphType()
+        {
+            var visitor = Substitute.For<GraphVisitor>();
+            var adapter = CreateSUT(visitor);
+
+            var graphType = (IInterfaceGraphType) adapter.Adapt(typeof(IInterfaceWithoutDescription).GetTypeInfo());
+
+            visitor.Received(1).Visit(Arg.Is(graphType));
+        }
+
+        [Fact]
+        public void Adapt_InputTypeWithVisitor_CallsVisitWithGraphType()
+        {
+            var visitor = Substitute.For<GraphVisitor>();
+            var adapter = CreateSUT(visitor);
+
+            var graphType = (IObjectGraphType) adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            var inputObjectGraphType = (IInputObjectGraphType) graphType.Fields.Single(x => x.Name == nameof(ClassWithoutDescription.MethodWithComplexArgument))
+                .Arguments.Single(x => x.Name == "filter").ResolvedType;
+
+            visitor.Received(1).Visit(Arg.Is(inputObjectGraphType));
         }
 
         private abstract class AbstractClassWithoutDescription

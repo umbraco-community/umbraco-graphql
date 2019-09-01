@@ -6,6 +6,7 @@ using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
+using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
 
 namespace Our.Umbraco.GraphQL.Adapters
@@ -15,11 +16,13 @@ namespace Our.Umbraco.GraphQL.Adapters
         private readonly Dictionary<TypeInfo, IGraphType> _cache;
         private readonly ITypeRegistry _typeRegistry;
         private readonly IDependencyResolver _dependencyResolver;
+        private readonly IGraphVisitor _visitor;
 
-        public GraphTypeAdapter(ITypeRegistry typeRegistry, IDependencyResolver dependencyResolver)
+        public GraphTypeAdapter(ITypeRegistry typeRegistry, IDependencyResolver dependencyResolver, IGraphVisitor visitor)
         {
             _typeRegistry = typeRegistry ?? throw new ArgumentNullException(nameof(typeRegistry));
             _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            _visitor = visitor;
             _cache = new Dictionary<TypeInfo, IGraphType>();
         }
 
@@ -32,25 +35,29 @@ namespace Our.Umbraco.GraphQL.Adapters
         {
             if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
 
-            var initialType = typeInfo;
-            typeInfo = UnwrapTypeInfo(typeInfo);
-            var graphType = TryGetFromCache(typeInfo, initialType);
+            var unwrappedTypeInfo = UnwrapTypeInfo(typeInfo);
+            var graphType = TryGetFromCache(unwrappedTypeInfo, typeInfo);
             if (graphType != null) return graphType;
 
-            if (typeInfo.IsEnum)
+            if (unwrappedTypeInfo.IsEnum)
             {
-                var type = typeof(EnumerationGraphType<>).MakeGenericType(typeInfo);
-
-                return Wrap(initialType, CreateGraphType(typeInfo, type));
+                graphType = CreateGraphType(unwrappedTypeInfo,
+                    typeof(EnumerationGraphType<>).MakeGenericType(unwrappedTypeInfo));
+            }
+            else if (unwrappedTypeInfo.IsInterface || unwrappedTypeInfo.IsAbstract)
+            {
+                graphType = CreateGraphType(unwrappedTypeInfo,
+                    typeof(InterfaceGraphType<>).MakeGenericType(unwrappedTypeInfo));
+                _visitor?.Visit((IInterfaceGraphType) graphType);
+            }
+            else
+            {
+                graphType = CreateGraphType(unwrappedTypeInfo,
+                    typeof(ObjectGraphType<>).MakeGenericType(unwrappedTypeInfo));
+                _visitor?.Visit((IObjectGraphType) graphType);
             }
 
-            if (typeInfo.IsInterface || typeInfo.IsAbstract)
-            {
-                return Wrap(initialType,
-                    CreateGraphType(typeInfo, typeof(InterfaceGraphType<>).MakeGenericType(typeInfo)));
-            }
-
-            return Wrap(initialType, CreateGraphType(typeInfo, typeof(ObjectGraphType<>).MakeGenericType(typeInfo)));
+            return Wrap(typeInfo, graphType);
         }
 
         private IGraphType AdaptInput(TypeInfo typeInfo)
@@ -60,8 +67,9 @@ namespace Our.Umbraco.GraphQL.Adapters
             var graphType = TryGetFromCache(typeInfo, initialType);
             if (graphType != null) return graphType;
 
-            return Wrap(initialType,
-                CreateGraphType(typeInfo, typeof(InputObjectGraphType<>).MakeGenericType(typeInfo)));
+            graphType = CreateGraphType(typeInfo, typeof(InputObjectGraphType<>).MakeGenericType(typeInfo));
+            _visitor?.Visit((IInputObjectGraphType) graphType);
+            return Wrap(initialType, graphType);
         }
 
         private void AddFields(TypeInfo typeInfo, IComplexGraphType graphType)
@@ -104,7 +112,7 @@ namespace Our.Umbraco.GraphQL.Adapters
                 resolvedType = WrapList(WrapNonNull(listGraphType.ResolvedType));
             }
 
-            return new FieldType
+            var fieldType = new FieldType
             {
                 Arguments = CreateArguments(memberInfo),
                 DefaultValue = memberInfo.GetCustomAttribute<DefaultValueAttribute>()?.DefaultValue,
@@ -115,6 +123,8 @@ namespace Our.Umbraco.GraphQL.Adapters
                 ResolvedType = resolvedType,
                 Resolver = new FieldResolver(memberInfo, _dependencyResolver)
             };
+
+            return fieldType;
         }
 
         private QueryArguments CreateArguments(MemberInfo memberInfo)
@@ -188,17 +198,17 @@ namespace Our.Umbraco.GraphQL.Adapters
             return graphType;
         }
 
-        private IGraphType TryGetFromCache(TypeInfo typeInfo, TypeInfo initialType)
+        private IGraphType TryGetFromCache(TypeInfo typeInfo, TypeInfo unwrappedTypeInfo)
         {
             if (_cache.TryGetValue(typeInfo, out var foundGraphType))
             {
-                return Wrap(initialType, foundGraphType);
+                return Wrap(unwrappedTypeInfo, foundGraphType);
             }
 
             var foundType = _typeRegistry.Get(typeInfo);
             if (foundType != null)
             {
-                return Wrap(initialType, (IGraphType) Activator.CreateInstance(foundType));;
+                return Wrap(unwrappedTypeInfo, (IGraphType) Activator.CreateInstance(foundType));;
             }
 
             return null;
