@@ -99,8 +99,54 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
 
             typeRegistry.Get(type.GetTypeInfo()).Should().Be(graphType);
         }
+        [Fact]
+        public void AddExtend_WithTypes_DoesNotThrow()
+        {
+            var typeRegistry = CreateSUT();
+
+            Action action = () => typeRegistry.Extend<TypeToExtend, MyType>();
+
+            action.Should().NotThrow();
+        }
+
+        [Fact]
+        public void GetExtends_WithAddedType_ShouldContainType()
+        {
+            var typeRegistry = CreateSUT();
+            typeRegistry.Extend<TypeToExtend, MyType>();
+
+            var result = typeRegistry.GetExtending<TypeToExtend>();
+
+            result.Should().Contain(typeof(MyType).GetTypeInfo());
+        }
+
+        [Fact]
+        public void GetExtends_WithMultipleTypesAdded_ShouldContainTypes()
+        {
+            var typeRegistry = CreateSUT();
+            typeRegistry.Extend<TypeToExtend, MyType>();
+            typeRegistry.Extend<TypeToExtend, MyType2>();
+
+            var result = typeRegistry.GetExtending<TypeToExtend>();
+
+            result.Should().Contain(typeof(MyType).GetTypeInfo())
+                .And.Contain(typeof(MyType2).GetTypeInfo());
+        }
+
+
+        [Fact]
+        public void GetExtends_NoTypeAdded_ReturnsEmptyEnumerable()
+        {
+            var typeRegistry = CreateSUT();
+
+            var result = typeRegistry.GetExtending<TypeToExtend>();
+
+            result.Should().BeEmpty();
+        }
 
         private class MyType {}
         private class MyGraphType : ObjectGraphType<MyType>{}
+        private class MyType2 {}
+        private class TypeToExtend {}
     }
 }

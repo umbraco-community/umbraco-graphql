@@ -17,7 +17,8 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 {
     public class GraphTypeAdapterTests
     {
-        private GraphTypeAdapter CreateSUT(GraphVisitor visitor = null) => new GraphTypeAdapter(new TypeRegistry(), new DefaultDependencyResolver(), visitor);
+        private GraphTypeAdapter CreateSUT(GraphVisitor visitor = null, ITypeRegistry typeRegistry = null) =>
+            new GraphTypeAdapter(typeRegistry ?? new TypeRegistry(), new DefaultDependencyResolver(), visitor);
 
         [Fact]
         public void Adapt_Null_ThrowsArgumentNullException()
@@ -766,6 +767,39 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
                 .Subject;
 
             visitor.Received(1).Visit(Arg.Is(inputObjectGraphType));
+        }
+
+        [Fact]
+        public void Adapt_WithExtendTypes_AddsFieldsFromExtendTypes()
+        {
+            var typeRegistry = new TypeRegistry();
+            typeRegistry.Extend<InheritedClass, ClassWithDescription>();
+
+            var adapter = CreateSUT(typeRegistry: typeRegistry);
+
+            var graphTypeDefinition = adapter.Adapt(typeof(InheritedClass).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IComplexGraphType>()
+                .Which.Fields.Should().Contain(field => field.Name == nameof(ClassWithDescription.FieldWithDescription))
+                .And.Contain(field => field.Name == nameof(ClassWithDescription.MethodWithArgument))
+                .And.Contain(field => field.Name == nameof(ClassWithDescription.MethodWithDescription))
+                .And.Contain(field => field.Name == nameof(ClassWithDescription.PropertyWithDescription));
+        }
+
+        [Fact]
+        public void Adapt_WithExtendTypes_RecursiveAddsFieldsFromExtendTypes()
+        {
+            var typeRegistry = new TypeRegistry();
+            typeRegistry.Extend<ClassWithName, InheritedClass>();
+
+            var builder = CreateSUT(typeRegistry: typeRegistry);
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassWithName).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IComplexGraphType>()
+                .Which.Fields.Should().Contain(field => field.Name == nameof(InheritedClass.PublicField))
+                .And.Contain(field => field.Name == nameof(InheritedClass.PublicMethod))
+                .And.Contain(field => field.Name == nameof(InheritedClass.PublicProperty));
         }
 
         private abstract class AbstractClassWithoutDescription

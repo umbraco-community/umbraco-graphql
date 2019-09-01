@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using GraphQL.Types;
 
@@ -8,5 +9,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
         void Add<TType, TGraphType>() where TGraphType : IGraphType;
         TypeInfo Get<TType>();
         TypeInfo Get(TypeInfo type);
+        void Extend<TExtend, TWith>();
+        IEnumerable<TypeInfo> GetExtending<TType>();
+        IEnumerable<TypeInfo> GetExtending(TypeInfo type);
     }
 }

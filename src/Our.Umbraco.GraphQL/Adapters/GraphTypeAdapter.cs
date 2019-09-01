@@ -210,6 +210,10 @@ namespace Our.Umbraco.GraphQL.Adapters
             {
                 case IComplexGraphType complexGraphType:
                     AddFields(typeInfo, complexGraphType);
+                    foreach (var extendingTypes in _typeRegistry.GetExtending(typeInfo))
+                    {
+                        AddFields(extendingTypes, complexGraphType);
+                    }
                     break;
                 case EnumerationGraphType enumerationGraphType:
                 {
