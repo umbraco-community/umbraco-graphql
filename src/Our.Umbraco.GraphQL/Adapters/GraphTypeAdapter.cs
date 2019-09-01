@@ -10,7 +10,7 @@ using Our.Umbraco.GraphQL.Attributes;
 
 namespace Our.Umbraco.GraphQL.Adapters
 {
-    public class GraphTypeAdapter
+    public class GraphTypeAdapter : IGraphTypeAdapter
     {
         private readonly Dictionary<TypeInfo, IGraphType> _cache;
         private readonly ITypeRegistry _typeRegistry;
