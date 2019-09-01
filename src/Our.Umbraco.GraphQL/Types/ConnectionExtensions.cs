@@ -2,83 +2,57 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using GraphQL.Builders;
-using GraphQL.Types.Relay.DataObjects;
-using Umbraco.Core.Models;
+using Our.Umbraco.GraphQL.Types.Relay;
 
 namespace Our.Umbraco.GraphQL.Types
 {
     public static class ConnectionExtensions
     {
-        public static Connection<TSource> ToConnection<TSource, TParent>(this IEnumerable<TSource> source,
-            ResolveConnectionContext<TParent> context)
+        public static Connection<TSource> ToConnection<TSource>(this IEnumerable<TSource> source, Func<TSource, object> idSelector,
+             int? first = null, string after = null, int? last = null, string before = null, long? totalCount = null)
         {
-            var list = source.ToList();
-            return ToConnection(list, context, list.Count);
-        }
+            if(first < 0)
+                throw new ArgumentException($"{nameof(first)} cannot be less than 0.", nameof(first));
 
-        public static Connection<TSource> ToConnection<TSource, TParent>(this IEnumerable<TSource> source,
-            ResolveConnectionContext<TParent> context, int totalCount)
-        {
-            var items = source as List<TSource> ?? source.ToList();
+            if(last < 0)
+                throw new ArgumentException($"{nameof(last)} cannot be less than 0.", nameof(last));
 
-            var after = context.After;
-            var before = context.Before;
-            var first = context.First;
-            var last = context.Last;
+            var sourceList = source.ToList();
 
-            int startOffset = 0;
-            int endOffset = items.Count;
-
-            if (after != null)
+            var edges = sourceList.Select(x => new Edge<TSource>
             {
-                // cursor starts at 0, so we need to add one to the offset to ensure we don't include the same item
-                startOffset = CursorToOffset(after) + 1;
-            }
-            if(before != null)
-            {
-                endOffset = CursorToOffset(before);
-            }
-            if (first.HasValue)
-            {
-                endOffset = startOffset + first.Value;
-            }
-            if (last.HasValue)
-            {
-                startOffset = endOffset - last.Value;
-            }
-
-            // Ensure startOffset is not negative
-            startOffset = Math.Max(0, startOffset);
-
-            var edges = source.Skip(startOffset).Take(endOffset - startOffset).Select((x, i) => new Edge<TSource>
-            {
-                Cursor = OffsetToCursor(startOffset + i),
+                Cursor = IdToCursor(idSelector(x)),
                 Node = x
-            }).ToList();
+            });
+
+            if (after != null) edges = edges.SkipWhile(x => x.Cursor != after).Skip(1);
+            if (before != null) edges = edges.TakeWhile(x => x.Cursor != before);
+            if (first.HasValue) edges = edges.Take(first.Value);
+            if (last.HasValue) edges = edges.Reverse().Take(last.Value).Reverse();
+
+            var edgeList = edges.ToList();
+            var endCursor = edgeList.LastOrDefault()?.Cursor;
+            var startCursor = edgeList.FirstOrDefault()?.Cursor;
+
+            var firstCursor = sourceList.Count > 0 ? IdToCursor(idSelector(sourceList.First())) : null;
+            var lastCursor = sourceList.Count > 0 ? IdToCursor(idSelector(sourceList.Last())) : null;
 
             return new Connection<TSource>
             {
-                Edges = edges,
+                Edges = edgeList,
                 TotalCount = totalCount,
                 PageInfo = new PageInfo
                 {
-                    EndCursor = edges.LastOrDefault()?.Cursor,
-                    HasNextPage = endOffset < items.Count,
-                    HasPreviousPage = startOffset > 0,
-                    StartCursor = edges.FirstOrDefault()?.Cursor
+                    EndCursor = endCursor,
+                    HasNextPage = endCursor != lastCursor,
+                    HasPreviousPage = startCursor != firstCursor,
+                    StartCursor = startCursor
                 }
             };
         }
 
-        public static int CursorToOffset(string cursor)
-        {
-            return int.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(cursor)).Substring("connection:".Length));
-        }
+        private static string IdToCursor(object id) => IdToCursor(new Id(id.ToString()));
 
-        public static string OffsetToCursor(int offset)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes($"connection:{offset}"));
-        }
+        private static string IdToCursor(Id id) => Convert.ToBase64String(Encoding.UTF8.GetBytes($"connection:{id}"));
     }
 }

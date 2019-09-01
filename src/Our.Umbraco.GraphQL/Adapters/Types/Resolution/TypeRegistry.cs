@@ -4,13 +4,15 @@ using System.Linq;
 using System.Reflection;
 using GraphQL;
 using GraphQL.Types;
+using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Types;
+using Our.Umbraco.GraphQL.Types.Relay;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
 {
     public class TypeRegistry : ITypeRegistry
     {
-        private readonly Dictionary<TypeInfo, TypeInfo> _scalarTypes = new Dictionary<TypeInfo, TypeInfo>();
+        private readonly Dictionary<TypeInfo, TypeInfo> _types = new Dictionary<TypeInfo, TypeInfo>();
         private readonly Dictionary<TypeInfo, List<TypeInfo>> _extends = new Dictionary<TypeInfo, List<TypeInfo>>();
 
         public TypeRegistry()
@@ -33,11 +35,12 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<TimeSpan, TimeSpanMillisecondsGraphType>();
             Add<Uri, UriGraphType>();
             Add<Id, IdGraphType>();
+            Add<PageInfo, PageInfoGraphType>();
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType
         {
-            _scalarTypes.Add(typeof(TType).GetTypeInfo(), typeof(TGraphType).GetTypeInfo());
+            _types.Add(typeof(TType).GetTypeInfo(), typeof(TGraphType).GetTypeInfo());
         }
 
         public TypeInfo Get<TType>()
@@ -50,7 +53,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             if (type.IsNullable())
                 type = type.GenericTypeArguments[0].GetTypeInfo();
 
-            return _scalarTypes.TryGetValue(type, out var graphType) ? graphType : null;
+            return _types.TryGetValue(type, out var graphType) ? graphType : null;
         }
 
         public void Extend<TExtend, TWith>()

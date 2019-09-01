@@ -8,9 +8,11 @@ using GraphQL.Types;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
+using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
+using Our.Umbraco.GraphQL.Types.Relay;
 using Xunit;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters
@@ -71,6 +73,16 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             var graphType = adapter.Adapt(type.GetTypeInfo());
 
             graphType.Name.Should().Be(expectedName);
+        }
+
+        [Fact]
+        public void Adapt_NullableType_SetsName()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(EnumWithDescription?).GetTypeInfo());
+
+            graphType.Name.Should().Be("EnumWithDescription");
         }
 
         [Theory]
@@ -802,6 +814,36 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
                 .And.Contain(field => field.Name == nameof(InheritedClass.PublicProperty));
         }
 
+        [Fact]
+        [Fact]
+        public void Adapt_ConnectionMember_ResolvesToConnectionGraphType()
+        {
+            var builder = CreateSUT();
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassWithName).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.Descriptions))
+                .Which.ResolvedType.Should().BeOfType<ConnectionGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == "edges")
+                .Which.ResolvedType.Should().BeOfType<ListGraphType>()
+                .Which.ResolvedType.Should().BeOfType<EdgeGraphType>();
+        }
+
+        [Fact]
+        public void Adapt_ConnectionMemberWithRegisteredType_ResolvesToConnectionGraphType()
+        {
+            var typeRegistry = new TypeRegistry();
+            typeRegistry.Add<ClassWithDescription, ObjectGraphType>();
+            var builder = CreateSUT(typeRegistry: typeRegistry);
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassWithName).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.Descriptions))
+                .Which.Type.Should().BeAssignableTo<ConnectionGraphType<ObjectGraphType>>();
+        }
+
         private abstract class AbstractClassWithoutDescription
         {
             public string PublicField;
@@ -919,6 +961,8 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             public string MethodWithName() => null;
 
             public string MethodWithArgument([Name("myName")] string name) => null;
+
+            public Connection<ClassWithDescription> Descriptions() => null;
         }
 
         [Name("MyEnum")]

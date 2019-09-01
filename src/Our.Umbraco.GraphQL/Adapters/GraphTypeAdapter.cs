@@ -5,9 +5,11 @@ using System.Reflection;
 using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
+using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
+using Our.Umbraco.GraphQL.Types.Relay;
 
 namespace Our.Umbraco.GraphQL.Adapters
 {
@@ -111,8 +113,28 @@ namespace Our.Umbraco.GraphQL.Adapters
 
             IGraphType resolvedType = null;
             if (foundType == null)
-                resolvedType = Adapt(returnType);
-
+            {
+                if (unwrappedReturnType.IsGenericType && unwrappedReturnType.GetGenericTypeDefinition() == typeof(Connection<>))
+                {
+                    foundType = _typeRegistry.Get(unwrappedReturnType.GenericTypeArguments[0].GetTypeInfo());
+                    if (foundType != null)
+                        foundType = typeof(ConnectionGraphType<>).MakeGenericType(foundType).GetTypeInfo();
+                    else
+                        resolvedType = new ConnectionGraphType(Adapt(unwrappedReturnType.GenericTypeArguments[0].GetTypeInfo()));
+                }
+                else if (unwrappedReturnType.IsGenericType && unwrappedReturnType.GetGenericTypeDefinition() == typeof(Edge<>))
+                {
+                    foundType = _typeRegistry.Get(unwrappedReturnType.GenericTypeArguments[0].GetTypeInfo());
+                    if (foundType != null)
+                        foundType = typeof(EdgeGraphType<>).MakeGenericType(foundType).GetTypeInfo();
+                    else
+                        resolvedType = new EdgeGraphType(Adapt(unwrappedReturnType.GenericTypeArguments[0].GetTypeInfo()));
+                }
+                else
+                {
+                    resolvedType = Adapt(returnType);
+                }
+            }
             var isNonNullItem = memberInfo.GetCustomAttribute<NonNullItemAttribute>() != null;
             if (isNonNullItem && resolvedType != null &&
                 resolvedType is ListGraphType listGraphType)

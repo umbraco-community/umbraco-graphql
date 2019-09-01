@@ -25,15 +25,13 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
     internal class GraphQLMiddleware
     {
         private readonly IDocumentWriter _documentWriter;
-        private readonly ISchemaBuilder _schemaBuilder;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IDocumentExecuter _documentExecuter;
         private readonly ILocalizationService _localizationService;
 
-        public GraphQLMiddleware(ISchemaBuilder schemaBuilder, IDocumentExecuter documentExecuter, IDocumentWriter documentWriter, IUmbracoContextAccessor umbracoContextAccessor, ILocalizationService localizationService)
+        public GraphQLMiddleware(IDocumentExecuter documentExecuter, IDocumentWriter documentWriter, IUmbracoContextAccessor umbracoContextAccessor, ILocalizationService localizationService)
         {
-            _schemaBuilder = schemaBuilder ?? throw new ArgumentNullException(nameof(schemaBuilder));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+              _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
@@ -46,7 +44,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
             try
             {
                 // TODO: Add ISchemaCacher
-                using (ISchema schema = _schemaBuilder.Build())
+                using (ISchema schema = new Schema())
                 {
                     if (context.Request.Path.HasValue)
                     {

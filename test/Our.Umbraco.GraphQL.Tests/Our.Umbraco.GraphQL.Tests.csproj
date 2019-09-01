@@ -3,6 +3,9 @@
       <TargetFramework>net472</TargetFramework>
       <WarningLevel>2</WarningLevel>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <WarningLevel>2</WarningLevel>
+    </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="FluentAssertions" Version="5.8.0" />
       <PackageReference Include="NSubstitute" Version="4.2.1" />

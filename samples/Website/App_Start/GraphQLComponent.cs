@@ -13,8 +13,6 @@ namespace Website.App_Start
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-
-            composition.RegisterGraphQLServices();
         }
     }
 
