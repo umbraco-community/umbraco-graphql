@@ -1,6 +1,10 @@
+/App_Plugins/
 /App_Data/
+/Config/splashes/
+/css/
 /Media/**
 !/Media/web.config
+/scripts/
 /umbraco/
 /umbraco_client/
 Web.config

@@ -1,15 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <AssemblyName>Our.Umbraco.GraphQL.Test</AssemblyName>
-        <RootNamespace>Our.Umbraco.GraphQL.Test</RootNamespace>
+      <TargetFramework>net472</TargetFramework>
+      <WarningLevel>3</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="xunit" Version="2.4.0" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-      </PackageReference>
+      <PackageReference Include="FluentAssertions" Version="5.8.0" />
+      <PackageReference Include="NSubstitute" Version="4.2.1" />
+      <PackageReference Include="xunit" Version="2.4.1" />
+      <PackageReference Include="xunit.runner.console" Version="2.4.1" />
+      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\src\Our.Umbraco.GraphQL\Our.Umbraco.GraphQL.csproj" />

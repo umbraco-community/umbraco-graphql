@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL.Tests", "test\Our.Umbraco.GraphQL.Tests\Our.Umbraco.GraphQL.Tests.csproj", "{9CC632BF-46A8-4BA6-B51F-CDFF3A935974}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9B941129-D270-4DD7-A43E-CF2808BFDEE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,7 +22,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C2001952-0774-4BFA-AF30-043B3B16D275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2001952-0774-4BFA-AF30-043B3B16D275}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2001952-0774-4BFA-AF30-043B3B16D275}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59294783-3A17-479B-90C5-A3A2967176DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{59294783-3A17-479B-90C5-A3A2967176DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
@@ -37,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C2001952-0774-4BFA-AF30-043B3B16D275} = {D56E0413-4D79-45DF-BECA-09D6732637F5}
 		{59294783-3A17-479B-90C5-A3A2967176DE} = {BE019E17-BF39-443C-8D62-74940D3B6560}
+		{9CC632BF-46A8-4BA6-B51F-CDFF3A935974} = {9B941129-D270-4DD7-A43E-CF2808BFDEE7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E20ED350-4522-4159-8FDC-A80A46E7DD7F}
