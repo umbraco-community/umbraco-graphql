@@ -12,6 +12,7 @@ using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
+using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
 using Xunit;
 
@@ -855,6 +856,28 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         }
 
         [Fact]
+        public void Adapt_ClassImplementingInterfaces_AddsResolvedInterfaces()
+        {
+            var builder = CreateSUT();
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassImplementingInterfaces).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.ResolvedInterfaces.Should().Contain(@interface => @interface.Name == "MyInterface")
+                .And.Contain(@interface => @interface.Name == nameof(IInterfaceWithoutDescription));
+        }
+
+        [Fact]
+        public void Adapt_ClassImplementingInterfaces_DoesNotAddSystemInterfaces()
+        {
+            var builder = CreateSUT();
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassImplementingInterfaces).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Interfaces.Should().NotContain(@interface => @interface.Name == nameof(IComparable));
+        }
+
         [Fact]
         public void Adapt_ConnectionMember_ResolvesToConnectionGraphType()
         {
@@ -985,6 +1008,15 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             string Method();
         }
 
+        private class ClassImplementingInterfaces : IInterfaceWithoutDescription, IInterfaceWithName, IComparable
+        {
+            public string Property { get; set; }
+            public string Method() => null;
+
+            public string PropertyWithName { get; set; }
+            public int CompareTo(object obj) => 0;
+        }
+
         [Name("MyAbstractClass")]
         private abstract class AbstractClassWithName
         {
@@ -1019,6 +1051,8 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         [Name("MyInterface")]
         private interface IInterfaceWithName
         {
+            [Name("MyProperty")]
+            string PropertyWithName { get; set; }
         }
 
         [Attributes.Description("Abstract class description.")]

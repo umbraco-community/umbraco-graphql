@@ -247,6 +247,15 @@ namespace Our.Umbraco.GraphQL.Adapters
 
             _cache.Add(typeInfo, graphType);
 
+            if (graphType is IObjectGraphType objectGraphType)
+            {
+                foreach (var @interface in typeInfo.ImplementedInterfaces.Where(x =>
+                    x.Namespace?.StartsWith("System") == false))
+                {
+                    objectGraphType.AddResolvedInterface((IInterfaceGraphType) Adapt(@interface.GetTypeInfo()));
+                }
+            }
+
             switch (graphType)
             {
                 case IComplexGraphType complexGraphType:
