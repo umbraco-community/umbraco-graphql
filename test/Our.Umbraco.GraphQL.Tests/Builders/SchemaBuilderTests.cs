@@ -1,4 +1,5 @@
 using System;
+using System.Net.Configuration;
 using System.Reflection;
 using FluentAssertions;
 using GraphQL.Types;
@@ -79,6 +80,21 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
             visitor.Received(1).Visit(Arg.Is(schema));
         }
 
+
+        [Fact]
+        public void Build_WithAdditionalTypes_AddToAdditionalTypes()
+        {
+            var graphTypeAdapter = Substitute.For<IGraphTypeAdapter>();
+            graphTypeAdapter.Adapt(Arg.Is(typeof(Query).GetTypeInfo())).Returns(new ObjectGraphType());
+            graphTypeAdapter.Adapt(Arg.Is(typeof(MyType).GetTypeInfo()))
+                .Returns(new ObjectGraphType {Name = "MyType"});
+            var schemaBuilder = CreateSUT(graphTypeAdapter);
+
+            var schema = schemaBuilder.Build<SchemaWithQuery>(typeof(MyType).GetTypeInfo());
+
+            schema.FindType(nameof(MyType)).Should().NotBeNull();
+        }
+
         private class EmptySchema
         {
         }
@@ -99,6 +115,11 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
 
         private class Query
         {
+        }
+
+        private class MyType
+        {
+            public string Name { get; set; }
         }
     }
 }
