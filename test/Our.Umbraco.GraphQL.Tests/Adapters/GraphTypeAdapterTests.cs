@@ -368,6 +368,16 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         }
 
         [Fact]
+        public void Adapt_MethodsDefinedOnObject_DoesNotAddAsFields()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = (IObjectGraphType) adapter.Adapt<ClassWithOverriddenFields>();
+
+            graphType.Fields.Should().NotContain(x => x.Name == nameof(ClassWithOverriddenFields.ToString));
+        }
+
+        [Fact]
         public void Adapt_MemberType_IsAddedToMetadata()
         {
             var adapter = CreateSUT();
@@ -1051,6 +1061,13 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         private class Filter
         {
             public string Name { get; set; }
+        }
+
+        private class ClassWithOverriddenFields
+        {
+            public override bool Equals(object obj) => false;
+            public override string ToString() => null;
+            public override int GetHashCode() => 0;
         }
     }
 }

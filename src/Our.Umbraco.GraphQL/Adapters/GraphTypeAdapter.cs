@@ -74,7 +74,8 @@ namespace Our.Umbraco.GraphQL.Adapters
             }
             else
             {
-                graphType = CreateGraphType(unwrappedTypeInfo, typeof(InputObjectGraphType<>).MakeGenericType(unwrappedTypeInfo));
+                graphType = CreateGraphType(unwrappedTypeInfo,
+                    typeof(InputObjectGraphType<>).MakeGenericType(unwrappedTypeInfo));
                 _visitor?.Visit((IInputObjectGraphType)graphType);
             }
             return graphType;
@@ -88,7 +89,7 @@ namespace Our.Umbraco.GraphQL.Adapters
                     x.IsPublic && x.IsStatic == false && x.FieldType != typeof(object));
                 var methods = typeInfo.DeclaredMethods.Where(x =>
                     x.IsPublic && x.IsStatic == false && x.IsSpecialName == false && x.ReturnType != typeof(void) &&
-                    x.ReturnType != typeof(object));
+                    x.ReturnType != typeof(object) && x.GetBaseDefinition()?.DeclaringType != typeof(object));
                 var properties = typeInfo.DeclaredProperties.Where(x =>
                     x.CanRead && x.GetMethod.IsPublic && x.GetMethod.IsStatic == false &&
                     x.GetMethod.ReturnType != typeof(object));
