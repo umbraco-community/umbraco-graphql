@@ -225,7 +225,25 @@ namespace Our.Umbraco.GraphQL.Adapters
             graphType.Description = typeInfo.GetCustomAttribute<DescriptionAttribute>()?.Description;
             graphType.DeprecationReason = typeInfo.GetCustomAttribute<DeprecatedAttribute>()?.DeprecationReason;
             graphType.Metadata[nameof(TypeInfo)] = typeInfo;
-            graphType.Name = typeInfo.GetCustomAttribute<NameAttribute>()?.Name ?? typeInfo.Name;
+
+            var nameAttribute = typeInfo.GetCustomAttribute<NameAttribute>();
+            if(nameAttribute != null)
+            {
+                graphType.Name = nameAttribute.Name;
+            }
+            else if (typeInfo.IsGenericType)
+            {
+                var genericTypeNames =
+                    typeInfo.GenericTypeArguments.Select(x => x.GetCustomAttribute<NameAttribute>()?.Name ?? x.Name);
+
+                graphType.Name = string.Join(string.Empty, genericTypeNames) +
+                                 (typeInfo.GetCustomAttribute<NameAttribute>()?.Name ??
+                                  typeInfo.Name.Substring(0, typeInfo.Name.IndexOf('`')));
+            }
+            else
+            {
+                graphType.Name = typeInfo.Name;
+            }
 
             _cache.Add(typeInfo, graphType);
 
@@ -264,12 +282,8 @@ namespace Our.Umbraco.GraphQL.Adapters
             }
 
             var foundType = _typeRegistry.Get(typeInfo);
-            if (foundType != null)
-            {
-                return Wrap(unwrappedTypeInfo, (IGraphType) Activator.CreateInstance(foundType));;
-            }
-
-            return null;
+            if (foundType == null) return null;
+            return Wrap(unwrappedTypeInfo, (IGraphType) Activator.CreateInstance(foundType));
         }
 
         private static TypeInfo UnwrapTypeInfo(TypeInfo typeInfo)

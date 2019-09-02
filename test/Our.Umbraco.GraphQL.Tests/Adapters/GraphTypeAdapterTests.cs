@@ -76,6 +76,36 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         }
 
         [Fact]
+        public void Adapt_GenericTypeObject_SetsName()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(Connection<ClassWithoutDescription>).GetTypeInfo());
+
+            graphType.Name.Should().Be("ClassWithoutDescriptionConnection");
+        }
+
+        [Fact]
+        public void Adapt_GenericTypeObjectArgumentHasNameAttribute_SetsName()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(Connection<ClassWithName>).GetTypeInfo());
+
+            graphType.Name.Should().Be("MyClassConnection");
+        }
+
+        [Fact]
+        public void Adapt_GenericTypeObjectMultipleArguments_SetsName()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(Tuple<ClassWithName, ClassWithDescription, ClassWithoutDescription>).GetTypeInfo());
+
+            graphType.Name.Should().Be("MyClassClassWithDescriptionClassWithoutDescriptionTuple");
+        }
+
+        [Fact]
         public void Adapt_NullableType_SetsName()
         {
             var adapter = CreateSUT();
