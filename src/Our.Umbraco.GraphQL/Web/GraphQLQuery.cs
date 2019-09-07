@@ -1,5 +1,6 @@
-﻿using GraphQL;
+using GraphQL;
 using Newtonsoft.Json;
+using Our.Umbraco.GraphQL.Json;
 using Our.Umbraco.GraphQL.Json.Converters;
 
 namespace Our.Umbraco.GraphQL.Web

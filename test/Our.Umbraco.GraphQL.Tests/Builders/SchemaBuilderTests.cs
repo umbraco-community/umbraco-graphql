@@ -2,6 +2,7 @@ using System;
 using System.Net.Configuration;
 using System.Reflection;
 using FluentAssertions;
+using GraphQL;
 using GraphQL.Types;
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
@@ -23,7 +24,7 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
                 graphTypeAdapter.Adapt(Arg.Is(typeof(Query).GetTypeInfo())).Returns(queryObjectGraphType);
             }
 
-            return new SchemaBuilder(graphTypeAdapter, visitor);
+            return new SchemaBuilder(graphTypeAdapter, new FuncDependencyResolver(Activator.CreateInstance), visitor);
         }
 
         [Fact]

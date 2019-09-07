@@ -108,6 +108,7 @@ namespace Our.Umbraco.GraphQL.Adapters
         private FieldType CreateField(MemberInfo memberInfo)
         {
             var returnType = GetReturnType(memberInfo);
+
             var unwrappedReturnType = UnwrapTypeInfo(returnType);
 
             var foundType = _typeRegistry.Get(unwrappedReturnType);
@@ -322,7 +323,7 @@ namespace Our.Umbraco.GraphQL.Adapters
             if (enumerableArgument != null)
                 graphType = typeof(ListGraphType<>).MakeGenericType(graphType).GetTypeInfo();
 
-            if (isNonNull)
+            if (isNonNull && typeof(NonNullGraphType).IsAssignableFrom(graphType) == false)
                 graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType).GetTypeInfo();
 
             return graphType;

@@ -597,6 +597,18 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         }
 
         [Fact]
+        public void Adapt_ValueTypeMemberWithNonNullAttribute_TypeIsNonNullOfType()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.DateTime))
+                .Which.Type.Should().Be<NonNullGraphType<DateTimeGraphType>>();
+        }
+
+        [Fact]
         public void Adapt_EnumerableMembersWithNonNullItemAttribute_ResolvedTypeIsNonNullType()
         {
             var adapter = CreateSUT();
@@ -607,6 +619,18 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
                 .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.NonNullItemOfComplexTypeField))
                 .Which.ResolvedType.Should().BeAssignableTo<ListGraphType>()
                 .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>();
+        }
+
+        [Fact]
+        public void Adapt_EnumerableMembersOfValueTypesWithNonNullItemAttribute_TypeIsListOfNonNullType()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt(typeof(ClassWithoutDescription).GetTypeInfo());
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().ContainSingle(x => x.Name == nameof(ClassWithoutDescription.NonNullItemOfValueTypeField))
+                .Which.Type.Should().BeAssignableTo<ListGraphType<NonNullGraphType<DateTimeGraphType>>>();
         }
 
         [Theory]
@@ -975,6 +999,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             [NonNullItem]
             public IEnumerable<ClassWithName> NonNullItemOfComplexTypeField;
 
+            [NonNullItem]
+            public IEnumerable<DateTime> NonNullItemOfValueTypeField;
+
             [DefaultValue("FieldDefaultValue")]
             public string FieldWithDefaultValue;
 
@@ -989,6 +1016,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             public string MethodWithComplexArgument(Filter filter) => null;
             public string MethodWithEnumArgument(EnumWithName? enumWithName) => null;
             public string MethodWithInjectedArgument([Inject]Filter injected) => null;
+
+            [NonNull]
+            public DateTime DateTime { get; set; }
         }
 
         private enum EnumWithoutDescription

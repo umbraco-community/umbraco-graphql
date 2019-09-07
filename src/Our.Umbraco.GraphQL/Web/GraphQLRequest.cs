@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Owin;
 using StackExchange.Profiling;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,13 +20,25 @@ using Umbraco.Web;
 namespace Our.Umbraco.GraphQL.Web
 {
 
-    public class GraphQLRequest : List<GraphQLQuery>
+    public class GraphQLRequest : IEnumerable<GraphQLQuery>
     {
-        public GraphQLRequest(IEnumerable<GraphQLQuery> list, bool isBatched) : base(list)
+        private IEnumerable<GraphQLQuery> _queries;
+
+        public GraphQLRequest(GraphQLQuery query)
         {
-            IsBatched = isBatched;
+            _queries = new[] {query};
+            IsBatched = false;
+        }
+        public GraphQLRequest(IEnumerable<GraphQLQuery> queries)
+        {
+            _queries = queries;
+
+            IsBatched = true;
         }
 
         public bool IsBatched { get; }
+
+        public IEnumerator<GraphQLQuery> GetEnumerator() => _queries.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

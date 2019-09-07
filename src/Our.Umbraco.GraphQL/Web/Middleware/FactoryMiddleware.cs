@@ -15,11 +15,11 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
             _factory = factory ?? throw new System.ArgumentNullException(nameof(factory));
         }
 
-        public async override Task Invoke(IOwinContext context)
+        public override async Task Invoke(IOwinContext context)
         {
-            using (var scope = _factory.BeginScope())
+            using (_factory.BeginScope())
             {
-                context.Set("umbraco:factory", _factory);
+                context.Set(typeof(IFactory).AssemblyQualifiedName, _factory);
                 await Next.Invoke(context);
             }
         }

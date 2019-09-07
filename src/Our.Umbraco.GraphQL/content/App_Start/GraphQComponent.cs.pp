@@ -1,21 +1,16 @@
-using Our.Umbraco.GraphQL;
+using System.Web.Hosting;
 using Our.Umbraco.GraphQL.Web;
+using Owin;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
-using Umbraco.Web;
 using Umbraco.Core;
+using Umbraco.Web;
 
 namespace $rootnamespace$
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class GraphQLComposer : ComponentComposer<GraphQLComponent>, IUserComposer
     {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-
-            composition.RegisterGraphQLServices();
-        }
     }
 
     public class GraphQLComponent : IComponent
@@ -31,18 +26,28 @@ namespace $rootnamespace$
 
         public void Initialize()
         {
-            UmbracoDefaultOwinStartup.MiddlewareConfigured += (s, e) =>
+            UmbracoDefaultOwinStartup.MiddlewareConfigured += UmbracoDefaultOwinStartup_MiddlewareConfigured;
+        }
+
+        private void UmbracoDefaultOwinStartup_MiddlewareConfigured(object sender, OwinMiddlewareConfiguredEventArgs e) =>
+            Configure(e.AppBuilder);
+
+        private void Configure(IAppBuilder app)
+        {
+            var path = $"/{_globalSettings.GetUmbracoMvcArea()}/graphql";
+
+            app.UseUmbracoGraphQL(path, _factory, opts =>
             {
-                e.AppBuilder.UseUmbracoGraphQL(_globalSettings.GetUmbracoMvcArea(), _factory, new GraphQLServerOptions
-                {
-                    EnableMetrics = true,
-                    Debug = true,
-                });
-            };
+                opts.Debug = HostingEnvironment.IsDevelopmentEnvironment;
+                opts.EnableMetrics = true;
+                opts.EnableMiniProfiler = false;
+                opts.EnablePlayground = true;
+            });
         }
 
         public void Terminate()
         {
+            UmbracoDefaultOwinStartup.MiddlewareConfigured -= UmbracoDefaultOwinStartup_MiddlewareConfigured;
         }
     }
 }
