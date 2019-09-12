@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -53,6 +54,12 @@ namespace Our.Umbraco.GraphQL.Adapters.Resolvers
                 if (parameterInfo.GetCustomAttribute<InjectAttribute>() != null)
                 {
                     arguments[i] = _dependencyResolver.Resolve(parameterType);
+                    continue;
+                }
+
+                if (parameterInfo.ParameterType == typeof(CancellationToken))
+                {
+                    arguments[i] = context.CancellationToken;
                     continue;
                 }
 

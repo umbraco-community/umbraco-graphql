@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
@@ -86,13 +87,13 @@ namespace Our.Umbraco.GraphQL.Adapters
             do
             {
                 var fields = typeInfo.DeclaredFields.Where(x =>
-                    x.IsPublic && x.IsStatic == false && x.FieldType != typeof(object));
+                    x.IsPublic && x.IsStatic == false && IsValidReturnType(x.FieldType));
                 var methods = typeInfo.DeclaredMethods.Where(x =>
-                    x.IsPublic && x.IsStatic == false && x.IsSpecialName == false && x.ReturnType != typeof(void) &&
-                    x.ReturnType != typeof(object) && x.GetBaseDefinition()?.DeclaringType != typeof(object));
+                    x.IsPublic && x.IsStatic == false && x.IsSpecialName == false && IsValidReturnType(x.ReturnType) &&
+                    x.GetBaseDefinition()?.DeclaringType != typeof(object));
                 var properties = typeInfo.DeclaredProperties.Where(x =>
                     x.CanRead && x.GetMethod.IsPublic && x.GetMethod.IsStatic == false &&
-                    x.GetMethod.ReturnType != typeof(object));
+                    IsValidReturnType(x.GetMethod.ReturnType));
 
                 var members = fields.Cast<MemberInfo>().Concat(methods).Concat(properties)
                     .Where(x => x.GetCustomAttribute<IgnoreAttribute>() == null)
@@ -298,6 +299,9 @@ namespace Our.Umbraco.GraphQL.Adapters
 
         private static TypeInfo UnwrapTypeInfo(TypeInfo typeInfo)
         {
+            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
+                typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
+
             var isNullable = typeInfo.IsNullable();
             if (isNullable)
                 return typeInfo.GenericTypeArguments[0].GetTypeInfo();
@@ -362,6 +366,9 @@ namespace Our.Umbraco.GraphQL.Adapters
 
         private static Type GetEnumerableArgument(TypeInfo typeInfo)
         {
+            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
+                typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
+
             if (typeInfo == typeof(string))
                 return null;
 
@@ -373,5 +380,8 @@ namespace Our.Umbraco.GraphQL.Adapters
 
             return enumerableInterface?.GenericTypeArguments[0];
         }
+
+        private bool IsValidReturnType(Type type) =>
+            type != typeof(void) && type != typeof(object) && type != typeof(Task);
     }
 }

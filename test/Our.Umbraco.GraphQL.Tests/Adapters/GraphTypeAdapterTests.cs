@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Types;
@@ -931,6 +932,41 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
                 .Which.Type.Should().BeAssignableTo<ConnectionGraphType<ObjectGraphType>>();
         }
 
+        [Fact]
+        public void Adapt_TaskMember_ResolvesToGenericTypeArgumentGraphType()
+        {
+            var builder = CreateSUT();
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassWithName).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.TaskDescription))
+                .Which.ResolvedType.Should().BeAssignableTo<ObjectGraphType<ClassWithDescription>>();
+        }
+
+        [Fact]
+        public void Adapt_TaskOFEnumerablr_ResolvesToListGraphType()
+        {
+            var builder = CreateSUT();
+
+            var graphTypeDefinition = builder.Adapt(typeof(ClassWithName).GetTypeInfo());
+
+            graphTypeDefinition.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.TaskEnumerableDescriptions))
+                .Which.ResolvedType.Should().BeOfType<ListGraphType<ObjectGraphType<ClassWithDescription>>>();
+        }
+
+        [Fact]
+        public void Adapt_MethodsTaskReturnType_DoesNotAddAsFields()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt<ClassWithoutDescription>();
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.VoidTaskMethod));
+        }
+
         private abstract class AbstractClassWithoutDescription
         {
             public string PublicField;
@@ -957,6 +993,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             public object ObjectMethod() => null;
             public void VoidMethod(){}
+            public Task VoidTaskMethod() => null;
             public string PublicProperty { get; set; }
             public object ObjectProperty { get; set; }
 
@@ -1065,6 +1102,11 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
             public string MethodWithArgument([Name("myName")] string name) => null;
 
             public Connection<ClassWithDescription> Descriptions() => null;
+
+            public Task<ClassWithDescription> TaskDescription() => Task.FromResult((ClassWithDescription) null);
+
+            public Task<IEnumerable<ClassWithDescription>> TaskEnumerableDescriptions() =>
+                Task.FromResult(Enumerable.Empty<ClassWithDescription>());
         }
 
         [Name("MyEnum")]

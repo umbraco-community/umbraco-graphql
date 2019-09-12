@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Types;
@@ -205,6 +206,29 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
             action.Should().Throw<ArgumentOutOfRangeException>();
         }
 
+        [Fact]
+        public void Resolve_FieldDefinitionWithMethodInfoWithCancallationTokenArgument_ResolvesCancellationTokenFromContext()
+        {
+            var methodInfo = typeof(Query).GetMethod(nameof(Query.WithCancallationToken));
+            var resolver = CreateSUT(methodInfo, configureFieldType: fieldType =>
+            {
+                fieldType.Arguments = new QueryArguments(new QueryArgument(typeof(ObjectGraphType))
+                {
+                    Name = "cancellationToken"
+                });
+            });
+
+            var cancellationToken = new CancellationToken(true);
+
+            var result = resolver.Resolve(new ResolveFieldContext
+            {
+                Source = new Query(),
+                CancellationToken = cancellationToken
+            });
+
+            result.Should().Be(cancellationToken);
+        }
+
         private class Query
         {
             public int Answer = 42;
@@ -213,6 +237,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
             public string SayHello(string name = "John") => $"Hello {name}";
             public string GetInjected([Inject]Injected injected) => injected.Ping;
             public int? GetNullableArgumentValue(int? value) => value;
+            public CancellationToken WithCancallationToken(CancellationToken cancellationToken) => cancellationToken;
         }
 
         private class Injected
