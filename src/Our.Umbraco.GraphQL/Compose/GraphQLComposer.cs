@@ -12,6 +12,7 @@ using Our.Umbraco.GraphQL.Web;
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors;
 using GraphQL.DataLoader;
+using Our.Umbraco.GraphQL.Middleware;
 
 namespace Our.Umbraco.GraphQL.Compose
 {
@@ -28,6 +29,9 @@ namespace Our.Umbraco.GraphQL.Compose
 
             composition.GraphVisitors()
                 .Append<PublishedContentVisitor>();
+
+            composition.FieldMiddlewares()
+                .Append<EnsureHttpContextFieldMiddleware>();
 
             composition.Register(new GraphQLRequestParser(new JsonSerializer()));
             composition.Register<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetInstance<GraphVisitorCollection>().ToArray()));
