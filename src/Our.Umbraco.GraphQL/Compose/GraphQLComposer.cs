@@ -11,6 +11,7 @@ using System.Linq;
 using Our.Umbraco.GraphQL.Web;
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors;
+using GraphQL.DataLoader;
 
 namespace Our.Umbraco.GraphQL.Compose
 {
@@ -34,6 +35,9 @@ namespace Our.Umbraco.GraphQL.Compose
             composition.Register<IDependencyResolver>(factory =>
                 new FuncDependencyResolver(type => factory.TryGetInstance(type) ?? factory.CreateInstance(type)), Lifetime.Singleton);
             composition.Register<IDocumentWriter, DocumentWriter>(Lifetime.Singleton);
+
+            composition.Register<IDataLoaderContextAccessor, DataLoaderContextAccessor>(Lifetime.Singleton);
+            composition.Register<DataLoaderDocumentListener>(Lifetime.Singleton);
         }
     }
 }

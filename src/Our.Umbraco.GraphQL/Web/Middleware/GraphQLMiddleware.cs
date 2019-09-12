@@ -4,9 +4,11 @@ using GraphQL.Instrumentation;
 using Microsoft.Owin;
 using StackExchange.Profiling;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using GraphQL.DataLoader;
 using GraphQL.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,22 +16,25 @@ using Newtonsoft.Json.Serialization;
 using Our.Umbraco.GraphQL.Builders;
 using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Types;
-using System.Collections.Generic;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
 {
     internal class GraphQLMiddleware
     {
         private readonly IDocumentWriter _documentWriter;
+        private readonly DataLoaderDocumentListener _dataLoaderDocumentListener;
         private readonly GraphQLRequestParser _requestParser;
         private readonly ISchemaBuilder _schemaBuilder;
         private readonly GraphQLServerOptions _options;
 
         public GraphQLMiddleware(ISchemaBuilder schemaBuilder, IDocumentWriter documentWriter,
-            GraphQLRequestParser requestParser, GraphQLServerOptions options)
+            DataLoaderDocumentListener dataLoaderDocumentListener, GraphQLRequestParser requestParser,
+            GraphQLServerOptions options)
         {
             _schemaBuilder = schemaBuilder ?? throw new ArgumentNullException(nameof(schemaBuilder));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
+            _dataLoaderDocumentListener = dataLoaderDocumentListener ??
+                                          throw new ArgumentNullException(nameof(dataLoaderDocumentListener));
             _requestParser = requestParser ?? throw new ArgumentNullException(nameof(requestParser));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
@@ -77,6 +82,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                                     opts.FieldMiddleware.Use<MiniProfilerFieldsMiddleware>();
                                 opts.ExposeExceptions = _options.Debug;
                                 opts.Inputs = variables;
+                                opts.Listeners.Add(_dataLoaderDocumentListener);
                                 opts.OperationName = operationName;
                                 opts.Query = query;
                                 opts.Schema = schema;
