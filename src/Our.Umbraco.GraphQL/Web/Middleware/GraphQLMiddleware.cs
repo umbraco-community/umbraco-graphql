@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using Our.Umbraco.GraphQL.Builders;
 using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Types;
+using Our.Umbraco.GraphQL.Composing;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
 {
@@ -26,15 +27,18 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
         private readonly GraphQLRequestParser _requestParser;
         private readonly ISchemaBuilder _schemaBuilder;
         private readonly GraphQLServerOptions _options;
+        private readonly FieldMiddlewareCollection _fieldMiddlewareCollection;
 
         public GraphQLMiddleware(ISchemaBuilder schemaBuilder, IDocumentWriter documentWriter,
-            DataLoaderDocumentListener dataLoaderDocumentListener, GraphQLRequestParser requestParser,
-            GraphQLServerOptions options)
+            DataLoaderDocumentListener dataLoaderDocumentListener, FieldMiddlewareCollection fieldMiddlewareCollection,
+            GraphQLRequestParser requestParser, GraphQLServerOptions options)
         {
             _schemaBuilder = schemaBuilder ?? throw new ArgumentNullException(nameof(schemaBuilder));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
             _dataLoaderDocumentListener = dataLoaderDocumentListener ??
                                           throw new ArgumentNullException(nameof(dataLoaderDocumentListener));
+            _fieldMiddlewareCollection = fieldMiddlewareCollection ??
+                                         throw new ArgumentNullException(nameof(fieldMiddlewareCollection));
             _requestParser = requestParser ?? throw new ArgumentNullException(nameof(requestParser));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
@@ -77,9 +81,15 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                                 opts.CancellationToken = context.Request.CallCancelled;
                                 opts.ComplexityConfiguration = _options.ComplexityConfiguration;
                                 opts.EnableMetrics = _options.EnableMetrics;
+
+                                foreach(var fieldMiddleware in _fieldMiddlewareCollection)
+                                {
+                                    opts.FieldMiddleware.Use(nextMiddleware => fieldContext => fieldMiddleware.Resolve(fieldContext, nextMiddleware));
+                                }
+
                                 opts.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
                                 if (_options.EnableMiniProfiler)
-                                    opts.FieldMiddleware.Use<MiniProfilerFieldsMiddleware>();
+                                    opts.FieldMiddleware.Use<MiniProfilerFieldMiddleware>();
                                 opts.ExposeExceptions = _options.Debug;
                                 opts.Inputs = variables;
                                 opts.Listeners.Add(_dataLoaderDocumentListener);

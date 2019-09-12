@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Our.Umbraco.GraphQL.Instrumentation
 {
-    public class MiniProfilerFieldsMiddleware
+    public class MiniProfilerFieldMiddleware
     {
         public Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
         {
