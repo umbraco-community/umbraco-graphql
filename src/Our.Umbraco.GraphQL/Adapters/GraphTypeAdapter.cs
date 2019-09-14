@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
+using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Attributes;
+using Our.Umbraco.GraphQL.Reflection;
+using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
 
 namespace Our.Umbraco.GraphQL.Adapters
@@ -38,7 +42,7 @@ namespace Our.Umbraco.GraphQL.Adapters
         {
             if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
 
-            var unwrappedTypeInfo = UnwrapTypeInfo(typeInfo);
+            var unwrappedTypeInfo = typeInfo.Unwrap();
             var graphType = TryGetFromCache(unwrappedTypeInfo, typeInfo);
             if (graphType != null) return graphType;
 
@@ -65,7 +69,7 @@ namespace Our.Umbraco.GraphQL.Adapters
 
         private IGraphType AdaptInput(TypeInfo typeInfo)
         {
-            var unwrappedTypeInfo = UnwrapTypeInfo(typeInfo);
+            var unwrappedTypeInfo = typeInfo.Unwrap();
             var graphType = TryGetFromCache(unwrappedTypeInfo, typeInfo);
             if (graphType != null) return graphType;
             if (unwrappedTypeInfo.IsEnum)
@@ -110,7 +114,7 @@ namespace Our.Umbraco.GraphQL.Adapters
         {
             var returnType = GetReturnType(memberInfo);
 
-            var unwrappedReturnType = UnwrapTypeInfo(returnType);
+            var unwrappedReturnType = returnType.Unwrap();
 
             var foundType = _typeRegistry.Get(unwrappedReturnType);
 
@@ -160,7 +164,7 @@ namespace Our.Umbraco.GraphQL.Adapters
                 Metadata = {{nameof(MemberInfo), memberInfo}},
                 Name = memberInfo.GetCustomAttribute<NameAttribute>()?.Name ?? memberInfo.Name,
                 ResolvedType = resolvedType,
-                Type = WrapTypeInfo(foundType, returnType, isNonNull, isNonNullItem)
+                Type = foundType.Wrap(returnType, isNonNull, isNonNullItem)
             };
 
             fieldType.Resolver = new FieldResolver(fieldType, _dependencyResolver);
@@ -188,7 +192,40 @@ namespace Our.Umbraco.GraphQL.Adapters
                                   parameterInfo.GetCustomAttribute<DefaultValueAttribute>() != null ||
                                   parameterType.IsValueType && parameterType.IsNullable();
 
-            var inputType = AdaptInput(parameterType.GetTypeInfo());
+            var unwrappedType = parameterType.GetTypeInfo().Unwrap();
+
+            IGraphType inputType;
+            if (unwrappedType == typeof(OrderBy))
+            {
+                var returnType = GetReturnType(parameterInfo.Member);
+                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Connection<>))
+                    returnType = returnType.GenericTypeArguments[0].GetTypeInfo();
+
+                var foundType = _typeRegistry.Get(returnType);
+
+                IGraphType graphType;
+
+                if (foundType != null)
+                {
+                    graphType = Activator.CreateInstance(foundType) as IComplexGraphType;
+                }
+                else
+                {
+                    graphType = Adapt(returnType);
+                }
+
+                inputType = (IGraphType)Activator.CreateInstance(typeof(OrderByGraphType), graphType);
+
+                if (parameterType.IsArray)
+                {
+                    inputType = WrapList(WrapNonNull(inputType));
+                }
+            }
+            else
+            {
+                inputType = AdaptInput(parameterType.GetTypeInfo());
+            }
+
             if (hasDefaultValue == false  && !(inputType is NonNullGraphType))
             {
                 inputType = WrapNonNull(inputType);
@@ -299,45 +336,9 @@ namespace Our.Umbraco.GraphQL.Adapters
             return Wrap(unwrappedTypeInfo, (IGraphType) Activator.CreateInstance(foundType));
         }
 
-        private static TypeInfo UnwrapTypeInfo(TypeInfo typeInfo)
-        {
-            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
-                typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
-
-            var isNullable = typeInfo.IsNullable();
-            if (isNullable)
-                return typeInfo.GenericTypeArguments[0].GetTypeInfo();
-
-            var enumerableArgument = GetEnumerableArgument(typeInfo);
-            if (enumerableArgument != null)
-                return enumerableArgument.GetTypeInfo();
-
-            return typeInfo;
-        }
-
-        private TypeInfo WrapTypeInfo(TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem)
-        {
-            if (graphType == null)
-                return null;
-
-            var enumerableArgument = GetEnumerableArgument(typeInfo);
-
-            if (typeInfo.IsValueType && typeInfo.IsNullable() == false || enumerableArgument != null &&
-                (enumerableArgument.IsValueType && enumerableArgument.IsNullable() == false || isNonNullItem))
-                graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType).GetTypeInfo();
-
-            if (enumerableArgument != null)
-                graphType = typeof(ListGraphType<>).MakeGenericType(graphType).GetTypeInfo();
-
-            if (isNonNull && typeof(NonNullGraphType).IsAssignableFrom(graphType) == false)
-                graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType).GetTypeInfo();
-
-            return graphType;
-        }
-
         private IGraphType Wrap(TypeInfo typeInfo, IGraphType graphType)
         {
-            var enumerableArgument = GetEnumerableArgument(typeInfo);
+            var enumerableArgument = typeInfo.GetEnumerableArgument();
 
             if (typeInfo.IsValueType && typeInfo.IsNullable() == false || enumerableArgument != null &&
                 enumerableArgument.IsValueType && enumerableArgument.IsNullable() == false)
@@ -364,23 +365,6 @@ namespace Our.Umbraco.GraphQL.Adapters
                     typeof(NonNullGraphType<>).MakeGenericType(graphType.GetType()));
             nonNullGraphType.ResolvedType = graphType;
             return nonNullGraphType;
-        }
-
-        private static Type GetEnumerableArgument(TypeInfo typeInfo)
-        {
-            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
-                typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
-
-            if (typeInfo == typeof(string))
-                return null;
-
-            if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                return typeInfo.GenericTypeArguments[0];
-
-            var enumerableInterface = typeInfo.ImplementedInterfaces.FirstOrDefault(x =>
-                x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-
-            return enumerableInterface?.GenericTypeArguments[0];
         }
 
         private bool IsValidReturnType(Type type) =>

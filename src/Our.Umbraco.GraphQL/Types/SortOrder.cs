@@ -1,6 +1,5 @@
-﻿namespace Our.Umbraco.GraphQL.Models
+﻿namespace Our.Umbraco.GraphQL.Types
 {
-
     public enum SortOrder
     {
         Ascending,
