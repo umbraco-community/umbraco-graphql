@@ -173,7 +173,9 @@ namespace Our.Umbraco.GraphQL.Adapters
             if (memberInfo is MethodInfo methodInfo)
             {
                 return new QueryArguments(methodInfo.GetParameters()
-                    .Where(x => x.GetCustomAttribute<InjectAttribute>() == null).Select(CreateArgument));
+                    .Where(x => x.GetCustomAttribute<InjectAttribute>() == null
+                        && typeof(CancellationToken).IsAssignableFrom(x.ParameterType) == false)
+                    .Select(CreateArgument));
             }
 
             return null;

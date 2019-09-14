@@ -207,7 +207,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
         }
 
         [Fact]
-        public void Resolve_FieldDefinitionWithMethodInfoWithCancallationTokenArgument_ResolvesCancellationTokenFromContext()
+        public void Resolve_FieldDefinitionWithMethodInfoWithCancellationTokenArgument_ResolvesCancellationTokenFromContext()
         {
             var methodInfo = typeof(Query).GetMethod(nameof(Query.WithCancallationToken));
             var resolver = CreateSUT(methodInfo, configureFieldType: fieldType =>

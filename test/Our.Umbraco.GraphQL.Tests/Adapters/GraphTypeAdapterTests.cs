@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GraphQL;
@@ -945,7 +946,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         }
 
         [Fact]
-        public void Adapt_TaskOFEnumerablr_ResolvesToListGraphType()
+        public void Adapt_TaskOfEnumerable_ResolvesToListGraphType()
         {
             var builder = CreateSUT();
 
@@ -965,6 +966,18 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             graphType.Should().BeAssignableTo<IObjectGraphType>()
                 .Which.Fields.Should().NotContain(x => x.Name == nameof(ClassWithoutDescription.VoidTaskMethod));
+        }
+
+        [Fact]
+        public void Adapt_MethodCancellationToken_ArgumentIsNotAdded()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt<ClassWithName>();
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.TaskDescription))
+                .Which.Arguments.Should().NotContain(x => x.Name == "cancellationToken");
         }
 
         private abstract class AbstractClassWithoutDescription
@@ -1103,7 +1116,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             public Connection<ClassWithDescription> Descriptions() => null;
 
-            public Task<ClassWithDescription> TaskDescription() => Task.FromResult((ClassWithDescription) null);
+            public Task<ClassWithDescription> TaskDescription(CancellationToken cancellationToken) => Task.FromResult((ClassWithDescription) null);
 
             public Task<IEnumerable<ClassWithDescription>> TaskEnumerableDescriptions() =>
                 Task.FromResult(Enumerable.Empty<ClassWithDescription>());
