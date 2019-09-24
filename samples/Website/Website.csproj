@@ -501,7 +501,7 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>IF NOT EXIST "$(ProjectDir)Web.config" (
+    <PreBuildEvent Condition="'$(OS)' == 'Windows_NT'">IF NOT EXIST "$(ProjectDir)Web.config" (
   copy "$(ProjectDir)Web.config.template" "$(ProjectDir)Web.config"
 )</PreBuildEvent>
   </PropertyGroup>
