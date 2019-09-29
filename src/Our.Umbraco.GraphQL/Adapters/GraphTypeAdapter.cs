@@ -226,10 +226,11 @@ namespace Our.Umbraco.GraphQL.Adapters
                 inputType = AdaptInput(parameterType.GetTypeInfo());
             }
 
-            if (hasDefaultValue == false  && !(inputType is NonNullGraphType))
+            if (hasDefaultValue == false)
             {
                 inputType = WrapNonNull(inputType);
             }
+
             if (hasDefaultValue && inputType is NonNullGraphType nonNullGraphType)
             {
                 inputType = nonNullGraphType.ResolvedType;
@@ -360,6 +361,9 @@ namespace Our.Umbraco.GraphQL.Adapters
 
         private static IGraphType WrapNonNull(IGraphType graphType)
         {
+            if (graphType is NonNullGraphType)
+                return graphType;
+
             var nonNullGraphType =
                 (NonNullGraphType) Activator.CreateInstance(
                     typeof(NonNullGraphType<>).MakeGenericType(graphType.GetType()));
