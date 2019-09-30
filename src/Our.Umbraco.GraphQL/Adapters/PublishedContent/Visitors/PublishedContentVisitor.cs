@@ -113,9 +113,12 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                 .Argument<StringGraphType>("culture", "The culture.")
                 .Bidirectional()
                 .Resolve(ctx =>
-                    fetch(_publishedSnapshotAccessor.PublishedSnapshot.Content, ctx.GetArgument<string>("culture"))
-                        .OrderBy(ctx.GetArgument<IEnumerable<OrderBy>>("orderBy"))
-                        .ToConnection(x => x.Key, ctx.First, ctx.After, ctx.Last, ctx.Before));
+                {
+                    var items = fetch(_publishedSnapshotAccessor.PublishedSnapshot.Content, ctx.GetArgument<string>("culture")).ToList();
+
+                    return items.OrderBy(ctx.GetArgument<IEnumerable<OrderBy>>("orderBy"))
+                    .ToConnection(x => x.Key, ctx.First, ctx.After, ctx.Last, ctx.Before, items.Count);
+                });
 
             var connectionField = query.GetField(publishedContentType.Alias);
             connectionField.ResolvedType = new ConnectionGraphType(graphType);
