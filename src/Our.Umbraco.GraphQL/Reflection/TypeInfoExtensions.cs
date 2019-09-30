@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,21 @@ namespace Our.Umbraco.GraphQL.Reflection
 {
     internal static class TypeInfoExtensions
     {
+        public static  TypeInfo GetReturnType(this MemberInfo memberInfo)
+        {
+            switch (memberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    return fieldInfo.FieldType.GetTypeInfo();
+                case MethodInfo methodInfo:
+                    return methodInfo.ReturnType.GetTypeInfo();
+                case PropertyInfo propertyInfo:
+                    return propertyInfo.GetMethod.ReturnType.GetTypeInfo();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(memberInfo));
+            }
+        }
+
         public static TypeInfo Unwrap(this TypeInfo typeInfo)
         {
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
@@ -19,10 +35,7 @@ namespace Our.Umbraco.GraphQL.Reflection
                 return typeInfo.GenericTypeArguments[0].GetTypeInfo();
 
             var enumerableArgument = GetEnumerableArgument(typeInfo);
-            if (enumerableArgument != null)
-                return enumerableArgument.GetTypeInfo();
-
-            return typeInfo;
+            return enumerableArgument != null ? enumerableArgument.GetTypeInfo() : typeInfo;
         }
 
         public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem)

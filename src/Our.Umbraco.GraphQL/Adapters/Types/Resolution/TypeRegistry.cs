@@ -38,15 +38,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<PageInfo, PageInfoGraphType>();
         }
 
-        public void Add<TType, TGraphType>() where TGraphType : IGraphType
-        {
+        public void Add<TType, TGraphType>() where TGraphType : IGraphType =>
             _types.Add(typeof(TType).GetTypeInfo(), typeof(TGraphType).GetTypeInfo());
-        }
-
-        public TypeInfo Get<TType>()
-        {
-            return Get(typeof(TType).GetTypeInfo());
-        }
 
         public TypeInfo Get(TypeInfo type)
         {
@@ -70,14 +63,9 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             list.Add(with);
         }
 
-        public IEnumerable<TypeInfo> GetExtending<TType>()
-        {
-            return GetExtending(typeof(TType).GetTypeInfo());
-        }
-
-        public IEnumerable<TypeInfo> GetExtending(TypeInfo type)
-        {
-            return _extends.TryGetValue(type, out var list) ? list.AsReadOnly() : Enumerable.Empty<TypeInfo>();
-        }
+        public IEnumerable<TypeInfo> GetExtending(TypeInfo type) =>
+            _extends.TryGetValue(type, out var list)
+                ? list.AsReadOnly()
+                : Enumerable.Empty<TypeInfo>();
     }
 }

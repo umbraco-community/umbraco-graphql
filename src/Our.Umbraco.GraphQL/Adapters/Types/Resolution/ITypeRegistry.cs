@@ -7,10 +7,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
     public interface ITypeRegistry
     {
         void Add<TType, TGraphType>() where TGraphType : IGraphType;
-        TypeInfo Get<TType>();
         TypeInfo Get(TypeInfo type);
         void Extend<TExtend, TWith>();
-        IEnumerable<TypeInfo> GetExtending<TType>();
         IEnumerable<TypeInfo> GetExtending(TypeInfo type);
     }
 }

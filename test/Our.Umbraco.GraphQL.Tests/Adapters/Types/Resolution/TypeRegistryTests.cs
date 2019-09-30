@@ -40,7 +40,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
             var typeRegistry = CreateSUT();
             typeRegistry.Add<MyType, MyGraphType>();
 
-            var result = typeRegistry.Get<MyType>();
+            var result = typeRegistry.Get(typeof(MyType).GetTypeInfo());
 
             result.Should().Be<MyGraphType>();
         }
@@ -50,7 +50,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
         {
             var typeRegistry = CreateSUT();
 
-            var result = typeRegistry.Get<MyType>();
+            var result = typeRegistry.Get(typeof(MyType).GetTypeInfo());
 
             result.Should().BeNull();
         }
@@ -120,7 +120,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
             var typeRegistry = CreateSUT();
             typeRegistry.Extend<TypeToExtend, MyType>();
 
-            var result = typeRegistry.GetExtending<TypeToExtend>();
+            var result = typeRegistry.GetExtending(typeof(TypeToExtend).GetTypeInfo());
 
             result.Should().Contain(typeof(MyType).GetTypeInfo());
         }
@@ -132,7 +132,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
             typeRegistry.Extend<TypeToExtend, MyType>();
             typeRegistry.Extend<TypeToExtend, MyType2>();
 
-            var result = typeRegistry.GetExtending<TypeToExtend>();
+            var result = typeRegistry.GetExtending(typeof(TypeToExtend).GetTypeInfo());
 
             result.Should().Contain(typeof(MyType).GetTypeInfo())
                 .And.Contain(typeof(MyType2).GetTypeInfo());
@@ -144,7 +144,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
         {
             var typeRegistry = CreateSUT();
 
-            var result = typeRegistry.GetExtending<TypeToExtend>();
+            var result = typeRegistry.GetExtending(typeof(TypeToExtend).GetTypeInfo());
 
             result.Should().BeEmpty();
         }
