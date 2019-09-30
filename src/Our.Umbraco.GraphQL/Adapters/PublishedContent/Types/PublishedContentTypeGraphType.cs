@@ -4,12 +4,13 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
 {
-    [GraphQLMetadata("PublishedContentType")]
+    [GraphQLMetadata(TypeName)]
     public class PublishedContentTypeGraphType : ObjectGraphType<IPublishedContentType>
     {
+        private const string TypeName = "PublishedContentType";
         public PublishedContentTypeGraphType()
         {
-            Name = "PublishedContentType";
+            Name = TypeName;
 
             Field<NonNullGraphType<StringGraphType>>().Name("alias").Resolve(ctx => ctx.Source.Alias);
             Field<NonNullGraphType<ListGraphType<StringGraphType>>>().Name("compositionAliases")

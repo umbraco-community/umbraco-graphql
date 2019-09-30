@@ -10,7 +10,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
         public PublishedContentCompositionGraphType(IContentTypeComposition contentType,
             IPublishedContentType publishedContentType, ITypeRegistry typeRegistry)
         {
-            Name = contentType.Alias.ToPascalCase() + "Published" + contentType.GetItemType();
+            Name = $"{contentType.Alias.ToPascalCase()}Published{contentType.GetItemType()}";
 
             foreach (var propertyType in contentType.CompositionPropertyTypes)
                 base.AddField(new PublishedPropertyFieldType(publishedContentType, propertyType, typeRegistry));
