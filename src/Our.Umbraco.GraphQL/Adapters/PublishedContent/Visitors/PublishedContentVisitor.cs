@@ -105,7 +105,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
             }
         }
 
-        private void CreateContentField<T>(ObjectGraphType<T> query, IComplexGraphType graphType,
+        private void CreateContentField<T>(ComplexGraphType<T> query, IComplexGraphType graphType,
             IPublishedContentType publishedContentType,
             Func<IPublishedContentCache, string, IEnumerable<IPublishedContent>> fetch)
         {
@@ -114,15 +114,18 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                 .Bidirectional()
                 .Resolve(ctx =>
                 {
-                    var items = fetch(_publishedSnapshotAccessor.PublishedSnapshot.Content, ctx.GetArgument<string>("culture")).ToList();
+                    var items = fetch(_publishedSnapshotAccessor.PublishedSnapshot.Content,
+                        ctx.GetArgument<string>("culture")).ToList();
 
                     return items.OrderBy(ctx.GetArgument<IEnumerable<OrderBy>>("orderBy"))
-                    .ToConnection(x => x.Key, ctx.First, ctx.After, ctx.Last, ctx.Before, items.Count);
+                        .ToConnection(x => x.Key, ctx.First, ctx.After, ctx.Last, ctx.Before, items.Count);
                 });
 
             var connectionField = query.GetField(publishedContentType.Alias);
             connectionField.ResolvedType = new ConnectionGraphType(graphType);
-            connectionField.Arguments.Add(new QueryArgument(new ListGraphType(new NonNullGraphType(new OrderByGraphType(graphType)))) { Name = "orderBy" });
+            connectionField.Arguments.Add(
+                new QueryArgument(new ListGraphType(new NonNullGraphType(new OrderByGraphType(graphType))))
+                    {Name = "orderBy"});
         }
     }
 }

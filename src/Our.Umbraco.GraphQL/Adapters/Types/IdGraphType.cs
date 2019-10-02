@@ -10,6 +10,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types
             var parsed = base.ParseValue(value);
             return parsed == null ? (Id?)null : new Id(parsed.ToString());
         }
+
         public override object ParseLiteral(IValue value)
         {
             var parsed = base.ParseLiteral(value);

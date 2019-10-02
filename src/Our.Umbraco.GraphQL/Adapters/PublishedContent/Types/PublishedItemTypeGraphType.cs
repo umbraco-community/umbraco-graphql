@@ -12,6 +12,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
         public PublishedItemTypeGraphType()
         {
             Name = TypeName;
+            Description = "The type of published element.";
         }
     }
 }

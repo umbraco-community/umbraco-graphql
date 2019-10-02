@@ -10,6 +10,7 @@ using GraphQL.Types;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
+using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
@@ -981,6 +982,36 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
                 .Which.Arguments.Should().NotContain(x => x.Name == "cancellationToken");
         }
 
+        [Fact]
+        public void Adapt_MethodWithOrderByArgument_ArgumentIsAdded()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt<ClassWithName>();
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.HasOrderByArgument))
+                .Which.Arguments.Should().Contain(x => x.Name == "orderBy")
+                .Which.ResolvedType.Should().BeAssignableTo<ListGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<OrderByGraphType>();
+        }
+
+        [Fact]
+        public void Adapt_MethodReturnTypeIsConnectionHasOrderByArgument_ArgumentIsAdded()
+        {
+            var adapter = CreateSUT();
+
+            var graphType = adapter.Adapt<ClassWithName>();
+
+            graphType.Should().BeAssignableTo<IObjectGraphType>()
+                .Which.Fields.Should().Contain(x => x.Name == nameof(ClassWithName.ConnectionWithOrderByArgument))
+                .Which.Arguments.Should().Contain(x => x.Name == "orderBy")
+                .Which.ResolvedType.Should().BeAssignableTo<ListGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<NonNullGraphType>()
+                .Which.ResolvedType.Should().BeAssignableTo<OrderByGraphType>();
+        }
+
         private abstract class AbstractClassWithoutDescription
         {
             public string PublicField;
@@ -1121,6 +1152,12 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             public Task<IEnumerable<ClassWithDescription>> TaskEnumerableDescriptions() =>
                 Task.FromResult(Enumerable.Empty<ClassWithDescription>());
+
+            public IEnumerable<ClassWithDescription> HasOrderByArgument(IEnumerable<OrderBy> orderBy = null) =>
+                Enumerable.Empty<ClassWithDescription>();
+
+            public Connection<ClassWithDescription> ConnectionWithOrderByArgument(IEnumerable<OrderBy> orderBy = null) =>
+                null;
         }
 
         [Name("MyEnum")]
@@ -1154,6 +1191,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             [Attributes.Description("Property description.")]
             public string PropertyWithDescription { get; set; }
+
             [Attributes.Description("Method description.")]
             public string MethodWithDescription() => null;
 

@@ -12,6 +12,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
         public ContentVariationGraphType()
         {
             Name = TypeName;
+            Description = "Indicates how values can vary.";
         }
     }
 }

@@ -214,7 +214,8 @@ namespace Our.Umbraco.GraphQL.Adapters
             IGraphType inputType;
             if (unwrappedType == typeof(OrderBy))
             {
-                var returnType = parameterInfo.Member.GetReturnType();
+                var returnType = parameterInfo.Member.GetReturnType().Unwrap();
+
                 if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Connection<>))
                     returnType = returnType.GenericTypeArguments[0].GetTypeInfo();
 
@@ -225,6 +226,7 @@ namespace Our.Umbraco.GraphQL.Adapters
                     : Activator.CreateInstance(foundType);
 
                 inputType = new OrderByGraphType((IComplexGraphType) graphType);
+                _visitor.Visit((EnumerationGraphType) inputType);
 
                 if (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 {

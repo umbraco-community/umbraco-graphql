@@ -12,6 +12,14 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types
     public class OrderByGraphTypeTests
     {
         [Fact]
+        public void Ctor_SetsName()
+        {
+            var sut = new OrderByGraphType(new PersonGraphType());
+
+            sut.Name.Should().Be("PersonOrder");
+        }
+
+        [Fact]
         public void Ctor_WithGraphType_SetsNameToGraphTypeOrder()
         {
             var sut = new OrderByGraphType(new PersonGraphType());

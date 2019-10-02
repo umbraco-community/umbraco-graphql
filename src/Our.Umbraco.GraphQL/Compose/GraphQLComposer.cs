@@ -12,6 +12,7 @@ using Our.Umbraco.GraphQL.Web;
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors;
 using GraphQL.DataLoader;
+using Our.Umbraco.GraphQL.FieldMiddleware;
 using Our.Umbraco.GraphQL.Middleware;
 
 namespace Our.Umbraco.GraphQL.Compose

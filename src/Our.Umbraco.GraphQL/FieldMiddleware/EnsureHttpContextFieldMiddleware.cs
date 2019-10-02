@@ -2,9 +2,10 @@ using System.Threading.Tasks;
 using System.Web;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
+using Our.Umbraco.GraphQL.Middleware;
 using Umbraco.Web;
 
-namespace Our.Umbraco.GraphQL.Middleware
+namespace Our.Umbraco.GraphQL.FieldMiddleware
 {
     internal class EnsureHttpContextFieldMiddleware : IFieldMiddleware
     {

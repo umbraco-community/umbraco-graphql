@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
@@ -8,6 +10,7 @@ using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Types;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Xunit;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
 
@@ -15,10 +18,11 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
 {
     public class PublishedContentGraphTypeTests
     {
-        private PublishedContentGraphType CreateSUT(IContentTypeComposition contentType = null)
+        private PublishedContentGraphType CreateSUT(IContentTypeComposition contentType = null,
+            IPublishedContentType publishedContentType = null)
         {
             return new PublishedContentGraphType(contentType ?? Substitute.For<IContentTypeComposition>(),
-                Substitute.For<IPublishedContentType>(), new TypeRegistry());
+                publishedContentType ?? Substitute.For<IPublishedContentType>(), new TypeRegistry());
         }
 
         [Theory]
@@ -129,6 +133,22 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
             graphType.Fields.Should().Contain(x => x.Name == "_id")
                 .Which.Resolver.Resolve(new ResolveFieldContext{ Source = content })
                 .Should().Be(new Id(content?.Key.ToString()));
+        }
+    }
+
+    internal static class PropertyTypeExtensions
+    {
+        /// <summary>
+        /// Set the property type alias without requiring `Current`.
+        /// </summary>
+        /// <param name="propertyType"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public static PropertyType SetAlias(this PropertyType propertyType, string alias)
+        {
+            typeof(PropertyType).GetField("_alias", BindingFlags.Instance | BindingFlags.NonPublic)
+                .SetValue(propertyType, alias);
+            return propertyType;
         }
     }
 }

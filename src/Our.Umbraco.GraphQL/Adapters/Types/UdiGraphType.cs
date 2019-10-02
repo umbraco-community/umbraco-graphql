@@ -8,7 +8,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types
     {
         public UdiGraphType()
         {
-            Name = "Udi";
+            Name = "UDI";
             Description = "Represents an entity identifier.";
         }
 
