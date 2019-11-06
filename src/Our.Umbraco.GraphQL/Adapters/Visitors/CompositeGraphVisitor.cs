@@ -12,6 +12,11 @@ namespace Our.Umbraco.GraphQL.Adapters.Visitors
             _visitors = visitors ?? throw new ArgumentNullException(nameof(visitors));
         }
 
+        public override void Visit(EnumerationGraphType graphType)
+        {
+            foreach (var visitor in _visitors) visitor.Visit(graphType);
+        }
+
         public override void Visit(IInputObjectGraphType graphType)
         {
 

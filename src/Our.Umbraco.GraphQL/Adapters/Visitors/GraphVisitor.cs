@@ -4,6 +4,10 @@ namespace Our.Umbraco.GraphQL.Adapters.Visitors
 {
     public abstract class GraphVisitor : IGraphVisitor
     {
+        public virtual void Visit(EnumerationGraphType graphType)
+        {
+        }
+
         public virtual void Visit(IInputObjectGraphType graphType)
         {
         }
