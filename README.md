@@ -10,9 +10,7 @@ Please note this **should not be used in production**, since there are **no secu
 
 ## How does it work
 
-An Owin middleware exposes Umbraco Published Content as a GraphQL endpoint.
-
-GraphQL types are dynamically generated for all Umbraco document types (content and media), with all the properties as fields. They all implement an interface `PublishedContent` which implements the generic Umbraco properties as fields.
+GraphQL types are dynamically generated for all Umbraco document types (content and media), with all the properties as fields.
 
 ## Installation
 
@@ -20,7 +18,7 @@ The preferred way to install GraphQL for Umbraco is through NuGet
 
 ### Option 1: NuGet
 
-GraphQL for Umbraco is available as a NuGet [package](https://www.nuget.org/packages/Our.Umbraco.GraphQL).
+GraphQL for Umbraco is available as a [NuGet package](https://www.nuget.org/packages/Our.Umbraco.GraphQL).
 
 To install run the following command in the [Package Manager Console](https://docs.nuget.org/docs/start-here/using-the-package-manager-console)
 
@@ -32,40 +30,40 @@ PM> Install-Package Our.Umbraco.GraphQL
 
 Clone the repository and run the Website (F5 in Visual Studio), install Umbraco with the starter kit and start exploring the API using the GraphQL Playground by opening `/umbraco/graphql`.
 
-### Urls
+## Docs
 
-| Method | Url              | Description        |
-| ------ | ---------------- | ------------------ |
-| GET    | /umbraco/graphql | GraphQL Playground |
-| POST   | /umbraco/graphql | GraphQL endpoint   |
+The docs can be found [here](docs/index.md)
 
-### Querying
+## TODO
 
-The Umbraco queries/types can be found under the `umbraco` field.
+-   [x] GraphQL Playground
+-   [x] Schema Stitching (extending types)
+-   [x] Metrics
+-   [x] Published Content
+-   [ ] Published Media
+-   [ ] Dictionary
+-   [ ] Statistics (field usage etc.)
+-   [ ] Deprecation (Content Types and Properties)
+-   [ ] API Tokens (OAUTH) with permissions (for content types and properties)
+-   [ ] Data Types
+-   [ ] Document Types
+-   [ ] Media Types
+-   [ ] Member Types
+-   [ ] Content
+-   [ ] Media
+-   [ ] Members
+-   [ ] Documentation
 
-```graphql
-{
-    umbraco {
-        content {
-            atRoot {
-                all {
-                    ...
-                }
-                ...
-            }
-            byId(id: "id") {
-            }
-            byType {
-                ...
-            }
-            byUrl(url: "url") {
-                ...
-            }
-        }
-    }
-}
-```
+## Contributing
 
-### Extending the Schema with your own types
+Anyone can help make this project better - check out our [Contributing guide](CONTRIBUTING.md)
 
-Take a look at the [Star Wars sample](samples/Website/Starwars).
+## Authors
+
+-   [Rasmus John Pedersen](https://www.github.com/rasmusjp)
+
+## License
+
+Copyright © 2018 Rasmus John Pedersen
+
+GraphQL for Umbraco is released under the [MIT License](LICENSE)
