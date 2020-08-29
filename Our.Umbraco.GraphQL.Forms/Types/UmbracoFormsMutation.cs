@@ -8,22 +8,29 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Forms.Core.Data.Storage;
 using Umbraco.Forms.Core.Enums;
 using Umbraco.Forms.Core.Extensions;
 using Umbraco.Forms.Core.Models;
 using Umbraco.Forms.Core.Persistence.Dtos;
 using Umbraco.Forms.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace Our.Umbraco.GraphQL.Forms.Types
 {
     public class UmbracoFormsMutation : ObjectGraphType
     {
+        private readonly ILogger _logger;
         private readonly IFormStorage _formStorage;
         private readonly IFieldTypeStorage _fieldTypeStorage;
         private readonly IRecordService _recordService;
+        private readonly IUmbracoContextFactory _umbracoContextFactory;
+        private readonly IPublishedRouter _publishedRouter;
 
-        public UmbracoFormsMutation(IFormStorage formStorage, IFieldTypeStorage fieldTypeStorage, IRecordService recordService)
+        public UmbracoFormsMutation(ILogger logger, IFormStorage formStorage, IFieldTypeStorage fieldTypeStorage, IRecordService recordService, IUmbracoContextFactory umbracoContextFactory, IPublishedRouter publishedRouter)
         {
             Name = nameof(UmbracoFormsMutation);
 
@@ -33,28 +40,62 @@ namespace Our.Umbraco.GraphQL.Forms.Types
                 .Argument<IntGraphType>("umbracoPageId", "The integer ID of the Umbraco page you were on")
                 .Argument<ListGraphType<FieldValueInputType>>("fields", "An array of objects representing the field data.  Each object has a 'field' property that is either the GUID or alias of the form field, and a 'value' property that is the field value")
                 .Resolve(Submit);
-
+            _logger = logger;
             _formStorage = formStorage;
             _fieldTypeStorage = fieldTypeStorage;
             _recordService = recordService;
+            _umbracoContextFactory = umbracoContextFactory;
+            _publishedRouter = publishedRouter;
         }
 
         private object Submit(ResolveFieldContext<object> ctx)
         {
-            if (!Guid.TryParse(ctx.GetArgument<string>("formId"), out var formId) || !(_formStorage.GetForm(formId) is Form form)) return Guid.Empty;
+            string formIdArg = null;
+            int umbracoPageId = 0;
 
-            var context = HttpContext.Current;
-            var contextWrapped = new HttpContextWrapper(context);
-            var umbracoPageId = ctx.GetArgument<int>("umbracoPageId");
-            var fieldsList = ctx.GetArgument<List<FieldValue>>("fields");
-            if (fieldsList == null || fieldsList.Count == 0) return Guid.Empty;
+            try
+            {
+                formIdArg = ctx.GetArgument<string>("formId");
+                umbracoPageId = ctx.GetArgument<int>("umbracoPageId");
+                var fieldsList = ctx.GetArgument<List<FieldValue>>("fields");
 
-            var fields = new Dictionary<string, string>(fieldsList.Count);
-            fieldsList.ForEach(f => fields[f.Field] = f.Value);
+                if (!Guid.TryParse(formIdArg, out var formId) || !(_formStorage.GetForm(formId) is Form form)) return SubmitResult("The form ID specified could not be found");
+                if (fieldsList == null || fieldsList.Count == 0) return SubmitResult("You must specify one or more field values");
 
-            var errors = ValidateFormState(fields, form, contextWrapped)?.ToList();
-            if (errors != null && errors.Count > 0) return SubmitResult(errors);
+                var fields = new Dictionary<string, string>(fieldsList.Count);
+                fieldsList.ForEach(f => fields[f.Field] = f.Value);
 
+                var context = HttpContext.Current;
+                var contextWrapped = new HttpContextWrapper(context);
+                var errors = ValidateFormState(fields, form, contextWrapped)?.ToList();
+                if (errors != null && errors.Count > 0) return SubmitResult(errors);
+
+                using (var ucRef = _umbracoContextFactory.EnsureUmbracoContext(contextWrapped))
+                {
+                    var uc = ucRef.UmbracoContext;
+                    var page = uc.Content.GetById(umbracoPageId);
+                    if (page == null) return SubmitResult("Could not find the umbracoPageId specified");
+
+                    var url = page.Url;
+                    if (string.IsNullOrEmpty(url)) return SubmitResult("The page specified does not have a routable URL to associate with the form request");
+
+                    var request = _publishedRouter.CreateRequest(uc, new Uri(context.Request.Url, url));
+                    uc.PublishedRequest = request;
+                    _publishedRouter.PrepareRequest(request);
+
+                    var recordId = SubmitForm(context, contextWrapped, formId, form, umbracoPageId, fields);
+                    return SubmitResult(recordId);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error<UmbracoFormsMutation>(ex, "Could not submit form {formId} for Umbraco page {umbracoPageId}", formIdArg, umbracoPageId);
+                return SubmitResult("An unspecified error occurred.  Check the Umbraco logs for more details.");
+            }
+        }
+
+        private Guid SubmitForm(HttpContext context, HttpContextBase contextWrapped, Guid formId, Form form, int umbracoPageId, Dictionary<string, string> fields)
+        {
             var record = new Record
             {
                 Form = formId,
@@ -93,8 +134,17 @@ namespace Our.Umbraco.GraphQL.Forms.Types
 
             _recordService.Submit(record, form);
 
-            return SubmitResult(record.UniqueId);
+            return record.UniqueId;
         }
+
+        private JToken SubmitResult(string error) => new JObject
+        {
+            ["success"] = false,
+            ["errors"] = new JArray(new[] { new JObject
+            {
+                ["error"] = error
+            } })
+        };
 
         private JToken SubmitResult(IEnumerable<FieldValue> errors) => new JObject
             {
