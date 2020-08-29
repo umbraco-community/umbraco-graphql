@@ -29,6 +29,7 @@ namespace Our.Umbraco.GraphQL.Builders
             var schema = new Schema(_dependencyResolver);
 
             schema.Query = GenerateFromProperty(schemaType, "Query", true);
+            schema.Mutation = GenerateFromProperty(schemaType, "Mutation", false);
 
             foreach (var type in additionalTypes)
             {
