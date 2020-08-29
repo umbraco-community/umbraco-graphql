@@ -1,0 +1,142 @@
+using GraphQL.Types;
+using Newtonsoft.Json.Linq;
+using Our.Umbraco.GraphQL.Adapters.Types;
+using Our.Umbraco.GraphQL.Attributes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using Umbraco.Forms.Core.Data.Storage;
+using Umbraco.Forms.Core.Enums;
+using Umbraco.Forms.Core.Extensions;
+using Umbraco.Forms.Core.Models;
+using Umbraco.Forms.Core.Persistence.Dtos;
+using Umbraco.Forms.Core.Services;
+
+namespace Our.Umbraco.GraphQL.Forms.Types
+{
+    public class UmbracoFormsMutation : ObjectGraphType
+    {
+        private readonly IFormStorage _formStorage;
+        private readonly IFieldTypeStorage _fieldTypeStorage;
+        private readonly IRecordService _recordService;
+
+        public UmbracoFormsMutation(IFormStorage formStorage, IFieldTypeStorage fieldTypeStorage, IRecordService recordService)
+        {
+            Name = nameof(UmbracoFormsMutation);
+
+            Field<JsonGraphType>()
+                .Name("submit")
+                .Argument<StringGraphType>("formId", "The GUID of the form")
+                .Argument<IntGraphType>("umbracoPageId", "The integer ID of the Umbraco page you were on")
+                .Argument<ListGraphType<FieldValueInputType>>("fields", "An array of objects representing the field data.  Each object has a 'field' property that is either the GUID or alias of the form field, and a 'value' property that is the field value")
+                .Resolve(Submit);
+
+            _formStorage = formStorage;
+            _fieldTypeStorage = fieldTypeStorage;
+            _recordService = recordService;
+        }
+
+        private object Submit(ResolveFieldContext<object> ctx)
+        {
+            if (!Guid.TryParse(ctx.GetArgument<string>("formId"), out var formId) || !(_formStorage.GetForm(formId) is Form form)) return Guid.Empty;
+
+            var context = HttpContext.Current;
+            var contextWrapped = new HttpContextWrapper(context);
+            var umbracoPageId = ctx.GetArgument<int>("umbracoPageId");
+            var fieldsList = ctx.GetArgument<List<FieldValue>>("fields");
+            if (fieldsList == null || fieldsList.Count == 0) return Guid.Empty;
+
+            var fields = new Dictionary<string, string>(fieldsList.Count);
+            fieldsList.ForEach(f => fields[f.Field] = f.Value);
+
+            var errors = ValidateFormState(fields, form, contextWrapped)?.ToList();
+            if (errors != null && errors.Count > 0) return SubmitResult(errors);
+
+            var record = new Record
+            {
+                Form = formId,
+                State = FormState.Submitted,
+                UmbracoPageId = umbracoPageId,
+                IP = context.Request.UserHostAddress
+            };
+
+            if (context.User != null && context.User.Identity != null && context.User.Identity.IsAuthenticated)
+            {
+                var username = context.User.Identity.Name;
+                var user = string.IsNullOrWhiteSpace(username) ? null : Membership.GetUser(username);
+
+                if (user != null) record.MemberKey = user.ProviderUserKey != null ? user.ProviderUserKey.ToString() : null;
+            }
+
+            foreach (var allField in form.AllFields)
+            {
+                var inputValues = new object[0];
+                if (fields.TryGetValue(allField.Id.ToString(), out var field) || fields.TryGetValue(allField.Alias, out field)) inputValues = new[] { field };
+
+                var fieldValues = _fieldTypeStorage.GetFieldTypeByField(allField).ConvertToRecord(allField, inputValues, contextWrapped).ToArray();
+
+                if (record.RecordFields.TryGetValue(allField.Id, out var recordField))
+                {
+                    recordField.Values.Clear();
+                    recordField.Values.AddRange(fieldValues);
+                }
+                else
+                {
+                    recordField = new RecordField(allField);
+                    recordField.Values.AddRange(fieldValues);
+                    record.RecordFields.Add(allField.Id, recordField);
+                }
+            }
+
+            _recordService.Submit(record, form);
+
+            return SubmitResult(record.UniqueId);
+        }
+
+        private JToken SubmitResult(IEnumerable<FieldValue> errors) => new JObject
+            {
+                ["success"] = false,
+                ["errors"] = new JArray(errors.Select(e => new JObject
+                {
+                    ["field"] = e.Field,
+                    ["error"] = e.Value
+                }).ToArray())
+            };
+
+        private JToken SubmitResult(Guid recordId) => new JObject
+            {
+                ["success"] = true,
+                ["id"] = recordId.ToString()
+            };
+
+        private IEnumerable<FieldValue> ValidateFormState(Dictionary<string, string> fields, Form form, HttpContextBase context)
+        {
+            var allFields = form.AllFields.ToDictionary(f => f.Id, f => string.Join(", ", f.Values ?? new List<object>()));
+            foreach (var formField in form.AllFields)
+            {
+                var inputValues = new object[0];
+                if (fields.TryGetValue(formField.Id.ToString(), out var field) || fields.TryGetValue(formField.Alias, out field)) inputValues = new[] { field };
+
+                var type = _fieldTypeStorage.GetFieldTypeByField(formField);
+                var errors = type.ValidateField(form, formField, inputValues, context, _formStorage);
+
+                foreach (string error in errors)
+                {
+                    var message = error;
+                    if (string.IsNullOrWhiteSpace(message)) message = string.Format((form.InvalidErrorMessage ?? "").ParsePlaceHolders(), formField.Caption);
+                    yield return new FieldValue { Field = formField.Alias, Value = message };
+                }
+            }
+        }
+    }
+
+    public class ExtendMutationWithUmbracoFormsMutation
+    {
+        [NonNull]
+        [Description("Mutation to submit an Umbraco Form")]
+        public UmbracoFormsMutation UmbracoForms([Inject] UmbracoFormsMutation mutation) => mutation;
+    }
+}
