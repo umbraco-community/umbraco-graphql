@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Forms.Core;
 using Umbraco.Forms.Core.Enums;
+using Umbraco.Forms.Core.Interfaces;
 using Umbraco.Forms.Core.Models;
 
 namespace Our.Umbraco.GraphQL.Forms.Types
@@ -124,9 +125,35 @@ namespace Our.Umbraco.GraphQL.Forms.Types
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("value").Metadata(nameof(MemberInfo), GetMember((KeyValuePair<string, string> x) => x.Value)).Resolve(ctx => ctx.Source.Value);
         }
 
-        //public static void AddBuiltinFields(this ComplexGraphType<Page> graphType)
-        //{
-        //}
+        public static void AddBuiltinFields(this ComplexGraphType<FormDataSource> graphType)
+        {
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("id").Metadata(nameof(MemberInfo), GetMember((FormDataSource x) => x.Id)).Resolve(ctx => ctx.Source.Id);
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("name").Metadata(nameof(MemberInfo), GetMember((FormDataSource x) => x.Name)).Resolve(ctx => ctx.Source.Name);
+            graphType.Field<NonNullGraphType<ListGraphType<StringKeyValuePairGraphType>>>().Name("settings").Metadata(nameof(MemberInfo), GetMember((FormDataSource x) => x.Settings)).Resolve(ctx => ctx.Source.Settings);
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("formDataSourceTypeId").Metadata(nameof(MemberInfo), GetMember((FormDataSource x) => x.FormDataSourceTypeId)).Resolve(ctx => ctx.Source.FormDataSourceTypeId);
+            graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("valid").Metadata(nameof(MemberInfo), GetMember((FormDataSource x) => x.Valid)).Resolve(ctx => ctx.Source.Valid);
+        }
+
+        public static void AddBuiltinFields(this ComplexGraphType<IWorkflow> graphType)
+        {
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("Id").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.Id)).Resolve(ctx => ctx.Source.Id);
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("Name").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.Name)).Resolve(ctx => ctx.Source.Name);
+            graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("Active").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.Active)).Resolve(ctx => ctx.Source.Active);
+            graphType.Field<NonNullGraphType<EnumerationGraphType<IncludeSensitiveData>>>().Name("IncludeSensitiveData").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.IncludeSensitiveData)).Resolve(ctx => ctx.Source.IncludeSensitiveData);
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("WorkflowTypeId").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.WorkflowTypeId)).Resolve(ctx => ctx.Source.WorkflowTypeId);
+            graphType.Field<NonNullGraphType<EnumerationGraphType<FormState>>>().Name("ExecutesOn").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.ExecutesOn)).Resolve(ctx => ctx.Source.ExecutesOn);
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("Form").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.Form)).Resolve(ctx => ctx.Source.Form);
+            graphType.Field<NonNullGraphType<ListGraphType<StringKeyValuePairGraphType>>>().Name("Settings").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.Settings)).Resolve(ctx => ctx.Source.Settings);
+            graphType.Field<NonNullGraphType<IntGraphType>>().Name("SortOrder").Metadata(nameof(MemberInfo), GetMember((IWorkflow x) => x.SortOrder)).Resolve(ctx => ctx.Source.SortOrder);
+        }
+
+        public static void AddBuiltinFields(this ComplexGraphType<IFieldPreValueSource> graphType)
+        {
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("Id").Metadata(nameof(MemberInfo), GetMember((IFieldPreValueSource x) => x.Id)).Resolve(ctx => ctx.Source.Id);
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("Name").Metadata(nameof(MemberInfo), GetMember((IFieldPreValueSource x) => x.Name)).Resolve(ctx => ctx.Source.Name);
+            graphType.Field<NonNullGraphType<ListGraphType<StringKeyValuePairGraphType>>>().Name("Settings").Metadata(nameof(MemberInfo), GetMember((IFieldPreValueSource x) => x.Settings)).Resolve(ctx => ctx.Source.Settings);
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("FieldPreValueSourceTypeId").Metadata(nameof(MemberInfo), GetMember((IFieldPreValueSource x) => x.FieldPreValueSourceTypeId)).Resolve(ctx => ctx.Source.FieldPreValueSourceTypeId);
+        }
 
         private static MemberInfo GetMember<TSource, TReturn>(Expression<Func<TSource, TReturn>> expression)
         {

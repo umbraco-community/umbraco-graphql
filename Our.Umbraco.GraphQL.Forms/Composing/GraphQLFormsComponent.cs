@@ -4,6 +4,7 @@ using Our.Umbraco.GraphQL.Types;
 using System.Collections.Generic;
 using Umbraco.Core.Composing;
 using Umbraco.Forms.Core;
+using Umbraco.Forms.Core.Interfaces;
 using Umbraco.Forms.Core.Models;
 
 namespace Our.Umbraco.GraphQL.Forms.Composing
@@ -29,11 +30,12 @@ namespace Our.Umbraco.GraphQL.Forms.Composing
             _typeRegistry.Add<Field, FieldGraphType>();
             _typeRegistry.Add<FieldConditionRule, FieldConditionRuleGraphType>();
             _typeRegistry.Add<KeyValuePair<string, string>, StringKeyValuePairGraphType>();
-//            _typeRegistry.Add<Form, GraphType>();
-//            _typeRegistry.Add<Form, GraphType>();
+            _typeRegistry.Add<FormDataSource, FormDataSourceGraphType>();
+            _typeRegistry.Add<IWorkflow, WorkflowGraphType>();
+            _typeRegistry.Add<IFieldPreValueSource, FieldPreValueSourceGraphType>();
 
             _typeRegistry.Extend<Query, ExtendQueryWithUmbracoFormsQuery>();
-//            _typeRegistry.Extend<Mutation, ExtendMutationWithUmbracoFormsMutation>();
+            _typeRegistry.Extend<Mutation, ExtendMutationWithUmbracoFormsMutation>();
         }
 
         public void Terminate()
