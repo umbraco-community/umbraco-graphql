@@ -30,6 +30,8 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 unwrappedTypeInfo = typeof(IPublishedElement).GetTypeInfo();
 
             var propertyGraphType = typeRegistry.Get(unwrappedTypeInfo) ?? typeof(StringGraphType).GetTypeInfo();
+            // The Grid data type declares its return type as a JToken, but is actually a JObject.  The result is that without this check,
+            // it is cast as an IEnumerable<JProperty> which causes problems when trying to serialize the graph to send to the client
             propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false, propertyType.PropertyEditorAlias != global::Umbraco.Core.Constants.PropertyEditors.Aliases.Grid);
 
             if (propertyType.VariesByCulture())
@@ -44,11 +46,8 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
             Name = publishedPropertyType.Alias.ToCamelCase();
             Description = propertyType.Description;
             Resolver = new FuncFieldResolver<IPublishedElement, object>(context =>
-            {
-                var val = context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"),
-                    fallback: Fallback.ToLanguage);
-                return val;
-            });
+                context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"),
+                    fallback: Fallback.ToLanguage));
         }
     }
 }
