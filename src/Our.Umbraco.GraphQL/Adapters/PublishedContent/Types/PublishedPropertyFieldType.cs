@@ -30,7 +30,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 unwrappedTypeInfo = typeof(IPublishedElement).GetTypeInfo();
 
             var propertyGraphType = typeRegistry.Get(unwrappedTypeInfo) ?? typeof(StringGraphType).GetTypeInfo();
-            propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false);
+            propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false, propertyType.PropertyEditorAlias != global::Umbraco.Core.Constants.PropertyEditors.Aliases.Grid);
 
             if (propertyType.VariesByCulture())
             {
@@ -44,8 +44,11 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
             Name = publishedPropertyType.Alias.ToCamelCase();
             Description = propertyType.Description;
             Resolver = new FuncFieldResolver<IPublishedElement, object>(context =>
-                context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"),
-                    fallback: Fallback.ToLanguage));
+            {
+                var val = context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"),
+                    fallback: Fallback.ToLanguage);
+                return val;
+            });
         }
     }
 }
