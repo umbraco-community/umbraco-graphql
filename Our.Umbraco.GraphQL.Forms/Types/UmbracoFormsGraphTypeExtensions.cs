@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.Builders;
 using System;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace Our.Umbraco.GraphQL.Forms.Types
         public static void AddBuiltinFields(this ComplexGraphType<FormDataSourceMapping> graphType)
         {
             graphType.Field<NonNullGraphType<GuidGraphType>>().Name("formId").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.FormId)).Resolve(ctx => ctx.Source.FormId);
-            graphType.Field<NonNullGraphType<ObjectGraphType>>().Name("dataFieldKey").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.DataFieldKey)).Resolve(ctx => ctx.Source.DataFieldKey);
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("dataFieldKey").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.DataFieldKey)).Resolve(ctx => JsonConvert.SerializeObject(ctx.Source.DataFieldKey));
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("prevalueKeyField").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.PrevalueKeyfield)).Resolve(ctx => ctx.Source.PrevalueKeyfield);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("prevalueValueField").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.PrevalueValueField)).Resolve(ctx => ctx.Source.PrevalueValueField);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("prevalueTable").Metadata(nameof(MemberInfo), GetMember((FormDataSourceMapping x) => x.PrevalueTable)).Resolve(ctx => ctx.Source.PrevalueTable);
@@ -100,7 +101,7 @@ namespace Our.Umbraco.GraphQL.Forms.Types
             graphType.Field<NonNullGraphType<GuidGraphType>>().Name("id").Metadata(nameof(MemberInfo), GetMember((Field x) => x.Id)).Resolve(ctx => ctx.Source.Id);
             graphType.Field<NonNullGraphType<GuidGraphType>>().Name("fieldTypeId").Metadata(nameof(MemberInfo), GetMember((Field x) => x.FieldTypeId)).Resolve(ctx => ctx.Source.FieldTypeId);
             graphType.Field<NonNullGraphType<GuidGraphType>>().Name("prevalueSourceId").Metadata(nameof(MemberInfo), GetMember((Field x) => x.PreValueSourceId)).Resolve(ctx => ctx.Source.PreValueSourceId);
-            graphType.Field<NonNullGraphType<ObjectGraphType>>().Name("dataSourceFieldKey").Metadata(nameof(MemberInfo), GetMember((Field x) => x.DataSourceFieldKey)).Resolve(ctx => ctx.Source.DataSourceFieldKey);
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("dataSourceFieldKey").Metadata(nameof(MemberInfo), GetMember((Field x) => x.DataSourceFieldKey)).Resolve(ctx => JsonConvert.SerializeObject(ctx.Source.DataSourceFieldKey));
             graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("containsSensitiveData").Metadata(nameof(MemberInfo), GetMember((Field x) => x.ContainsSensitiveData)).Resolve(ctx => ctx.Source.ContainsSensitiveData);
             graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("mandatory").Metadata(nameof(MemberInfo), GetMember((Field x) => x.Mandatory)).Resolve(ctx => ctx.Source.Mandatory);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("regex").Metadata(nameof(MemberInfo), GetMember((Field x) => x.RegEx)).Resolve(ctx => ctx.Source.RegEx);
