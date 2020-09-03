@@ -10,7 +10,7 @@ namespace Our.Umbraco.GraphQL.Forms.Types
     {
         public IEnumerable<Form> All([Inject] IFormStorage formStorage) => formStorage.GetAllForms();
 
-        public Form ById([Inject] IFormStorage formStorage, Guid id) => formStorage.GetForm(id);
+        public Form ById([Inject] IFormStorage formStorage, string id) => Guid.TryParse(id, out var formId) ? formStorage.GetForm(formId) : null;
 
         public Form ByName([Inject] IFormStorage formStorage, string name) => formStorage.GetForm(name);
     }

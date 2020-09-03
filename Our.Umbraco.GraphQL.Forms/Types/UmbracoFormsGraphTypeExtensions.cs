@@ -1,20 +1,24 @@
 using GraphQL.Types;
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.Builders;
+using Our.Umbraco.GraphQL.Types;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Umbraco.Forms.Core;
+using Umbraco.Forms.Core.Data.Storage;
 using Umbraco.Forms.Core.Enums;
 using Umbraco.Forms.Core.Interfaces;
 using Umbraco.Forms.Core.Models;
+using Umbraco.Forms.Data.Storage;
 
 namespace Our.Umbraco.GraphQL.Forms.Types
 {
     public static class UmbracoFormsGraphTypeExtensions
     {
-        public static void AddBuiltinFields(this ComplexGraphType<Form> graphType)
+        public static void AddBuiltinFields(this ComplexGraphType<Form> graphType, IDataSourceStorage dataSourceStorage = null, IWorkflowStorage workflowStorage = null)
         {
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("name").Metadata(nameof(MemberInfo), GetMember((Form x) => x.Name)).Resolve(ctx => ctx.Source.Name);
             graphType.Field<NonNullGraphType<DateTimeGraphType>>().Name("created").Metadata(nameof(MemberInfo), GetMember((Form x) => x.Created)).Resolve(ctx => ctx.Source.Created);
@@ -35,10 +39,17 @@ namespace Our.Umbraco.GraphQL.Forms.Types
             graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("disableDefaultStylesheet").Metadata(nameof(MemberInfo), GetMember((Form x) => x.DisableDefaultStylesheet)).Resolve(ctx => ctx.Source.DisableDefaultStylesheet);
             graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("useClientDependency").Metadata(nameof(MemberInfo), GetMember((Form x) => x.UseClientDependency)).Resolve(ctx => ctx.Source.UseClientDependency);
             graphType.Field<NonNullGraphType<ListGraphType<GuidGraphType>>>().Name("workflowIds").Metadata(nameof(MemberInfo), GetMember((Form x) => x.WorkflowIds)).Resolve(ctx => ctx.Source.WorkflowIds);
-            graphType.Field<NonNullGraphType<FormDataSourceDefinitionGraphType>>().Name("dataSource").Metadata(nameof(MemberInfo), GetMember((Form x) => x.DataSource)).Resolve(ctx => ctx.Source.DataSource);
+            graphType.Field<NonNullGraphType<FormDataSourceDefinitionGraphType>>().Name("dataSourceDefinition").Metadata(nameof(MemberInfo), GetMember((Form x) => x.DataSource)).Resolve(ctx => ctx.Source.DataSource);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("submitLabel").Metadata(nameof(MemberInfo), GetMember((Form x) => x.SubmitLabel)).Resolve(ctx => ctx.Source.SubmitLabel);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("nextLabel").Metadata(nameof(MemberInfo), GetMember((Form x) => x.NextLabel)).Resolve(ctx => ctx.Source.NextLabel);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("prevLabel").Metadata(nameof(MemberInfo), GetMember((Form x) => x.PrevLabel)).Resolve(ctx => ctx.Source.PrevLabel);
+
+            graphType.Field<NonNullGraphType<FormDataSourceGraphType>>().Name("_dataSource").Resolve(ctx => ctx.Source.DataSource != null && dataSourceStorage != null ? dataSourceStorage.GetDataSource(ctx.Source.DataSource.Id) : null);
+
+            graphType.Connection<WorkflowGraphType>().Name("_workflows")
+                .Bidirectional()
+                .Resolve(ctx => (workflowStorage == null ? new List<IWorkflow>() : (ctx.Source.WorkflowIds ?? new List<Guid>()).Select(i => workflowStorage.GetWorkflow(i)).ToList())
+                    .ToConnection(x => x.Id, ctx.First, ctx.After, ctx.Last, ctx.Before));
         }
 
         public static void AddBuiltinFields(this ComplexGraphType<Page> graphType)
@@ -79,19 +90,21 @@ namespace Our.Umbraco.GraphQL.Forms.Types
 
         public static void AddBuiltinFields(this ComplexGraphType<FieldsetContainer> graphType)
         {
-        graphType.Field<NonNullGraphType<StringGraphType>>().Name("caption").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Caption)).Resolve(ctx => ctx.Source.Caption);
-        graphType.Field<NonNullGraphType<IntGraphType>>().Name("width").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Width)).Resolve(ctx => ctx.Source.Width);
-        graphType.Field<NonNullGraphType<ListGraphType<FieldGraphType>>>().Name("fields").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Fields)).Resolve(ctx => ctx.Source.Fields);        }
+            graphType.Field<NonNullGraphType<StringGraphType>>().Name("caption").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Caption)).Resolve(ctx => ctx.Source.Caption);
+            graphType.Field<NonNullGraphType<IntGraphType>>().Name("width").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Width)).Resolve(ctx => ctx.Source.Width);
+            graphType.Field<NonNullGraphType<ListGraphType<FieldGraphType>>>().Name("fields").Metadata(nameof(MemberInfo), GetMember((FieldsetContainer x) => x.Fields)).Resolve(ctx => ctx.Source.Fields);
+        }
 
         public static void AddBuiltinFields(this ComplexGraphType<FieldCondition> graphType)
         {
-        graphType.Field<NonNullGraphType<GuidGraphType>>().Name("id").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Id)).Resolve(ctx => ctx.Source.Id);
-        graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("enabled").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Enabled)).Resolve(ctx => ctx.Source.Enabled);
-        graphType.Field<NonNullGraphType<EnumerationGraphType<FieldConditionActionType>>>().Name("actionType").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.ActionType)).Resolve(ctx => ctx.Source.ActionType);
-        graphType.Field<NonNullGraphType<EnumerationGraphType<FieldConditionLogicType>>>().Name("logicType").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.LogicType)).Resolve(ctx => ctx.Source.LogicType);
-        graphType.Field<NonNullGraphType<ListGraphType<FieldConditionRuleGraphType>>>().Name("rules").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Rules)).Resolve(ctx => ctx.Source.Rules);        }
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("id").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Id)).Resolve(ctx => ctx.Source.Id);
+            graphType.Field<NonNullGraphType<BooleanGraphType>>().Name("enabled").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Enabled)).Resolve(ctx => ctx.Source.Enabled);
+            graphType.Field<NonNullGraphType<EnumerationGraphType<FieldConditionActionType>>>().Name("actionType").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.ActionType)).Resolve(ctx => ctx.Source.ActionType);
+            graphType.Field<NonNullGraphType<EnumerationGraphType<FieldConditionLogicType>>>().Name("logicType").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.LogicType)).Resolve(ctx => ctx.Source.LogicType);
+            graphType.Field<NonNullGraphType<ListGraphType<FieldConditionRuleGraphType>>>().Name("rules").Metadata(nameof(MemberInfo), GetMember((FieldCondition x) => x.Rules)).Resolve(ctx => ctx.Source.Rules);
+        }
 
-        public static void AddBuiltinFields(this ComplexGraphType<Field> graphType)
+        public static void AddBuiltinFields(this ComplexGraphType<Field> graphType, IPrevalueSourceStorage prevalueSourceStorage = null)
         {
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("caption").Metadata(nameof(MemberInfo), GetMember((Field x) => x.Caption)).Resolve(ctx => ctx.Source.Caption);
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("tooltip").Metadata(nameof(MemberInfo), GetMember((Field x) => x.ToolTip)).Resolve(ctx => ctx.Source.ToolTip);
@@ -110,6 +123,8 @@ namespace Our.Umbraco.GraphQL.Forms.Types
             graphType.Field<NonNullGraphType<FieldConditionGraphType>>().Name("condition").Metadata(nameof(MemberInfo), GetMember((Field x) => x.Condition)).Resolve(ctx => ctx.Source.Condition);
             graphType.Field<NonNullGraphType<ListGraphType<StringKeyValuePairGraphType>>>().Name("settings").Metadata(nameof(MemberInfo), GetMember((Field x) => x.Settings)).Resolve(ctx => ctx.Source.Settings);
             graphType.Field<NonNullGraphType<ListGraphType<StringGraphType>>>().Name("preValues").Metadata(nameof(MemberInfo), GetMember((Field x) => x.PreValues)).Resolve(ctx => ctx.Source.PreValues);
+
+            graphType.Field<NonNullGraphType<GuidGraphType>>().Name("_prevalueSource").Resolve(ctx => !Guid.Empty.Equals(ctx.Source.PreValueSourceId) && prevalueSourceStorage != null ? prevalueSourceStorage.GetPrevalueSource(ctx.Source.PreValueSourceId) : null);
         }
 
         public static void AddBuiltinFields(this ComplexGraphType<FieldConditionRule> graphType)

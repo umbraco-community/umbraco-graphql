@@ -10,6 +10,6 @@ namespace Our.Umbraco.GraphQL.Forms.Types
     {
         public IEnumerable<IFieldPreValueSource> All([Inject] IPrevalueSourceStorage prevalueSourceStorage) => prevalueSourceStorage.GetAllPrevalueSources();
 
-        public IFieldPreValueSource ById([Inject] IPrevalueSourceStorage prevalueSourceStorage, Guid id) => prevalueSourceStorage.GetPrevalueSource(id);
+        public IFieldPreValueSource ById([Inject] IPrevalueSourceStorage prevalueSourceStorage, string id) => Guid.TryParse(id, out var guid) ? prevalueSourceStorage.GetPrevalueSource(guid) : null;
     }
 }
