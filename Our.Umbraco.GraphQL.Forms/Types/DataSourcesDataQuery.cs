@@ -10,6 +10,6 @@ namespace Our.Umbraco.GraphQL.Forms.Types
     {
         public IEnumerable<FormDataSource> All([Inject] IDataSourceStorage dataSourceStorage) => dataSourceStorage.GetAllDataSources();
 
-        public FormDataSource ById([Inject] IDataSourceStorage dataSourceStorage, Guid id) => dataSourceStorage.GetDataSource(id);
+        public FormDataSource ById([Inject] IDataSourceStorage dataSourceStorage, string id) => Guid.TryParse(id, out var guid) ? dataSourceStorage.GetDataSource(guid) : null;
     }
 }

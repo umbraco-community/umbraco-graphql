@@ -10,6 +10,6 @@ namespace Our.Umbraco.GraphQL.Forms.Types
     {
         public IEnumerable<IWorkflow> All([Inject] IWorkflowStorage workflowStorage) => workflowStorage.GetAllWorkFlows();
 
-        public IWorkflow ById([Inject] IWorkflowStorage workflowStorage, Guid id) => workflowStorage.GetWorkflow(id);
+        public IWorkflow ById([Inject] IWorkflowStorage workflowStorage, string id) => Guid.TryParse(id, out var guid) ? workflowStorage.GetWorkflow(guid) : null;
     }
 }
