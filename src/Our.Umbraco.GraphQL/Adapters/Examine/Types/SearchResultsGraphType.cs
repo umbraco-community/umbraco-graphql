@@ -8,7 +8,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
     {
         public SearchResultsGraphType(string searcherSafeName, IEnumerable<string> fields)
         {
-            Name = $"{searcherSafeName}SearchResults";
+            Name = $"{searcherSafeName}Results";
 
             Interface<SearchResultsInterfaceGraphType>();
 

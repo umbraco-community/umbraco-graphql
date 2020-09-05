@@ -27,10 +27,13 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Visitors
 
             foreach (var searcher in searchers)
             {
+                var loopCaptured = searcher;
                 var searcherSafeName = searcher.Name.SafeName();
                 if (searcherSafeName.EndsWith("Searcher")) searcherSafeName = searcherSafeName.Substring(0, searcherSafeName.Length - 8);
-                IObjectGraphType graphType = new ExamineSearcherGraphType(searcher, searcherSafeName);
+
+                var graphType = new ExamineSearcherGraphType(loopCaptured, searcherSafeName);
                 examineQuery.Field<ExamineSearcherGraphType>().Name(searcherSafeName).Resolve(ctx => new ExamineSearcherQuery());
+                examineQuery.GetField(searcherSafeName).ResolvedType = graphType;
 
                 _visitor.Value.Visit(graphType);
                 schema.RegisterType(graphType);
