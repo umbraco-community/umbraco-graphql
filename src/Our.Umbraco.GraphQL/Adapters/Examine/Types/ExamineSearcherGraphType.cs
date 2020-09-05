@@ -31,7 +31,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Argument<StringGraphType>("sortFields", "A comma-separated list of field names to sort by.  If you need to specify a sort field type, do so with a pipe and then the type, i.e. fieldName|bool")
                 .Argument<SortDirectionGraphType, SortDirection>("sortDir", "The direction for Examine to sort", SortDirection.ASC)
                 .Resolve(GetQueryResults);
-            GetField("search").ResolvedType = new SearchResultsGraphType(searcherSafeName, fields);
+            GetField("query").ResolvedType = new SearchResultsGraphType($"{searcherSafeName}Query", fields);
 
             Field<SearchResultsInterfaceGraphType>()
                 .Name("search")
@@ -39,7 +39,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Argument<StringGraphType>("query", "The text to search for")
                 .Argument<IntGraphType, int>("maxResults", "The maximum number of results to return", 500)
                 .Resolve(GetSearchResults);
-            GetField("search").ResolvedType = new SearchResultsGraphType(searcherSafeName, fields);
+            GetField("search").ResolvedType = new SearchResultsGraphType($"{searcherSafeName}Search", fields);
 
             _searcher = searcher;
         }
