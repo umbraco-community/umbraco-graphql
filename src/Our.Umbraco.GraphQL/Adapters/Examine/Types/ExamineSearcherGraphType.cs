@@ -22,15 +22,23 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
             var fields = GetFieldNames(searcher as LuceneSearcher) ?? (searcher is BaseLuceneSearcher bls ? bls.GetAllIndexedFields() : null);
 
             Field<SearchResultsInterfaceGraphType>()
-                .Name("search")
-                .Description("Queries the Examine searcher")
+                .Name("query")
+                .Description("Queries the Examine searcher using a raw Lucene syntax query")
                 .Argument<StringGraphType>("query", "The raw Lucene query to execute in this searcher")
                 .Argument<StringGraphType, string>("category", "The category of data to include in the results.  For Umbraco content indexes, this is the content type alias", null)
                 .Argument<BooleanOperationGraphType, BooleanOperation>("defaultOperation", "The default operation to use when searching", BooleanOperation.And)
                 .Argument<IntGraphType, int>("maxResults", "The maximum number of results to return", 500)
                 .Argument<StringGraphType>("sortFields", "A comma-separated list of field names to sort by.  If you need to specify a sort field type, do so with a pipe and then the type, i.e. fieldName|bool")
                 .Argument<SortDirectionGraphType, SortDirection>("sortDir", "The direction for Examine to sort", SortDirection.ASC)
-                .Resolve(GetResults);
+                .Resolve(GetQueryResults);
+            GetField("search").ResolvedType = new SearchResultsGraphType(searcherSafeName, fields);
+
+            Field<SearchResultsInterfaceGraphType>()
+                .Name("search")
+                .Description("Queries the Examine searcher using the natural language Search method")
+                .Argument<StringGraphType>("query", "The text to search for")
+                .Argument<IntGraphType, int>("maxResults", "The maximum number of results to return", 500)
+                .Resolve(GetSearchResults);
             GetField("search").ResolvedType = new SearchResultsGraphType(searcherSafeName, fields);
 
             _searcher = searcher;
@@ -52,7 +60,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
             }
         }
 
-        private ISearchResults GetResults(ResolveFieldContext<ExamineSearcherQuery> ctx)
+        private ISearchResults GetQueryResults(ResolveFieldContext<ExamineSearcherQuery> ctx)
         {
             var query = _searcher.CreateQuery(ctx.GetArgument<string>("category"), ctx.GetArgument<bool>("defaultAnd") ? BooleanOperation.And : BooleanOperation.Or)
                 .NativeQuery(ctx.GetArgument<string>("query")) as IOrdering;
@@ -72,6 +80,12 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
             }
 
             var results = query.Execute(ctx.GetArgument<int>("maxResults"));
+            return results;
+        }
+
+        private ISearchResults GetSearchResults(ResolveFieldContext<ExamineSearcherQuery> ctx)
+        {
+            var results = _searcher.Search(ctx.GetArgument<string>("query"), ctx.GetArgument<int>("maxResults"));
             return results;
         }
     }
