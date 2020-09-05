@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Web.PublishedCache;
 
 namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
 {
@@ -16,7 +17,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
         private static readonly MethodInfo _validateSearcherMethod = typeof(LuceneSearcher).GetMethod("ValidateSearcher", BindingFlags.NonPublic | BindingFlags.Instance);
         private readonly ISearcher _searcher;
 
-        public ExamineSearcherGraphType(ISearcher searcher, string searcherSafeName)
+        public ExamineSearcherGraphType(IPublishedSnapshotAccessor snapshotAccessor, ISearcher searcher, string searcherSafeName)
         {
             Name = $"{searcherSafeName}Searcher";
             var fields = GetFieldNames(searcher as LuceneSearcher) ?? (searcher is BaseLuceneSearcher bls ? bls.GetAllIndexedFields() : null);
@@ -31,7 +32,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Argument<StringGraphType>("sortFields", "A comma-separated list of field names to sort by.  If you need to specify a sort field type, do so with a pipe and then the type, i.e. fieldName|bool")
                 .Argument<SortDirectionGraphType, SortDirection>("sortDir", "The direction for Examine to sort", SortDirection.ASC)
                 .Resolve(GetQueryResults);
-            GetField("query").ResolvedType = new SearchResultsGraphType($"{searcherSafeName}Query", fields);
+            GetField("query").ResolvedType = new SearchResultsGraphType(snapshotAccessor, $"{searcherSafeName}Query", fields);
 
             Field<SearchResultsInterfaceGraphType>()
                 .Name("search")
@@ -39,7 +40,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Argument<StringGraphType>("query", "The text to search for")
                 .Argument<IntGraphType, int>("maxResults", "The maximum number of results to return", 500)
                 .Resolve(GetSearchResults);
-            GetField("search").ResolvedType = new SearchResultsGraphType($"{searcherSafeName}Search", fields);
+            GetField("search").ResolvedType = new SearchResultsGraphType(snapshotAccessor, $"{searcherSafeName}Search", fields);
 
             _searcher = searcher;
         }
