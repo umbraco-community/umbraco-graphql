@@ -9,6 +9,7 @@ using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Builders;
 using Our.Umbraco.GraphQL.Types;
+using Umbraco.Web.PublishedCache;
 
 namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
 {
@@ -51,7 +52,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
             }
         }
 
-        public static void AddBuiltInFields(this ComplexGraphType<ISearchResults> graphType, string searcherSafeName = null, IEnumerable<string> fields = null)
+        public static void AddBuiltInFields(this ComplexGraphType<ISearchResults> graphType, IPublishedSnapshotAccessor snapshotAccessor = null, string searcherSafeName = null, IEnumerable<string> fields = null)
         {
             graphType.Field<FloatGraphType>().Name("total")
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResults x) => x.TotalItemCount))
@@ -61,7 +62,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResults x) => x.ToList()))
                 .Resolve(ctx => ctx.Source);
 
-            graphType.GetField("results").ResolvedType = new ListGraphType(new SearchResultGraphType(searcherSafeName, fields));
+            graphType.GetField("results").ResolvedType = new ListGraphType(new SearchResultGraphType(snapshotAccessor, searcherSafeName, fields));
         }
 
         public static void AddBuiltInFields(this ComplexGraphType<KeyValuePair<string, IReadOnlyList<string>>> graphType)
