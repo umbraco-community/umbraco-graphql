@@ -2,6 +2,7 @@ using GraphQL.Types;
 using Newtonsoft.Json.Linq;
 using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Attributes;
+using Our.Umbraco.GraphQL.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,8 +37,8 @@ namespace Our.Umbraco.GraphQL.Forms.Types
 
             Field<JsonGraphType>()
                 .Name("submit")
-                .Argument<StringGraphType>("formId", "The GUID of the form")
-                .Argument<IntGraphType>("umbracoPageId", "The integer ID of the Umbraco page you were on")
+                .Argument<NonNullGraphType<StringGraphType>>("formId", "The GUID of the form")
+                .Argument< NonNullGraphType<Adapters.Types.IdGraphType>>("umbracoPageId", "The integer ID of the Umbraco page you were on")
                 .Argument<ListGraphType<FieldValueInputType>>("fields", "An array of objects representing the field data.  Each object has a 'field' property that is either the GUID or alias of the form field, and a 'value' property that is the field value")
                 .Resolve(Submit);
             _logger = logger;
@@ -51,12 +52,12 @@ namespace Our.Umbraco.GraphQL.Forms.Types
         private object Submit(ResolveFieldContext<object> ctx)
         {
             string formIdArg = null;
-            int umbracoPageId = 0;
+            Id umbracoPageId = null;
 
             try
             {
                 formIdArg = ctx.GetArgument<string>("formId");
-                umbracoPageId = ctx.GetArgument<int>("umbracoPageId");
+                umbracoPageId = ctx.GetArgument<Id>("umbracoPageId");
                 var fieldsList = ctx.GetArgument<List<FieldValue>>("fields");
 
                 if (!Guid.TryParse(formIdArg, out var formId) || !(_formStorage.GetForm(formId) is Form form)) return SubmitResult("The form ID specified could not be found");
@@ -73,7 +74,9 @@ namespace Our.Umbraco.GraphQL.Forms.Types
                 using (var ucRef = _umbracoContextFactory.EnsureUmbracoContext(contextWrapped))
                 {
                     var uc = ucRef.UmbracoContext;
-                    var page = uc.Content.GetById(umbracoPageId);
+                    var page = Guid.TryParse(umbracoPageId.Value, out var guid) ? uc.Content.GetById(guid)
+                        : (int.TryParse(umbracoPageId.Value, out var id) ? uc.Content.GetById(id)
+                        : (GuidUdi.TryParse(umbracoPageId.Value, out var udi) ? uc.Content.GetById(udi.Guid) : null));
                     if (page == null) return SubmitResult("Could not find the umbracoPageId specified");
 
                     var url = page.Url;
@@ -83,7 +86,7 @@ namespace Our.Umbraco.GraphQL.Forms.Types
                     uc.PublishedRequest = request;
                     _publishedRouter.PrepareRequest(request);
 
-                    var recordId = SubmitForm(context, contextWrapped, formId, form, umbracoPageId, fields);
+                    var recordId = SubmitForm(context, contextWrapped, formId, form, page.Id, fields);
                     return SubmitResult(recordId);
                 }
             }
