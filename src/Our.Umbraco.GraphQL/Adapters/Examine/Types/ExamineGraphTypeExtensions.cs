@@ -62,7 +62,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResults x) => x.ToList()))
                 .Resolve(ctx => ctx.Source);
 
-            graphType.GetField("results").ResolvedType = new ListGraphType(new SearchResultGraphType(snapshotAccessor, searcherSafeName, fields));
+            if (snapshotAccessor != null && searcherSafeName != null)
+                graphType.GetField("results").ResolvedType = new ListGraphType(new SearchResultGraphType(snapshotAccessor, searcherSafeName, fields));
         }
 
         public static void AddBuiltInFields(this ComplexGraphType<KeyValuePair<string, IReadOnlyList<string>>> graphType)
