@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Our.Umbraco.GraphQL.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9B941129-D270-4DD7-A43E-CF2808BFDEE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.Umbraco.GraphQL.Forms", "Our.Umbraco.GraphQL.Forms\Our.Umbraco.GraphQL.Forms.csproj", "{F4E59846-A044-439A-B074-9402FA5F474B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.Umbraco.GraphQL.Forms", "src\Our.Umbraco.GraphQL.Forms\Our.Umbraco.GraphQL.Forms.csproj", "{F4E59846-A044-439A-B074-9402FA5F474B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
