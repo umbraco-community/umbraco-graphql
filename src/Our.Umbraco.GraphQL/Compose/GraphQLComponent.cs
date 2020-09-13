@@ -31,7 +31,6 @@ namespace Our.Umbraco.GraphQL.Compose
             _typeRegistry.Add<Udi, UdiGraphType>();
             _typeRegistry.Add<Link, LinkGraphType>();
             _typeRegistry.Add<LinkType, LinkGraphType>();
-            _typeRegistry.Add<JToken, JsonGraphType>();
 
             _typeRegistry.Extend<Query, ExtendQueryWithUmbracoQuery>();
             _typeRegistry.Extend<UmbracoQuery, ExtendUmbracoQueryWithPublishedContentQuery>();

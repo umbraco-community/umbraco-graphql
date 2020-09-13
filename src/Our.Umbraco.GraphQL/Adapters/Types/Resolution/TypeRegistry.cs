@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using GraphQL;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
@@ -38,6 +39,9 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<Uri, UriGraphType>();
             Add<Id, IdGraphType>();
             Add<PageInfo, PageInfoGraphType>();
+            Add<JToken, JsonGraphType>();
+            Add<JObject, JsonGraphType>();
+            Add<JArray, JsonGraphType>();
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType =>

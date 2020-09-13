@@ -5,12 +5,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 
 namespace Our.Umbraco.GraphQL.Reflection
 {
     internal static class TypeInfoExtensions
     {
-        public static  TypeInfo GetReturnType(this MemberInfo memberInfo)
+        public static TypeInfo GetReturnType(this MemberInfo memberInfo)
         {
             switch (memberInfo)
             {
@@ -38,12 +39,12 @@ namespace Our.Umbraco.GraphQL.Reflection
             return enumerableArgument != null ? enumerableArgument.GetTypeInfo() : typeInfo;
         }
 
-        public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem, bool checkEnumerable = true)
+        public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem)
         {
             if (graphType == null)
                 return null;
 
-            var enumerableArgument = checkEnumerable ? GetEnumerableArgument(typeInfo) : null;
+            var enumerableArgument = GetEnumerableArgument(typeInfo);
 
             if (typeInfo.IsValueType && typeInfo.IsNullable() == false || enumerableArgument != null &&
                 (enumerableArgument.IsValueType && enumerableArgument.IsNullable() == false || isNonNullItem))
@@ -63,7 +64,7 @@ namespace Our.Umbraco.GraphQL.Reflection
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
                 typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
 
-            if (typeInfo == typeof(string))
+            if (typeInfo == typeof(string) || typeof(JToken).IsAssignableFrom(typeInfo))
                 return null;
 
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
