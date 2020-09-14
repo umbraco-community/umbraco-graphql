@@ -30,6 +30,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 unwrappedTypeInfo = typeof(IPublishedElement).GetTypeInfo();
 
             var propertyGraphType = typeRegistry.Get(unwrappedTypeInfo) ?? typeof(StringGraphType).GetTypeInfo();
+
             propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false);
 
             if (propertyType.VariesByCulture())

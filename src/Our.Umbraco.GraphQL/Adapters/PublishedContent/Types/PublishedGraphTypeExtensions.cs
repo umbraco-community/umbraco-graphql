@@ -82,6 +82,10 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.SortOrder))
                 .Resolve(ctx => ctx.Source.SortOrder);
 
+            graphType.Field<StringGraphType>().Name("_template")
+                .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.GetTemplateAlias()))
+                .Resolve(ctx => ctx.Source.GetTemplateAlias());
+
             graphType.Field<StringGraphType>().Name("_url")
                 .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.Url(null, UrlMode.Default)))
                 .Argument<StringGraphType>("culture", "The culture.")

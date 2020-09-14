@@ -1,9 +1,14 @@
 using System;
 using System.Reflection;
+using System.Web;
 using FluentAssertions;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
+using Our.Umbraco.GraphQL.Adapters.Types;
+using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Types;
+using Our.Umbraco.GraphQL.Types.Relay;
 using Xunit;
 using GuidGraphType = Our.Umbraco.GraphQL.Adapters.Types.GuidGraphType;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
@@ -72,8 +77,13 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types.Resolution
         [InlineData(typeof(DateTime), typeof(DateTimeGraphType))]
         [InlineData(typeof(DateTimeOffset), typeof(DateTimeOffsetGraphType))]
         [InlineData(typeof(TimeSpan), typeof(TimeSpanMillisecondsGraphType))]
+        [InlineData(typeof(IHtmlString), typeof(HtmlGraphType))]
         [InlineData(typeof(Uri), typeof(UriGraphType))]
         [InlineData(typeof(Id), typeof(IdGraphType))]
+        [InlineData(typeof(PageInfo), typeof(PageInfoGraphType))]
+        [InlineData(typeof(JToken), typeof(JsonGraphType))]
+        [InlineData(typeof(JObject), typeof(JsonGraphType))]
+        [InlineData(typeof(JArray), typeof(JsonGraphType))]
         public void Get_Type_ReturnsRegisteredType(Type type, Type graphType)
         {
             var typeRegistry = CreateSUT();

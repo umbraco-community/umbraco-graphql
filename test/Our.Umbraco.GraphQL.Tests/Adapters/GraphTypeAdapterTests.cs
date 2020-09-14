@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using GraphQL;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
@@ -530,6 +531,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
         [InlineData(nameof(ClassWithoutDescription.PublicMethod), typeof(NonNullGraphType<BooleanGraphType>))]
         [InlineData(nameof(ClassWithoutDescription.ListOfString), typeof(ListGraphType<StringGraphType>))]
         [InlineData(nameof(ClassWithoutDescription.ListOfInt), typeof(ListGraphType<NonNullGraphType<IntGraphType>>))]
+        [InlineData(nameof(ClassWithoutDescription.JToken), typeof(JsonGraphType))]
+        [InlineData(nameof(ClassWithoutDescription.JObject), typeof(JsonGraphType))]
+        [InlineData(nameof(ClassWithoutDescription.JArray), typeof(JsonGraphType))]
         public void Adapt_Members_SetsCorrectType(string memberName, Type expectedType)
         {
             var adapter = CreateSUT();
@@ -1101,6 +1105,10 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
 
             [NonNull]
             public DateTime DateTime { get; set; }
+
+            public JToken JToken { get; set; }
+            public JObject JObject { get; set; }
+            public JArray JArray { get; set; }
         }
 
         private enum EnumWithoutDescription

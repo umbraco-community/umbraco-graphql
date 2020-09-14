@@ -5,12 +5,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+using Newtonsoft.Json.Linq;
 
 namespace Our.Umbraco.GraphQL.Reflection
 {
     internal static class TypeInfoExtensions
     {
-        public static  TypeInfo GetReturnType(this MemberInfo memberInfo)
+        public static TypeInfo GetReturnType(this MemberInfo memberInfo)
         {
             switch (memberInfo)
             {
@@ -63,7 +64,7 @@ namespace Our.Umbraco.GraphQL.Reflection
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Task<>))
                 typeInfo = typeInfo.GenericTypeArguments[0].GetTypeInfo();
 
-            if (typeInfo == typeof(string))
+            if (typeInfo == typeof(string) || typeof(JToken).IsAssignableFrom(typeInfo))
                 return null;
 
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
