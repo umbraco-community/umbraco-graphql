@@ -3,8 +3,8 @@ SETLOCAL EnableDelayedExpansion
 CLS
 
 SET "buildVersion="
-IF DEFINED APPVEYOR_BUILD_NUMBER (
-	SET buildVersion=%APPVEYOR_BUILD_NUMBER%
+IF DEFINED GITHUB_RUN_NUMBER (
+	SET buildVersion=%GITHUB_RUN_NUMBER%
 	SET buildVersion=00000!buildVersion!
 	SET buildVersion=!buildVersion:~-6!
 	SET buildVersion=build!buildVersion!
