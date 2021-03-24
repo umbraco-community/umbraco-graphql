@@ -9,9 +9,8 @@ using Our.Umbraco.GraphQL.Adapters.Builders;
 using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.PublishedContent;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
 
 namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
@@ -59,8 +58,8 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 .Resolve(x => x.Source.CreateDate);
 
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("_creatorName")
-                .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.CreatorName))
-                .Resolve(ctx => ctx.Source.CreatorName);
+                .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.CreatorName()))
+                .Resolve(ctx => ctx.Source.CreatorName());
 
             graphType.Field<NonNullGraphType<IdGraphType>>().Name("_id")
                 .Metadata(nameof(MemberInfo), GetMember((IPublishedElement x) => x.Key))
@@ -99,8 +98,8 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 .Resolve(ctx => ctx.Source.CultureDate(ctx.GetArgument<string>("culture")));
 
             graphType.Field<NonNullGraphType<StringGraphType>>().Name("_writerName")
-                .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.WriterName))
-                .Resolve(ctx => ctx.Source.WriterName);
+                .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.WriterName()))
+                .Resolve(ctx => ctx.Source.WriterName());
         }
 
         private static MemberInfo GetMember<TSource, TReturn>(Expression<Func<TSource, TReturn>> expression)

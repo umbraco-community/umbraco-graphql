@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core;
 using Umbraco.Web;
 
-namespace $rootnamespace$
+namespace Website
 {
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class GraphQLComposer : ComponentComposer<GraphQLComponent>, IUserComposer

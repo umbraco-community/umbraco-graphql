@@ -1,8 +1,8 @@
 using System;
 using Our.Umbraco.GraphQL.Attributes;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Our.Umbraco.GraphQL.Types.PublishedContent
 {

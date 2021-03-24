@@ -1,8 +1,8 @@
-using Microsoft.Owin;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
 {
@@ -27,13 +27,13 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public async Task Invoke(IOwinContext context, Func<Task> next)
+        public async Task Invoke(HttpContext context, Func<Task> next)
         {
             if (context.Request.Method == "GET")
             {
                 context.Response.ContentType = "text/html";
                 await context.Response.WriteAsync(
-                    Html.Replace("{{GraphQLEndPoint}}", context.Request.Uri.LocalPath)
+                    Html.Replace("{{GraphQLEndPoint}}", context.Request.Path)
                         .Replace("{{GraphQLConfig}}", JsonConvert.SerializeObject(_options.GraphQLConfig))
                         .Replace("{{PlaygroundSettings}}", JsonConvert.SerializeObject(_options.PlaygroundSettings))
                     );

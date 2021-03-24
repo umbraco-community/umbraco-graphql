@@ -3,8 +3,7 @@ using GraphQL.Http;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Builders;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Composing;
 using System.Linq;
@@ -12,38 +11,36 @@ using Our.Umbraco.GraphQL.Web;
 using Newtonsoft.Json;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors;
 using GraphQL.DataLoader;
-using Our.Umbraco.GraphQL.FieldMiddleware;
 using Our.Umbraco.GraphQL.Adapters.Examine.Visitors;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Our.Umbraco.GraphQL.Compose
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class GraphQLComposer : ComponentComposer<GraphQLComponent>, IUserComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Register<ITypeRegistry, TypeRegistry>(Lifetime.Singleton);
-            composition.Register<IGraphTypeAdapter, GraphTypeAdapter>(Lifetime.Scope);
-            composition.Register<ISchemaBuilder, SchemaBuilder>(Lifetime.Scope);
+            builder.Services.AddSingleton<ITypeRegistry, TypeRegistry>();
+            builder.Services.AddScoped<IGraphTypeAdapter, GraphTypeAdapter>();
+            builder.Services.AddScoped<ISchemaBuilder, SchemaBuilder>();
 
-            composition.GraphVisitors()
+            builder.GraphVisitors()
                 .Append<PublishedContentVisitor>()
                 .Append<ExamineVisitor>();
 
-            composition.FieldMiddlewares()
-                .Append<EnsureHttpContextFieldMiddleware>();
+            builder.Services.AddSingleton(new GraphQLRequestParser(new JsonSerializer()));
+            builder.Services.AddScoped<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetService<GraphVisitorCollection>().ToArray()));
 
-            composition.Register(new GraphQLRequestParser(new JsonSerializer()));
-            composition.Register<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetInstance<GraphVisitorCollection>().ToArray()));
+            builder.Services.AddSingleton<IDependencyResolver>(factory =>
+                new FuncDependencyResolver(type => factory.GetService(type) ?? factory.CreateInstance(type)));
+            builder.Services.AddSingleton<IDocumentWriter, DocumentWriter>();
 
-            composition.Register<IDependencyResolver>(factory =>
-                new FuncDependencyResolver(type => factory.TryGetInstance(type) ?? factory.CreateInstance(type)), Lifetime.Singleton);
-            composition.Register<IDocumentWriter, DocumentWriter>(Lifetime.Singleton);
-
-            composition.Register<IDataLoaderContextAccessor, DataLoaderContextAccessor>(Lifetime.Singleton);
-            composition.Register<DataLoaderDocumentListener>(Lifetime.Singleton);
+            builder.Services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
+            builder.Services.AddSingleton<DataLoaderDocumentListener>();
         }
     }
 }

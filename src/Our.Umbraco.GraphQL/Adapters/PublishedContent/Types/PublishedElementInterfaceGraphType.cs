@@ -1,6 +1,6 @@
 using GraphQL;
 using GraphQL.Types;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
 {

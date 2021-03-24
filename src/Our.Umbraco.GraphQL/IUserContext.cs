@@ -1,4 +1,4 @@
-using Umbraco.Web;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 
 namespace Our.Umbraco.GraphQL
 {

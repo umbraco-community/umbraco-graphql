@@ -4,7 +4,7 @@ using Our.Umbraco.GraphQL.Adapters.Examine.Types;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using System;
 using System.Linq;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Our.Umbraco.GraphQL.Adapters.Examine.Visitors
 {

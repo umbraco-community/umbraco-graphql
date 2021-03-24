@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Our.Umbraco.GraphQL.Web
@@ -15,7 +15,7 @@ namespace Our.Umbraco.GraphQL.Web
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
 
-        public async Task<GraphQLRequest> Parse(IOwinRequest request)
+        public async Task<GraphQLRequest> Parse(HttpRequest request)
         {
             switch (request.ContentType)
             {

@@ -1,6 +1,7 @@
 using System.Web;
 using GraphQL.Language.AST;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Html;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types
 {
@@ -29,7 +30,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types
 
         public override object Serialize(object value)
         {
-            if (value is IHtmlString htmlString)
+            if (value is HtmlString htmlString)
                 return htmlString.ToString();
 
             return null;

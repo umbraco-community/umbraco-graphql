@@ -1,19 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <title>GraphQL for Umbraco</title>
-        <authors>Rasmus John Pedersen, Offroadcode</authors>
-        <owners>rasmusjp, Offroadcode</owners>
+        <authors>Umbraco Community</authors>
+        <owners>umbraco-community</owners>
         <description>A GraphQL server for Umbraco</description>
-        <packageLicenseUrl>https://github.com/rasmusjp/umbraco-graphql/raw/master/LICENSE</packageLicenseUrl>
-        <packageProjectUrl>https://github.com/rasmusjp/umbraco-graphql</packageProjectUrl>
+        <packageLicenseUrl>https://github.com/umbraco-community/umbraco-graphql/raw/master/LICENSE</packageLicenseUrl>
+        <packageProjectUrl>https://github.com/umbraco-community/umbraco-graphql</packageProjectUrl>
         <packageTags>umbraco umbracocms graphql</packageTags>
-        <copyright>Copyright © 2018 Rasmus John Pedersen</copyright>
+        <copyright>Copyright © 2021 Rasmus John Pedersen</copyright>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <versionPrefix>0.1.0</versionPrefix>
+        <versionPrefix>2.0.0</versionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <AssemblyName>Our.Umbraco.GraphQL</AssemblyName>
         <RootNamespace>Our.Umbraco.GraphQL</RootNamespace>
         <UIRoot>Web\UI\</UIRoot>
@@ -23,11 +23,6 @@
     <ItemGroup>
         <None Include="$(UIRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).sass-cache\**" Pack="false" />
     </ItemGroup>
-
-    <!--<Target Name="RunUIBuild" BeforeTargets="Compile" Condition=" '$(Configuration)' == 'Release' ">
-        <Exec WorkingDirectory="$(UIRoot)" Command="npm install" />
-        <Exec WorkingDirectory="$(UIRoot)" Command="npm run build" />
-    </Target>-->
 
     <ItemGroup>
         <None Include="tools\**" Pack="True" PackagePath="tools\" />
@@ -42,17 +37,7 @@
 
     <ItemGroup>
         <PackageReference Include="GraphQL" Version="2.4.0" />
-        <PackageReference Include="Microsoft.Owin.Cors" Version="4.0.0" />
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" ExcludeAssets="all" />
-        <PackageReference Include="UmbracoCms.Core" Version="8.1.0" />
-        <PackageReference Include="UmbracoCms.Web" Version="8.1.0" />
+        <PackageReference Include="Umbraco.Cms" Version="9.0.0-alpha004" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="System.Web" />
-    </ItemGroup>
-
-    <!--<ItemGroup>
-      <Folder Include="Web\UI\" />
-    </ItemGroup>-->
 </Project>

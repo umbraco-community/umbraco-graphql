@@ -3,7 +3,7 @@ using System.Reflection;
 using FluentAssertions;
 using GraphQL.Language.AST;
 using Our.Umbraco.GraphQL.Adapters.Types;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 using Xunit;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters.Types

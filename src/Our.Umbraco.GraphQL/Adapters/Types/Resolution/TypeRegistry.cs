@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Web;
 using GraphQL;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Html;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
@@ -34,7 +35,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<DateTime, DateTimeGraphType>();
             Add<DateTimeOffset, DateTimeOffsetGraphType>();
             Add<TimeSpan, TimeSpanMillisecondsGraphType>();
-            Add<IHtmlString, HtmlGraphType>();
+            Add<HtmlString, HtmlGraphType>();
             Add<Uri, UriGraphType>();
             Add<Id, IdGraphType>();
             Add<PageInfo, PageInfoGraphType>();

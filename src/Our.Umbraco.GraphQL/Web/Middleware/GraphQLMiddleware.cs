@@ -1,7 +1,6 @@
 using GraphQL;
 using GraphQL.Http;
 using GraphQL.Instrumentation;
-using Microsoft.Owin;
 using StackExchange.Profiling;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ using Our.Umbraco.GraphQL.Builders;
 using Our.Umbraco.GraphQL.Instrumentation;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Composing;
+using Microsoft.AspNetCore.Http;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
 {
@@ -43,7 +43,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public async Task Invoke(IOwinContext context, Func<Task> next)
+        public async Task Invoke(HttpContext context, Func<Task> next)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                         var result = await new DocumentExecuter()
                             .ExecuteAsync(opts =>
                             {
-                                opts.CancellationToken = context.Request.CallCancelled;
+                                opts.CancellationToken = context.RequestAborted;
                                 opts.ComplexityConfiguration = _options.ComplexityConfiguration;
                                 opts.EnableMetrics = _options.EnableMetrics;
 

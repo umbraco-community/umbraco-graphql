@@ -8,8 +8,8 @@ using GraphQL.Types;
 using Our.Umbraco.GraphQL.Attributes;
 using Our.Umbraco.GraphQL.Reflection;
 using Our.Umbraco.GraphQL.Types.Relay;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Our.Umbraco.GraphQL.Types.PublishedContent
 {

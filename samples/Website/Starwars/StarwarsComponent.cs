@@ -1,8 +1,8 @@
 using System;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Types;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Website.Starwars.Data;
 using Website.Starwars.Schema;
 

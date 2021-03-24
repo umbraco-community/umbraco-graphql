@@ -17,3 +17,9 @@ node_modules/
 [Oo]bj/
 CurrentSettings.vssettings
 Visual Studio 2017/*
+/src/Our.Umbraco.GraphQL/umbraco/config/
+/src/Our.Umbraco.GraphQL/umbraco/PartialViewMacros/
+/src/Our.Umbraco.GraphQL/umbraco/UmbracoBackOffice/
+/src/Our.Umbraco.GraphQL/umbraco/UmbracoInstall/
+/src/Our.Umbraco.GraphQL/umbraco/UmbracoWebsite/
+/src/Our.Umbraco.GraphQL/wwwroot/umbraco/

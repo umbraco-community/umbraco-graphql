@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Xunit;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types

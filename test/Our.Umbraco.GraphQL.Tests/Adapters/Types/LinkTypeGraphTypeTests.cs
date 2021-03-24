@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Our.Umbraco.GraphQL.Adapters.Types;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Models;
 using Xunit;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters.Types

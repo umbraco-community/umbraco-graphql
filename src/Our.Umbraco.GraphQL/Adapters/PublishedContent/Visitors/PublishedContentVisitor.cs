@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Http;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
 using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
@@ -9,13 +10,13 @@ using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.PublishedContent;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
 namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
 {
@@ -30,11 +31,13 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
         private readonly ITypeRegistry _typeRegistry;
         private readonly Lazy<IGraphTypeAdapter> _graphTypeAdapter;
         private readonly Lazy<IGraphVisitor> _visitor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PublishedContentVisitor(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService,
             IPublishedContentTypeFactory publishedContentTypeFactory, IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IUmbracoContextFactory umbracoContextFactory, IPublishedRouter publishedRouter,
-            ITypeRegistry typeRegistry, Lazy<IGraphTypeAdapter> graphTypeAdapter, Lazy<IGraphVisitor> visitor)
+            ITypeRegistry typeRegistry, Lazy<IGraphTypeAdapter> graphTypeAdapter, Lazy<IGraphVisitor> visitor,
+            IHttpContextAccessor httpContextAccessor)
         {
             _contentTypeService = contentTypeService ?? throw new ArgumentNullException(nameof(contentTypeService));
             _mediaTypeService = mediaTypeService ?? throw new ArgumentNullException(nameof(mediaTypeService));
@@ -47,6 +50,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
             _typeRegistry = typeRegistry ?? throw new ArgumentNullException(nameof(typeRegistry));
             _graphTypeAdapter = graphTypeAdapter ?? throw new ArgumentNullException(nameof(graphTypeAdapter));
             _visitor = visitor ?? throw new ArgumentNullException(nameof(visitor));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public override void Visit(ISchema schema)
@@ -69,7 +73,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                 var publishedContentType = _publishedContentTypeFactory.CreateContentType(contentType);
 
                 var compositionGraphType =
-                    new PublishedContentCompositionGraphType(contentType, publishedContentType, _typeRegistry, _umbracoContextFactory, _publishedRouter);
+                    new PublishedContentCompositionGraphType(contentType, publishedContentType, _typeRegistry, _umbracoContextFactory, _publishedRouter, _httpContextAccessor);
                 compositionGraphTypes.Add(contentType.Alias, compositionGraphType);
                 _visitor.Value.Visit(compositionGraphType);
                 schema.RegisterType(compositionGraphType);
@@ -82,11 +86,11 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                 IObjectGraphType graphType;
                 if (publishedContentType.IsElement)
                 {
-                    graphType = new PublishedElementGraphType(contentType, publishedContentType, _typeRegistry);
+                    graphType = new PublishedElementGraphType(contentType, publishedContentType, _typeRegistry, _httpContextAccessor);
                 }
                 else
                 {
-                    graphType = new PublishedContentGraphType(contentType, publishedContentType, _typeRegistry, _umbracoContextFactory, _publishedRouter);
+                    graphType = new PublishedContentGraphType(contentType, publishedContentType, _typeRegistry, _umbracoContextFactory, _publishedRouter, _httpContextAccessor);
                     foreach (var composition in contentType.ContentTypeComposition)
                     {
                         graphType.AddResolvedInterface(compositionGraphTypes[composition.Alias]);
@@ -104,7 +108,6 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                             cache.GetByContentType(publishedContentType)
                                 .Where(x => culture == null || x.IsInvariantOrHasCulture(culture)));
                     }
-
                 }
 
                 _visitor.Value.Visit(graphType);

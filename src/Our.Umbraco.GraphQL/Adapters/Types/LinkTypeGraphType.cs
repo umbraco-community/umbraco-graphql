@@ -1,5 +1,5 @@
 using GraphQL.Types;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types
 {
