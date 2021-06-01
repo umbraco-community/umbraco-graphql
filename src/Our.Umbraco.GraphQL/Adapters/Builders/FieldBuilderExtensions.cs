@@ -13,16 +13,15 @@ namespace Our.Umbraco.GraphQL.Adapters.Builders
             return builder;
         }
 
-        public static ConnectionBuilder<TNodeType, TSourceType> Metadata<TNodeType, TSourceType>(
-            this ConnectionBuilder<TNodeType, TSourceType> builder, string key, object value)
-            where TNodeType : IGraphType
+        public static ConnectionBuilder<TSourceType> Metadata<TSourceType>(
+            this ConnectionBuilder<TSourceType> builder, string key, object value)
         {
             builder.FieldType.Metadata.Add(key, value);
             return builder;
         }
 
-        public static ConnectionBuilder<TNodeType, TSourceType> Orderable<TNodeType, TSourceType>(
-            this ConnectionBuilder<TNodeType, TSourceType> builder) where TNodeType : IComplexGraphType
+        public static ConnectionBuilder<TSourceType> Orderable<TSourceType, TNodeType>(
+            this ConnectionBuilder<TSourceType> builder) where TNodeType : IComplexGraphType
         {
             builder.Argument<ListGraphType<NonNullGraphType<OrderByGraphType<TNodeType>>>>("orderBy", "");
             return builder;

@@ -1,6 +1,7 @@
 using System.Web;
 using FluentAssertions;
 using GraphQL.Language.AST;
+using Microsoft.AspNetCore.Html;
 using Our.Umbraco.GraphQL.Adapters.Types;
 using Xunit;
 
@@ -54,7 +55,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types
 
             var parsed = htmlGraphType.ParseValue(value);
 
-            parsed.Should().BeAssignableTo<IHtmlString>().Which.ToString().Should().Be(value);
+            parsed.Should().BeAssignableTo<HtmlString>().Which.ToString().Should().Be(value);
         }
 
         [Fact]
@@ -75,7 +76,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Types
 
             var parsed = htmlGraphType.ParseLiteral(new StringValue(value));
 
-            parsed.Should().BeAssignableTo<IHtmlString>().Which.ToString().Should().Be(value);
+            parsed.Should().BeAssignableTo<HtmlString>().Which.ToString().Should().Be(value);
         }
 
         [Fact]

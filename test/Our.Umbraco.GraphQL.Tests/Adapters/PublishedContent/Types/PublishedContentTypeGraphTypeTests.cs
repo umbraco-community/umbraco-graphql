@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FluentAssertions;
+using GraphQL;
 using GraphQL.Types;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;

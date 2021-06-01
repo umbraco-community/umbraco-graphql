@@ -2,13 +2,14 @@ using System;
 using FluentAssertions;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
 using Xunit;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
 
@@ -19,7 +20,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
         private PublishedContentCompositionGraphType CreateSUT(IContentTypeComposition contentType = null)
         {
             return new PublishedContentCompositionGraphType(contentType ?? Substitute.For<IContentTypeComposition>(),
-                Substitute.For<IPublishedContentType>(), new TypeRegistry(), Substitute.For<IUmbracoContextFactory>(), Substitute.For<IPublishedRouter>());
+                Substitute.For<IPublishedContentType>(), new TypeRegistry(), Substitute.For<IUmbracoContextFactory>(), Substitute.For<IPublishedRouter>(), Substitute.For<IHttpContextAccessor>());
         }
 
         [Theory]

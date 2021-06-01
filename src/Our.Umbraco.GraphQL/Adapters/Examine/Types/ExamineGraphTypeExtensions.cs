@@ -44,7 +44,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 graphType.Connection<SearchResultFieldsGraphType>().Name("fields")
                     .Metadata(nameof(MemberInfo), GetMember((ISearchResult x) => x.AllValues))
                     .Bidirectional()
-                    .Orderable()
+                    .Orderable<ISearchResult, SearchResultFieldsGraphType>()
                     .Resolve(ctx =>
                         ctx.Source.AllValues
                             .OrderBy(ctx.GetArgument<IList<OrderBy>>("orderBy"))

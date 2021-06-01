@@ -1,147 +1,105 @@
 using GraphQL;
-using GraphQL.Http;
-using GraphQL.Instrumentation;
-using StackExchange.Profiling;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using GraphQL.DataLoader;
+using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
+using GraphQL.Types;
 using GraphQL.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using Our.Umbraco.GraphQL.Builders;
-using Our.Umbraco.GraphQL.Instrumentation;
-using Our.Umbraco.GraphQL.Types;
-using Our.Umbraco.GraphQL.Composing;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Our.Umbraco.GraphQL.Builders;
+using Our.Umbraco.GraphQL.Types;
+using System;
+using System.Reflection;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
 {
     internal class GraphQLMiddleware
     {
+        private readonly RequestDelegate _next;
+        private readonly IDocumentExecuter _documentExecuter;
         private readonly IDocumentWriter _documentWriter;
-        private readonly DataLoaderDocumentListener _dataLoaderDocumentListener;
-        private readonly GraphQLRequestParser _requestParser;
-        private readonly ISchemaBuilder _schemaBuilder;
-        private readonly GraphQLServerOptions _options;
-        private readonly FieldMiddlewareCollection _fieldMiddlewareCollection;
+        private readonly ILogger<GraphQLMiddleware> _logger;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-        public GraphQLMiddleware(ISchemaBuilder schemaBuilder, IDocumentWriter documentWriter,
-            DataLoaderDocumentListener dataLoaderDocumentListener, FieldMiddlewareCollection fieldMiddlewareCollection,
-            GraphQLRequestParser requestParser, GraphQLServerOptions options)
+        public GraphQLMiddleware(RequestDelegate next,
+                                 IDocumentExecuter documentExecuter,
+                                 IDocumentWriter documentWriter,
+                                 ILogger<GraphQLMiddleware> logger)
         {
-            _schemaBuilder = schemaBuilder ?? throw new ArgumentNullException(nameof(schemaBuilder));
+            _next = next;
+            _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
-            _dataLoaderDocumentListener = dataLoaderDocumentListener ??
-                                          throw new ArgumentNullException(nameof(dataLoaderDocumentListener));
-            _fieldMiddlewareCollection = fieldMiddlewareCollection ??
-                                         throw new ArgumentNullException(nameof(fieldMiddlewareCollection));
-            _requestParser = requestParser ?? throw new ArgumentNullException(nameof(requestParser));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _jsonSerializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
         }
 
-        public async Task Invoke(HttpContext context, Func<Task> next)
+        public async Task Invoke(HttpContext context,
+                                 IOptionsSnapshot<GraphQLServerOptions> graphQLServerOptions,
+                                 ISchema schema)
         {
+            var options = graphQLServerOptions.Value;
+
+            if (!IsGraphQlRequest(context, options))
+            {
+                await _next(context);
+                return;
+            }
+
+            if (!string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase))
+            {
+                await new PlaygroundMiddleware(_next, options.Playground).Invoke(context);
+                return;
+            }
+
             try
             {
-                // TODO: Add ISchemaCacher
-                using (var schema = _schemaBuilder.Build(typeof(Schema<Query, Mutation>).GetTypeInfo()))
+                var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>(context.Request.Body, _jsonSerializerOptions, context.RequestAborted);
+                var result = await _documentExecuter.ExecuteAsync(opts =>
                 {
-                    var request = await _requestParser.Parse(context.Request);
-                    switch (context.Request.Method)
+                    opts.Schema = schema;
+                    opts.Query = request?.Query;
+                    opts.OperationName = request?.OperationName;
+                    opts.Inputs = request?.Inputs;
+                    opts.ValidationRules = DocumentValidator.CoreRules;
+                    opts.EnableMetrics = options.EnableMetrics;
+                    opts.CancellationToken = context.RequestAborted;
+                    opts.ComplexityConfiguration = options.Complexity;
+                });
+
+                if (request?.OperationName == "IntrospectionQuery" && result.Errors != null && result.Errors.Count > 0)
+                {
+                    foreach (var error in result.Errors)
                     {
-                        case "POST":
-                            if (request == null)
-                            {
-                                context.Response.StatusCode = 400;
-                                await context.Response.WriteAsync("POST body missing.");
-                                return;
-                            }
-                            break;
-                        default:
-                            context.Response.StatusCode = 405;
-                            await context.Response.WriteAsync("Server supports only POST requests.");
-                            return;
-                    }
-
-                    var requests = request.Select(async requestParams =>
-                    {
-                        var query = requestParams.Query;
-                        var operationName = requestParams.OperationName;
-                        var variables = requestParams.Variables;
-
-                        var start = DateTime.Now;
-                        var miniProfiler = MiniProfiler.StartNew();
-                        var result = await new DocumentExecuter()
-                            .ExecuteAsync(opts =>
-                            {
-                                opts.CancellationToken = context.RequestAborted;
-                                opts.ComplexityConfiguration = _options.ComplexityConfiguration;
-                                opts.EnableMetrics = _options.EnableMetrics;
-
-                                foreach(var fieldMiddleware in _fieldMiddlewareCollection)
-                                {
-                                    opts.FieldMiddleware.Use(nextMiddleware => fieldContext => fieldMiddleware.Resolve(fieldContext, nextMiddleware));
-                                }
-
-                                opts.FieldMiddleware.Use<InstrumentFieldsMiddleware>();
-                                if (_options.EnableMiniProfiler)
-                                    opts.FieldMiddleware.Use<MiniProfilerFieldMiddleware>();
-                                opts.ExposeExceptions = _options.Debug;
-                                opts.Inputs = variables;
-                                opts.Listeners.Add(_dataLoaderDocumentListener);
-                                opts.OperationName = operationName;
-                                opts.Query = query;
-                                opts.Schema = schema;
-                                opts.ValidationRules = DocumentValidator.CoreRules();
-                            });
-
-                        if (result.Errors == null)
-                        {
-                            result.EnrichWithApolloTracing(start);
-                            if (_options.EnableMiniProfiler)
-                            {
-                                if (result.Extensions == null)
-                                    result.Extensions = new Dictionary<string, object>();
-                                result.Extensions["miniProfiler"] = JObject.FromObject(MiniProfiler.Current, new JsonSerializer { ContractResolver = new CamelCasePropertyNamesContractResolver() });
-                            }
-                        }
-                        miniProfiler.Stop();
-
-                        return result;
-                    });
-
-                    var responses = await Task.WhenAll(requests);
-
-                    context.Response.ContentType = "application/json";
-
-                    if (false == request.IsBatched)
-                    {
-                        await _documentWriter.WriteAsync(context.Response.Body, responses[0]);
-                    }
-                    else
-                    {
-                        await _documentWriter.WriteAsync(context.Response.Body, responses);
+                        _logger.LogError(error.GetBaseException(), "Could not introspect schema");
                     }
                 }
+
+                context.Response.ContentType = "application/json";
+                await _documentWriter.WriteAsync(context.Response.Body, result);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Could not handle GraphQL request");
+
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 500;
-
-                if (_options.Debug)
-                {
-                    await context.Response.WriteAsync(ex.ToString());
-                }
-                else
-                {
-                    await context.Response.WriteAsync("Internal server error");
-                }
+                await context.Response.WriteAsync("Internal server error");
             }
         }
+
+        private static bool IsGraphQlRequest(HttpContext context, GraphQLServerOptions options) =>
+            context.Request.Path.StartsWithSegments(options.Path)
+            && (
+                string.Equals(context.Request.Method, "POST", StringComparison.InvariantCultureIgnoreCase)
+                || (
+                    options.EnablePlayground
+                    && string.Equals(context.Request.Method, "GET", StringComparison.InvariantCultureIgnoreCase)
+                )
+            );
     }
 }

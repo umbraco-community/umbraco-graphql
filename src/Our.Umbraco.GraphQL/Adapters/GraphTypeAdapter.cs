@@ -22,14 +22,14 @@ namespace Our.Umbraco.GraphQL.Adapters
     {
         private readonly Dictionary<TypeInfo, IGraphType> _cache;
         private readonly ITypeRegistry _typeRegistry;
-        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IGraphVisitor _visitor;
 
-        public GraphTypeAdapter(ITypeRegistry typeRegistry, IDependencyResolver dependencyResolver,
+        public GraphTypeAdapter(ITypeRegistry typeRegistry, IServiceProvider serviceProvider,
             IGraphVisitor visitor)
         {
             _typeRegistry = typeRegistry ?? throw new ArgumentNullException(nameof(typeRegistry));
-            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _visitor = visitor;
             _cache = new Dictionary<TypeInfo, IGraphType>();
         }
@@ -191,7 +191,7 @@ namespace Our.Umbraco.GraphQL.Adapters
                 Type = foundType.Wrap(returnType, isNonNull, isNonNullItem)
             };
 
-            fieldType.Resolver = new FieldResolver(fieldType, _dependencyResolver);
+            fieldType.Resolver = new FieldResolver(fieldType, _serviceProvider);
 
             return fieldType;
         }
@@ -340,7 +340,7 @@ namespace Our.Umbraco.GraphQL.Adapters
 
             for (var i = 0; i < args.Length; i++)
             {
-                args[i] = _dependencyResolver.Resolve(parms[i].ParameterType);
+                args[i] = _serviceProvider.GetService(parms[i].ParameterType);
             }
 
             var graphType = constructor.Invoke(args) as IGraphType;

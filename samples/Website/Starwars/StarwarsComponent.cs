@@ -1,21 +1,21 @@
 using System;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Types;
-using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 using Website.Starwars.Data;
 using Website.Starwars.Schema;
 
 namespace Website
 {
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class StarwarsComposer : ComponentComposer<StarwarsComponent>, IUserComposer
     {
-        public override void Compose(Composition composition)
+        public override void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(composition);
+            base.Compose(builder);
 
-            composition.Register<StarWarsData>(Lifetime.Singleton);
+            builder.Services.AddUnique<StarWarsData>();
         }
     }
 

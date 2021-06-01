@@ -23,3 +23,5 @@ Visual Studio 2017/*
 /src/Our.Umbraco.GraphQL/umbraco/UmbracoInstall/
 /src/Our.Umbraco.GraphQL/umbraco/UmbracoWebsite/
 /src/Our.Umbraco.GraphQL/wwwroot/umbraco/
+/samples/Website/umbraco
+/samples/Website/wwwroot/umbraco

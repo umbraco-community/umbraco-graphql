@@ -10,7 +10,7 @@ namespace Our.Umbraco.GraphQL.Composing
         {
         }
 
-        protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Scoped;
+        protected override ServiceLifetime CollectionLifetime => ServiceLifetime.Singleton;
 
         protected override GraphVisitorCollectionBuilder This => this;
     }

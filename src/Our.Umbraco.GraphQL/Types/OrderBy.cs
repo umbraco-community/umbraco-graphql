@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using GraphQL.Types;
+using GraphQL;
 
 namespace Our.Umbraco.GraphQL.Types
 {

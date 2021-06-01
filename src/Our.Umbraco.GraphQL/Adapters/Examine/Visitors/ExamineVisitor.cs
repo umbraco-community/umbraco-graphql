@@ -25,7 +25,7 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Visitors
 
         public override void Visit(ISchema schema)
         {
-            var searchers = _examineManager.Indexes.Select(i => i.GetSearcher()).Concat(_examineManager.RegisteredSearchers).ToList();
+            var searchers = _examineManager.Indexes.Select(i => i.Searcher).Concat(_examineManager.RegisteredSearchers).ToList();
             var examineQuery = (ObjectGraphType<ExamineQuery>)_graphTypeAdapter.Value.Adapt<ExamineQuery>();
 
             foreach (var searcher in searchers)

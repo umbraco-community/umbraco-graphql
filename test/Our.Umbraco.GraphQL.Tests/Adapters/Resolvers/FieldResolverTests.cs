@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using FluentAssertions;
 using GraphQL;
+using GraphQL.Execution;
 using GraphQL.Types;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters.Resolvers;
@@ -14,14 +15,13 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
 {
     public class FieldResolverTests
     {
-        private FieldResolver CreateSUT(MemberInfo memberInfo, IDependencyResolver dependencyResolver = null,
+        private FieldResolver CreateSUT(MemberInfo memberInfo, IServiceProvider serviceProvider = null,
             Action<FieldType> configureFieldType = null)
         {
             var fieldType = new FieldType {Metadata = {{nameof(MemberInfo), memberInfo}}};
             configureFieldType?.Invoke(fieldType);
 
-            return new FieldResolver(fieldType,
-                dependencyResolver ?? new DefaultDependencyResolver());
+            return new FieldResolver(fieldType, serviceProvider ?? new DefaultServiceProvider());
         }
 
         [Fact]
@@ -81,9 +81,9 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
             var result = resolver.Resolve(new ResolveFieldContext
             {
                 Source = new Query(),
-                Arguments = new Dictionary<string, object>
+                Arguments = new Dictionary<string, ArgumentValue>
                 {
-                    {"name", "World!"}
+                    {"name", new ArgumentValue("World!", ArgumentSource.Literal)}
                 }
             });
 
@@ -133,11 +133,11 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
         [Fact]
         public void Resolve_FieldDefinitionWithMethodInfoWithInjectedArgument_ResolvesInjectedFromDependencyResolver()
         {
-            var dependencyResolver = Substitute.For<IDependencyResolver>();
-            dependencyResolver.Resolve(Arg.Is(typeof(Injected)))
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Is(typeof(Injected)))
                 .Returns(new Injected());
             var methodInfo = typeof(Query).GetMethod(nameof(Query.GetInjected));
-            var resolver = CreateSUT(methodInfo, dependencyResolver, fieldType =>
+            var resolver = CreateSUT(methodInfo, serviceProvider, fieldType =>
             {
                 fieldType.Arguments = new QueryArguments(new QueryArgument(typeof(ObjectGraphType))
                 {
@@ -151,40 +151,40 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
             });
 
             result.Should().Be("Injected Pong");
-            dependencyResolver.Received()
-                .Resolve(typeof(Injected));
+            serviceProvider.Received()
+                .GetService(typeof(Injected));
         }
 
         [Fact]
         public void Resolve_SourceIsNull_ResolvesSourceFromDependencyResolver()
         {
-            var dependencyResolver = Substitute.For<IDependencyResolver>();
-            dependencyResolver.Resolve(Arg.Is(typeof(Query)))
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Is(typeof(Query)))
                 .Returns(new Query
                 {
                     Answer = 17,
                 });
             var methodInfo = typeof(Query).GetField(nameof(Query.Answer));
-            var resolver = CreateSUT(methodInfo, dependencyResolver);
+            var resolver = CreateSUT(methodInfo, serviceProvider);
 
             var result = resolver.Resolve(new ResolveFieldContext());
 
             result.Should().Be(17);
-            dependencyResolver.Received()
-                .Resolve(typeof(Query));
+            serviceProvider.Received()
+                .GetService(typeof(Query));
         }
 
         [Fact]
         public void Resolve_SourceIsWrongType_ResolvesCorrectTypeFromDependencyResolver()
         {
-            var dependencyResolver = Substitute.For<IDependencyResolver>();
-            dependencyResolver.Resolve(Arg.Is(typeof(Query)))
+            var serviceProvider = Substitute.For<IServiceProvider>();
+            serviceProvider.GetService(Arg.Is(typeof(Query)))
                 .Returns(new Query
                 {
                     Answer = 17,
                 });
             var methodInfo = typeof(Query).GetField(nameof(Query.Answer));
-            var resolver = CreateSUT(methodInfo, dependencyResolver);
+            var resolver = CreateSUT(methodInfo, serviceProvider);
 
             var result = resolver.Resolve(new ResolveFieldContext
             {
@@ -192,8 +192,8 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.Resolvers
             });
 
             result.Should().Be(17);
-            dependencyResolver.Received()
-                .Resolve(typeof(Query));
+            serviceProvider.Received()
+                .GetService(typeof(Query));
         }
 
         [Fact]

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using GraphQL.Types;
@@ -10,11 +9,12 @@ using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Types;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Routing;
 using Xunit;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
+using Microsoft.AspNetCore.Http;
+using GraphQL;
 
 namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
 {
@@ -24,7 +24,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
             IPublishedContentType publishedContentType = null)
         {
             return new PublishedContentGraphType(contentType ?? Substitute.For<IContentTypeComposition>(),
-                publishedContentType ?? Substitute.For<IPublishedContentType>(), new TypeRegistry(), Substitute.For<IUmbracoContextFactory>(), Substitute.For<IPublishedRouter>());
+                publishedContentType ?? Substitute.For<IPublishedContentType>(), new TypeRegistry(), Substitute.For<IUmbracoContextFactory>(), Substitute.For<IPublishedRouter>(), Substitute.For<IHttpContextAccessor>());
         }
 
         [Theory]
@@ -120,7 +120,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
             content.ContentType.Returns(contentType);
 
             graphType.Fields.Should().Contain(x => x.Name == "_contentType")
-                .Which.Resolver.Resolve(new ResolveFieldContext{ Source = content })
+                .Which.Resolver.Resolve(new ResolveFieldContext { Source = content })
                 .Should().Be(contentType);
         }
 

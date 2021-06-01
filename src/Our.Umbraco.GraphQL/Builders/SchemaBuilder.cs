@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
@@ -11,12 +10,12 @@ namespace Our.Umbraco.GraphQL.Builders
     {
         private readonly IGraphTypeAdapter _graphTypeAdapter;
         private readonly IGraphVisitor _visitor;
-        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IServiceProvider _serviceProvider;
 
-        public SchemaBuilder(IGraphTypeAdapter graphTypeAdapter, IDependencyResolver dependencyResolver, IGraphVisitor visitor)
+        public SchemaBuilder(IGraphTypeAdapter graphTypeAdapter, IServiceProvider serviceProvider, IGraphVisitor visitor)
         {
             _graphTypeAdapter = graphTypeAdapter ?? throw new ArgumentNullException(nameof(graphTypeAdapter));
-            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _visitor = visitor;
         }
 
@@ -26,7 +25,7 @@ namespace Our.Umbraco.GraphQL.Builders
         {
             if (schemaType == null) throw new ArgumentNullException(nameof(schemaType));
 
-            var schema = new Schema(_dependencyResolver);
+            var schema = new Schema(_serviceProvider);
 
             schema.Query = GenerateFromProperty(schemaType, "Query", true);
             schema.Mutation = GenerateFromProperty(schemaType, "Mutation", false);

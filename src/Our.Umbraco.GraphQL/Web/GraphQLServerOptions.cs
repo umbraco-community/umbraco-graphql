@@ -1,17 +1,14 @@
-using System.Collections.Generic;
+using GraphQL.Server.Ui.Playground;
 using GraphQL.Validation.Complexity;
 
 namespace Our.Umbraco.GraphQL.Web
 {
     public class GraphQLServerOptions
     {
-        public string CorsPolicyName { get; set; }
-        public ComplexityConfiguration ComplexityConfiguration { get; set; }
-        public bool Debug { get; set; }
+        public string Path { get; set; } = "/umbraco/graphql";
         public bool EnableMetrics { get; set; }
-        public bool EnableMiniProfiler { get; set; }
         public bool EnablePlayground { get; set; }
-        public Dictionary<string, object> GraphQLConfig { get; set; }
-        public Dictionary<string, object> PlaygroundSettings { get; set; }
+        public ComplexityConfiguration Complexity { get; set; } = new ComplexityConfiguration();
+        public PlaygroundOptions Playground { get; set; } = new PlaygroundOptions { GraphQLEndPoint = "/umbraco/graphql", SubscriptionsEndPoint = "/umbraco/graphql" };
     }
 }

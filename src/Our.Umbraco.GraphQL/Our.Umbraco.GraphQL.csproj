@@ -36,8 +36,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="GraphQL" Version="2.4.0" />
-        <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" ExcludeAssets="all" />
-        <PackageReference Include="Umbraco.Cms" Version="9.0.0-alpha004" />
+        <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
+        <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.0.2" />
+        <PackageReference Include="Umbraco.Cms.Web.Common" Version="9.0.0-beta003" />
     </ItemGroup>
 </Project>

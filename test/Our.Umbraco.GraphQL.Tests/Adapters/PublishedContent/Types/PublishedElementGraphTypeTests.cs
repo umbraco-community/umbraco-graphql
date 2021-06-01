@@ -1,6 +1,8 @@
 using System;
 using FluentAssertions;
+using GraphQL;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
@@ -17,7 +19,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters.PublishedContent.Types
         private PublishedElementGraphType CreateSUT(IContentTypeComposition contentType = null)
         {
             return new PublishedElementGraphType(contentType ?? Substitute.For<IContentTypeComposition>(),
-                Substitute.For<IPublishedContentType>(), new TypeRegistry());
+                Substitute.For<IPublishedContentType>(), new TypeRegistry(), Substitute.For<IHttpContextAccessor>());
         }
 
         [Fact]

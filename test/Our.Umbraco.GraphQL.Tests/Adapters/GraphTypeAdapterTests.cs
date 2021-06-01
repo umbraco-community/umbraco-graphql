@@ -24,7 +24,7 @@ namespace Our.Umbraco.GraphQL.Tests.Adapters
     public class GraphTypeAdapterTests
     {
         private GraphTypeAdapter CreateSUT(GraphVisitor visitor = null, ITypeRegistry typeRegistry = null) =>
-            new GraphTypeAdapter(typeRegistry ?? new TypeRegistry(), new DefaultDependencyResolver(),
+            new GraphTypeAdapter(typeRegistry ?? new TypeRegistry(), new DefaultServiceProvider(),
                 visitor ?? new CompositeGraphVisitor());
 
         [Fact]

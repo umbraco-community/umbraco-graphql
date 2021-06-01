@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using GraphQL;
 using GraphQL.Types;
 
 namespace Our.Umbraco.GraphQL.Reflection
 {
     internal static class TypeInfoExtensions
     {
+        public static bool IsNullable(this TypeInfo type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+
         public static  TypeInfo GetReturnType(this MemberInfo memberInfo)
         {
             switch (memberInfo)

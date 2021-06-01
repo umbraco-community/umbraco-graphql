@@ -4,7 +4,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Umbraco.Cms" Version="9.0.0-alpha004" />
+        <PackageReference Include="Umbraco.Cms" Version="9.0.0-beta003" />
+        <PackageReference Include="Umbraco.Cms.SqlCe" Version="9.0.0-beta003" />
     </ItemGroup>
 
 
@@ -12,16 +13,13 @@
         <Compile Remove="umbraco\Data\**" />
         <Compile Remove="umbraco\logs\**" />
         <Compile Remove="umbraco\MediaCache\**" />
-        <Compile Remove="umbraco\models\**" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Remove="umbraco\Data\**" />
         <EmbeddedResource Remove="umbraco\logs\**" />
         <EmbeddedResource Remove="umbraco\MediaCache\**" />
-        <EmbeddedResource Remove="umbraco\models\**" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="umbraco\models\**" />
         <None Remove="umbraco\Data\**" />
         <None Remove="umbraco\logs\**" />
         <None Remove="umbraco\MediaCache\**" />
@@ -38,7 +36,9 @@
         <Content Remove="umbraco\Data\**" />
         <Content Remove="umbraco\logs\**" />
         <Content Remove="umbraco\MediaCache\**" />
-        <Content Remove="umbraco\models\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Our.Umbraco.GraphQL\Our.Umbraco.GraphQL.csproj" />
     </ItemGroup>
 
     <!--Set this to true ModelsBuilder mode is not PureLive -->

@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Xml;
+using GraphQL;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.Builders;
-using Our.Umbraco.GraphQL.Adapters.Types;
 using Our.Umbraco.GraphQL.Types;
-using Our.Umbraco.GraphQL.Types.PublishedContent;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using IdGraphType = Our.Umbraco.GraphQL.Adapters.Types.IdGraphType;
@@ -33,7 +31,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
             graphType.Connection<PublishedContentInterfaceGraphType>().Name("_ancestors")
                 .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.Ancestors()))
                 .Bidirectional()
-                .Orderable()
+                .Orderable<IPublishedContent, PublishedContentInterfaceGraphType>()
                 .Resolve(ctx =>
                     ctx.Source.Ancestors()
                         .OrderBy(ctx.GetArgument<IList<OrderBy>>("orderBy"))
@@ -42,7 +40,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
             graphType.Connection<PublishedContentInterfaceGraphType>().Name("_children")
                 .Metadata(nameof(MemberInfo), GetMember((IPublishedContent x) => x.Children(null)))
                 .Bidirectional()
-                .Orderable()
+                .Orderable<IPublishedContent, PublishedContentInterfaceGraphType>()
                 .Resolve(ctx =>
                     ctx.Source.Children(ctx.GetArgument<string>("culture"))
                         .OrderBy(ctx.GetArgument<IList<OrderBy>>("orderBy"))
