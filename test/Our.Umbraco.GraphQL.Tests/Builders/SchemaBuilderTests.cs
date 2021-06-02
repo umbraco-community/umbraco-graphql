@@ -23,37 +23,7 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
                 graphTypeAdapter.Adapt(Arg.Is(typeof(Query).GetTypeInfo())).Returns(queryObjectGraphType);
             }
 
-            return new SchemaBuilder(graphTypeAdapter, new FuncServiceProvider(Activator.CreateInstance), visitor);
-        }
-
-        [Fact]
-        public void Build_WithNull_ThrowsException()
-        {
-            var schemaBuilder = CreateSUT();
-
-            Action action = () => schemaBuilder.Build(null);
-
-            action.Should().Throw<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void Build_SchemaWithoutQueryProperty_ThrowsException()
-        {
-            var schemaBuilder = CreateSUT();
-
-            Action action = () => schemaBuilder.Build(typeof(EmptySchema).GetTypeInfo());
-
-            action.Should().Throw<ArgumentException>();
-        }
-
-        [Fact]
-        public void Build_SchemaWithSetOnlyQueryProperty_ThrowsException()
-        {
-            var schemaBuilder = CreateSUT();
-
-            Action action = () => schemaBuilder.Build<SchemaWithSetOnlyQuery>();
-
-            action.Should().Throw<ArgumentException>();
+            return new SchemaBuilderWithQuery(graphTypeAdapter, new FuncServiceProvider(Activator.CreateInstance), visitor);
         }
 
         [Fact]
@@ -64,7 +34,7 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
             graphTypeAdapter.Adapt(Arg.Is(typeof(Query).GetTypeInfo())).Returns(queryObjectGraphType);
             var schemaBuilder = CreateSUT(graphTypeAdapter);
 
-            var schema = schemaBuilder.Build<SchemaWithQuery>();
+            var schema = schemaBuilder.Build();
 
             schema.Query.Should().Be(queryObjectGraphType);
         }
@@ -75,7 +45,7 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
             var visitor = Substitute.For<GraphVisitor>();
             var schemaBuilder = CreateSUT(visitor: visitor);
 
-            var schema = schemaBuilder.Build<SchemaWithQuery>();
+            var schema = schemaBuilder.Build();
 
             visitor.Received(1).Visit(Arg.Is(schema));
         }
@@ -91,6 +61,15 @@ namespace Our.Umbraco.GraphQL.Tests.Builders
             {
                 set => _query = value;
             }
+        }
+
+        private class SchemaBuilderWithQuery : SchemaBuilder
+        {
+            public SchemaBuilderWithQuery(IGraphTypeAdapter graphTypeAdapter, IServiceProvider serviceProvider, IGraphVisitor visitor) : base(graphTypeAdapter, serviceProvider, visitor)
+            {
+            }
+
+            public override Type SchemaType => typeof(SchemaWithQuery);
         }
 
         private class SchemaWithQuery
