@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using GraphQL.Types;
 using Our.Umbraco.GraphQL.Attributes;
-using Our.Umbraco.GraphQL.Reflection;
 using Our.Umbraco.GraphQL.Types.Relay;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;

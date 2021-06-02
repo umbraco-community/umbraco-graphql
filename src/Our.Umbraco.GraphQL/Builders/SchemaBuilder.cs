@@ -3,6 +3,7 @@ using System.Reflection;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
+using Our.Umbraco.GraphQL.Types;
 
 namespace Our.Umbraco.GraphQL.Builders
 {
@@ -19,39 +20,35 @@ namespace Our.Umbraco.GraphQL.Builders
             _visitor = visitor;
         }
 
-        public ISchema Build<TSchema>(params TypeInfo[] additionalTypes) => Build(typeof(TSchema).GetTypeInfo(), additionalTypes);
+        public virtual Type SchemaType => typeof(Schema<Query>);
 
-        public ISchema Build(TypeInfo schemaType, params TypeInfo[] additionalTypes)
+        public virtual ISchema Build()
         {
-            if (schemaType == null) throw new ArgumentNullException(nameof(schemaType));
-
             var schema = new Schema(_serviceProvider);
 
-            schema.Query = GenerateFromProperty(schemaType, "Query", true);
-            schema.Mutation = GenerateFromProperty(schemaType, "Mutation", false);
-
-            foreach (var type in additionalTypes)
-            {
-                schema.RegisterType(_graphTypeAdapter.Adapt(type));
-            }
-
+            AddProperties(schema);
             _visitor?.Visit(schema);
 
             return schema;
         }
 
-        private IObjectGraphType GenerateFromProperty(TypeInfo schemaType, string propertyName, bool throwError)
+        protected virtual void AddProperties(Schema schema)
         {
-            var queryPropertyInfo = schemaType.GetProperty(propertyName);
+            schema.Query = GenerateFromProperty("Query", true);
+        }
+
+        protected virtual IObjectGraphType GenerateFromProperty(string propertyName, bool throwError)
+        {
+            var queryPropertyInfo = SchemaType.GetProperty(propertyName);
             if (queryPropertyInfo == null)
             {
-                if (throwError) throw new ArgumentException($"Could not find property 'Query' on {schemaType}.", nameof(schemaType));
+                if (throwError) throw new ArgumentException($"Could not find property '{propertyName}' on {SchemaType.FullName}.");
                 return null;
             }
 
             if (queryPropertyInfo.CanRead == false)
             {
-                if (throwError) throw new ArgumentException("'Query' does not have a getter.", nameof(schemaType));
+                if (throwError) throw new ArgumentException($"Could not find getter for '{propertyName}' on {SchemaType.FullName}.");
                 return null;
             }
 

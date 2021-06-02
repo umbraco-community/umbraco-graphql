@@ -4,12 +4,17 @@ using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Our.Umbraco.GraphQL.Adapters;
+using Our.Umbraco.GraphQL.Adapters.Examine.Types;
 using Our.Umbraco.GraphQL.Adapters.Examine.Visitors;
+using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors;
+using Our.Umbraco.GraphQL.Adapters.Types;
+using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Adapters.Visitors;
 using Our.Umbraco.GraphQL.Builders;
 using Our.Umbraco.GraphQL.Composing;
+using Our.Umbraco.GraphQL.Types.PublishedContent;
 using Our.Umbraco.GraphQL.Web;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
@@ -44,6 +49,33 @@ namespace Our.Umbraco.GraphQL.Compose
 
             builder.Services.AddOptions<GraphQLServerOptions>().Bind(builder.Config.GetSection("GraphQL:Server"));
             builder.Services.ConfigureOptions<GraphQLUmbracoOptionsSetup>();
+
+            // Add all classes that need to be able to be resolved from the service provider
+            builder.Services.AddTransient<ExtendQueryWithUmbracoQuery>();
+            builder.Services.AddTransient<ExtendUmbracoQueryWithPublishedContentQuery>();
+            builder.Services.AddTransient<ExtendUmbracoQueryWithExamineQuery>();
+            builder.Services.AddTransient<ExamineQuery>();
+            builder.Services.AddTransient<PublishedContentAtRootQuery>();
+            builder.Services.AddTransient<PublishedContentByTypeQuery>();
+            builder.Services.AddTransient<PublishedContentQuery>();
+            builder.Services.AddTransient<UmbracoQuery>();
+            builder.Services.AddTransient<PublishedContentTypeGraphType>();
+            builder.Services.AddTransient<PublishedElementInterfaceGraphType>();
+            builder.Services.AddTransient<PublishedContentInterfaceGraphType>();
+            builder.Services.AddTransient<PublishedItemTypeGraphType>();
+            builder.Services.AddTransient<ContentVariationGraphType>();
+            builder.Services.AddTransient<UrlModeGraphType>();
+            builder.Services.AddTransient<UdiGraphType>();
+            builder.Services.AddTransient<LinkGraphType>();
+            builder.Services.AddTransient<JsonGraphType>();
+            builder.Services.AddTransient<SearchResultsInterfaceGraphType>();
+            builder.Services.AddTransient<SearchResultInterfaceGraphType>();
+            builder.Services.AddTransient<SearchResultFieldsGraphType>();
+            builder.Services.AddTransient<BooleanOperationGraphType>();
+            builder.Services.AddTransient<SortDirectionGraphType>();
+            builder.Services.AddTransient(typeof(ConnectionGraphType<>));
+            builder.Services.AddTransient(typeof(OrderByGraphType<>));
+            builder.Services.AddTransient<Adapters.Types.IdGraphType>();
 
             builder.AddNotificationHandler<ContentTypeChangedNotification, SchemaInvalidator>();
             builder.AddNotificationHandler<ContentTypeDeletedNotification, SchemaInvalidator>();

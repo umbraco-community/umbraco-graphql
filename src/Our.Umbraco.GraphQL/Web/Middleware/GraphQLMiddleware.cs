@@ -21,17 +21,20 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
         private readonly IDocumentExecuter _documentExecuter;
         private readonly IDocumentWriter _documentWriter;
         private readonly ILogger<GraphQLMiddleware> _logger;
+        private readonly ISchemaBuilder _schemaBuilder;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public GraphQLMiddleware(RequestDelegate next,
                                  IDocumentExecuter documentExecuter,
                                  IDocumentWriter documentWriter,
-                                 ILogger<GraphQLMiddleware> logger)
+                                 ILogger<GraphQLMiddleware> logger,
+                                 ISchemaBuilder schemaBuilder)
         {
             _next = next;
             _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _schemaBuilder = schemaBuilder;
             _jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true

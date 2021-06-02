@@ -31,17 +31,17 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
 
         public static void AddBuiltInFields(this ComplexGraphType<ISearchResult> graphType, bool includeFields = false)
         {
-            graphType.Field<FloatGraphType>().Name("score")
+            graphType.Field<FloatGraphType>().Name("_examine_score")
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResult x) => x.Score))
                 .Resolve(ctx => ctx.Source.Score);
 
-            graphType.Field<StringGraphType>().Name("id")
+            graphType.Field<StringGraphType>().Name("_examine_id")
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResult x) => x.Id))
                 .Resolve(ctx => ctx.Source.Id);
 
             if (includeFields)
             {
-                graphType.Connection<SearchResultFieldsGraphType>().Name("fields")
+                graphType.Connection<SearchResultFieldsGraphType>().Name("_examine_fields")
                     .Metadata(nameof(MemberInfo), GetMember((ISearchResult x) => x.AllValues))
                     .Bidirectional()
                     .Orderable<ISearchResult, SearchResultFieldsGraphType>()

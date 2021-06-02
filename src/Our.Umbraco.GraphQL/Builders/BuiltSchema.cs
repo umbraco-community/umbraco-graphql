@@ -59,6 +59,6 @@ namespace Our.Umbraco.GraphQL.Builders
             _schema = new Lazy<ISchema>(BuildSchema);
         }
 
-        private ISchema BuildSchema() => _builder.Build(typeof(Schema<Query, Mutation>).GetTypeInfo());
+        private ISchema BuildSchema() => _builder.Build();
     }
 }
