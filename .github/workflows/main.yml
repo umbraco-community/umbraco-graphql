@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    branches: [ v9/dev ]
+
+jobs:
+  build:
+    env:
+      NUGET_KEY: ${{ secrets.NUGET_TOKEN }}
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: Publish NuGet
+      uses: brandedoutcast/publish-nuget@v2.5.5
+      with:
+        PROJECT_FILE_PATH: src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj
+        # API key to authenticate with NuGet server
+        NUGET_KEY: ${{ env.NUGET_TOKEN }}
+        # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
+        INCLUDE_SYMBOLS: true
