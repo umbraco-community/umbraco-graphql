@@ -28,7 +28,6 @@ jobs:
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
         PROJECT_FILE_PATH: src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj
-        # API key to authenticate with NuGet server
+        VERSION_REGEX: ^\s*<versionPrefix>(.*)<\/versionPrefix>\s*$
         NUGET_KEY: ${{ env.NUGET_TOKEN }}
-        # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
         INCLUDE_SYMBOLS: true
