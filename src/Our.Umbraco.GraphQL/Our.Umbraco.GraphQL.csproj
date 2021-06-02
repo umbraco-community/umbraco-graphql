@@ -4,12 +4,12 @@
         <authors>Umbraco Community</authors>
         <owners>umbraco-community</owners>
         <description>A GraphQL server for Umbraco</description>
-        <packageLicenseUrl>https://github.com/umbraco-community/umbraco-graphql/raw/master/LICENSE</packageLicenseUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <packageProjectUrl>https://github.com/umbraco-community/umbraco-graphql</packageProjectUrl>
         <packageTags>umbraco umbracocms graphql</packageTags>
         <copyright>Copyright © 2021 Rasmus John Pedersen</copyright>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <versionPrefix>9.0.0-alpha001</versionPrefix>
+        <versionPrefix>9.0.0-alpha002</versionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>
