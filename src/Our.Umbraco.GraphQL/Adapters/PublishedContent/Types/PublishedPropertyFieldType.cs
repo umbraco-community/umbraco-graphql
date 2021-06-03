@@ -1,14 +1,18 @@
 using System;
+using System.Collections;
+using System.Linq;
 using System.Reflection;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
 using Our.Umbraco.GraphQL.Reflection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -30,11 +34,14 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 unwrappedTypeInfo = typeof(IPublishedContent).GetTypeInfo();
             else if (typeof(IPublishedElement).IsAssignableFrom(unwrappedTypeInfo))
                 unwrappedTypeInfo = typeof(IPublishedElement).GetTypeInfo();
+            else if (typeof(BlockListItem).IsAssignableFrom(unwrappedTypeInfo))
+                unwrappedTypeInfo = typeof(BlockListItem).GetTypeInfo();
 
-            var propertyGraphType = typeRegistry.Get(unwrappedTypeInfo) ?? typeof(StringGraphType).GetTypeInfo();
+            var mappedType = typeRegistry.Get(unwrappedTypeInfo);
+            var propertyGraphType = mappedType ?? typeof(StringGraphType).GetTypeInfo();
             // The Grid data type declares its return type as a JToken, but is actually a JObject.  The result is that without this check,
             // it is cast as an IEnumerable<JProperty> which causes problems when trying to serialize the graph to send to the client
-            propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false, propertyType.PropertyEditorAlias != global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Grid);
+            propertyGraphType = propertyGraphType.Wrap(type, propertyType.Mandatory, false, propertyType.PropertyEditorAlias != global::Umbraco.Cms.Core.Constants.PropertyEditors.Aliases.Grid, out var isEnumerable);
 
             if (propertyType.VariesByCulture())
             {
@@ -49,7 +56,7 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
             Description = propertyType.Description;
             Resolver = new AsyncFieldResolver<IPublishedElement, object>(async context =>
             {
-                object ResolveProperty() => context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"), fallback: Fallback.ToLanguage);
+                object ResolveProperty() => NormalizeResult(mappedType, isEnumerable, context.Source.Value(propertyType.Alias, context.GetArgument<string>("culture"), fallback: Fallback.ToLanguage));
                 if (umbracoContextFactory == null || publishedRouter == null) return ResolveProperty();
 
                 var pc = context.Source as IPublishedContent;
@@ -71,5 +78,16 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 }
             });
         }
+
+        private object NormalizeResult(TypeInfo mappedType, bool isEnumerable, object result)
+        {
+            if (mappedType != null) return result;
+            if (result == null) return "null";
+
+            if (isEnumerable && result is IEnumerable en) return en.Cast<object>().Select(JsonString);
+            else return JsonString(result);
+        }
+
+        private string JsonString(object value) => value != null ? JsonConvert.SerializeObject(value, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }) : "null";
     }
 }

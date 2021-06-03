@@ -74,11 +74,11 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
                     opts.ComplexityConfiguration = options.Complexity;
                 });
 
-                if (request?.OperationName == "IntrospectionQuery" && result.Errors != null && result.Errors.Count > 0)
+                if (result.Errors != null && result.Errors.Count > 0)
                 {
                     foreach (var error in result.Errors)
                     {
-                        _logger.LogError(error.GetBaseException(), "Could not introspect schema");
+                        _logger.LogError(error.GetBaseException(), "There was an error" + (error.Path == null ? "" :" at [" + string.Join(", ", error.Path) + "]"));
                     }
                 }
 

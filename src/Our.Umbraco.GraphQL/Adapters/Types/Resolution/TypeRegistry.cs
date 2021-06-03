@@ -5,10 +5,12 @@ using System.Reflection;
 using GraphQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Html;
+using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
 using Our.Umbraco.GraphQL.Adapters.Types.Relay;
 using Our.Umbraco.GraphQL.Reflection;
 using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
+using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
 {
@@ -39,10 +41,11 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<Uri, UriGraphType>();
             Add<Id, IdGraphType>();
             Add<PageInfo, PageInfoGraphType>();
+            Add<BlockListItem, BlockListItemGraphType>();
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType =>
-            _types.Add(typeof(TType).GetTypeInfo(), typeof(TGraphType).GetTypeInfo());
+            _types[typeof(TType).GetTypeInfo()] = typeof(TGraphType).GetTypeInfo();
 
         public TypeInfo Get(TypeInfo type)
         {

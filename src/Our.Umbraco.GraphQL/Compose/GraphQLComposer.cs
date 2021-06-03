@@ -64,6 +64,7 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddTransient<PublishedContentInterfaceGraphType>();
             builder.Services.AddTransient<PublishedItemTypeGraphType>();
             builder.Services.AddTransient<ContentVariationGraphType>();
+            builder.Services.AddTransient<BlockListItemGraphType>();
             builder.Services.AddTransient<UrlModeGraphType>();
             builder.Services.AddTransient<UdiGraphType>();
             builder.Services.AddTransient<LinkGraphType>();

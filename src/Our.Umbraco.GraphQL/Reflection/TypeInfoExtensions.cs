@@ -39,18 +39,24 @@ namespace Our.Umbraco.GraphQL.Reflection
             return enumerableArgument != null ? enumerableArgument.GetTypeInfo() : typeInfo;
         }
 
-        public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem, bool checkEnumerable = true)
+        public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem)
+            => Wrap(graphType, typeInfo, isNonNull, isNonNullItem, true, out _);
+
+        public static TypeInfo Wrap(this TypeInfo graphType, TypeInfo typeInfo, bool isNonNull, bool isNonNullItem, bool checkEnumerable, out bool isEnumerable)
         {
+            isEnumerable = false;
+
             if (graphType == null)
                 return null;
 
             var enumerableArgument = checkEnumerable ? GetEnumerableArgument(typeInfo) : null;
+            isEnumerable = enumerableArgument != null;
 
             if (typeInfo.IsValueType && typeInfo.IsNullable() == false || enumerableArgument != null &&
                 (enumerableArgument.IsValueType && enumerableArgument.IsNullable() == false || isNonNullItem))
                 graphType = typeof(NonNullGraphType<>).MakeGenericType(graphType).GetTypeInfo();
 
-            if (enumerableArgument != null)
+            if (isEnumerable)
                 graphType = typeof(ListGraphType<>).MakeGenericType(graphType).GetTypeInfo();
 
             if (isNonNull && typeof(NonNullGraphType).IsAssignableFrom(graphType) == false)
