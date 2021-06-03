@@ -29,6 +29,7 @@
         <None Include="$(UIRoot)dist\**" Pack="True" PackagePath="content\" />
         <None Include="content\**" Pack="True" PackagePath="content\" />
         <None Include="readme.txt" Pack="True" PackagePath="" />
+        <None Include="..\..\LICENSE" Pack="True" PackagePath="" />
     </ItemGroup>
 
     <ItemGroup>
