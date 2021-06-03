@@ -69,6 +69,7 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddTransient<UdiGraphType>();
             builder.Services.AddTransient<LinkGraphType>();
             builder.Services.AddTransient<JsonGraphType>();
+            builder.Services.AddTransient<HtmlEncodedStringGraphType>();
             builder.Services.AddTransient<SearchResultsInterfaceGraphType>();
             builder.Services.AddTransient<SearchResultInterfaceGraphType>();
             builder.Services.AddTransient<SearchResultFieldsGraphType>();
