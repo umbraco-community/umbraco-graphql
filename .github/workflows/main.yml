@@ -8,6 +8,7 @@ jobs:
   build:
     env:
       NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+      NUGET_FEED: https://api.nuget.org/v3/index.json
     runs-on: windows-latest
 
     steps:
@@ -16,18 +17,15 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+
     - name: Add Beta source
       run: dotnet nuget add source "https://www.myget.org/F/umbracoprereleases/api/v3/index.json" -n "Umbraco Prereleases"
-    - name: Restore dependencies
-      run: dotnet restore
+
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet pack --include-source --include-symbols -c Release src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj -o .
+
     # - name: Test
     #   run: dotnet test --no-build --verbosity normal
+
     - name: Publish NuGet
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj
-        VERSION_REGEX: ^\s*<versionPrefix>(.*)<\/versionPrefix>\s*$
-        NUGET_KEY: ${{ env.NUGET_TOKEN }}
-        INCLUDE_SYMBOLS: true
+      run: dotnet nuget push *.nupkg -s '${{ env.NUGET_FEED }}' -k '${{ env.NUGET_TOKEN }}'
