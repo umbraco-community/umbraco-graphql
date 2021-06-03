@@ -22,7 +22,7 @@ jobs:
       run: dotnet nuget add source "https://www.myget.org/F/umbracoprereleases/api/v3/index.json" -n "Umbraco Prereleases"
 
     - name: Build
-      run: dotnet pack --include-source --include-symbols -c Release src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj -o .
+      run: dotnet pack --include-source --include-symbols -p:SymbolPackageFormat=snupkg -c Release src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj -o .
 
     # - name: Test
     #   run: dotnet test --no-build --verbosity normal
