@@ -46,10 +46,10 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddSingleton<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetService<GraphVisitorCollection>().ToArray()));
 
             var serverSection = builder.Config.GetSection("GraphQL:Server");
+            var options = serverSection.Get<GraphQLServerOptions>();
             builder.Services
                 .AddGraphQL(opts =>
                 {
-                    var options = serverSection.Get<GraphQLServerOptions>();
                     opts.ComplexityConfiguration = options.Complexity;
                     opts.EnableMetrics = options.EnableMetrics;
                 })
@@ -59,6 +59,40 @@ namespace Our.Umbraco.GraphQL.Compose
 
             builder.Services.AddOptions<GraphQLServerOptions>().Bind(serverSection);
             builder.Services.ConfigureOptions<GraphQLUmbracoOptionsSetup>();
+            if (options.EnableCors && !string.IsNullOrWhiteSpace(options.CorsPolicyName))
+            {
+                builder.Services.AddCors(opts =>
+                {
+                    opts.AddPolicy(options.CorsPolicyName, builder =>
+                    {
+                        if (options.CorsAllowedExposedHeaders != null && options.CorsAllowedExposedHeaders.Length > 0)
+                        {
+                            builder.WithExposedHeaders(options.CorsAllowedExposedHeaders);
+                        }
+                        if (options.CorsAllowedHeaders != null && options.CorsAllowedHeaders.Length > 0)
+                        {
+                            if (options.CorsAllowedHeaders.Length == 1 && options.CorsAllowedHeaders[0] == "*")
+                                builder.AllowAnyHeader();
+                            else
+                                builder.WithHeaders(options.CorsAllowedHeaders);
+                        }
+                        if (options.CorsAllowedMethods != null && options.CorsAllowedMethods.Length > 0)
+                        {
+                            if (options.CorsAllowedMethods.Length == 1 && options.CorsAllowedMethods[0] == "*")
+                                builder.AllowAnyMethod();
+                            else
+                                builder.WithMethods(options.CorsAllowedMethods);
+                        }
+                        if (options.CorsAllowedOrigins != null && options.CorsAllowedOrigins.Length > 0)
+                        {
+                            if (options.CorsAllowedOrigins.Length == 1 && options.CorsAllowedOrigins[0] == "*")
+                                builder.AllowAnyOrigin();
+                            else
+                                builder.WithOrigins(options.CorsAllowedOrigins);
+                        }
+                    });
+                });
+            }
 
             // Add all classes that need to be able to be resolved from the service provider
             builder.Services.AddTransient<ExtendQueryWithUmbracoQuery>();

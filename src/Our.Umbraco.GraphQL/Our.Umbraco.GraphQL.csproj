@@ -9,7 +9,7 @@
         <packageTags>umbraco umbracocms graphql</packageTags>
         <copyright>Copyright © 2021 Rasmus John Pedersen</copyright>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <versionPrefix>9.0.0-alpha005</versionPrefix>
+        <versionPrefix>9.0.0-alpha006</versionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>
