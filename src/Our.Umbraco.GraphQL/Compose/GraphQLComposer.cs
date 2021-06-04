@@ -1,7 +1,11 @@
 using GraphQL;
 using GraphQL.DataLoader;
+using GraphQL.Server;
+using GraphQL.Server.Transports.AspNetCore;
+using GraphQL.Server.Transports.AspNetCore.SystemTextJson;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Our.Umbraco.GraphQL.Adapters;
 using Our.Umbraco.GraphQL.Adapters.Examine.Types;
@@ -41,13 +45,19 @@ namespace Our.Umbraco.GraphQL.Compose
 
             builder.Services.AddSingleton<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetService<GraphVisitorCollection>().ToArray()));
 
-            builder.Services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            builder.Services.AddSingleton<IDocumentWriter, DocumentWriter>();
+            var serverSection = builder.Config.GetSection("GraphQL:Server");
+            builder.Services
+                .AddGraphQL(opts =>
+                {
+                    var options = serverSection.Get<GraphQLServerOptions>();
+                    opts.ComplexityConfiguration = options.Complexity;
+                    opts.EnableMetrics = options.EnableMetrics;
+                })
+                .AddSystemTextJson()
+                .AddDataLoader()
+                .AddRelayGraphTypes();
 
-            builder.Services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
-            builder.Services.AddSingleton<DataLoaderDocumentListener>();
-
-            builder.Services.AddOptions<GraphQLServerOptions>().Bind(builder.Config.GetSection("GraphQL:Server"));
+            builder.Services.AddOptions<GraphQLServerOptions>().Bind(serverSection);
             builder.Services.ConfigureOptions<GraphQLUmbracoOptionsSetup>();
 
             // Add all classes that need to be able to be resolved from the service provider

@@ -39,6 +39,30 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                 .Metadata(nameof(MemberInfo), GetMember((ISearchResult x) => x.Id))
                 .Resolve(ctx => ctx.Source.Id);
 
+            graphType.Field<StringGraphType>().Name("_umbraco_nodeId")
+                .Resolve(ctx => ctx.Source.GetValue("__NodeId"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_indexType")
+                .Resolve(ctx => ctx.Source.GetValue("__IndexType"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_nodeTypeAlias")
+                .Resolve(ctx => ctx.Source.GetValue("__NodeTypeAlias"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_published")
+                .Resolve(ctx => ctx.Source.GetValue("__Published"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_key")
+                .Resolve(ctx => ctx.Source.GetValue("__Key"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_variesByCulture")
+                .Resolve(ctx => ctx.Source.GetValue("__VariesByCulture"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_path")
+                .Resolve(ctx => ctx.Source.GetValue("__Path"));
+
+            graphType.Field<StringGraphType>().Name("_umbraco_icon")
+                .Resolve(ctx => ctx.Source.GetValue("__Icon"));
+
             if (includeFields)
             {
                 graphType.Connection<SearchResultFieldsGraphType>().Name("_examine_fields")
@@ -51,6 +75,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                             .ToConnection(x => x.Key, ctx.First, ctx.After, ctx.Last, ctx.Before));
             }
         }
+
+        private static string GetValue(this ISearchResult result, string field) => result?.AllValues != null && result.AllValues.TryGetValue(field, out var list) ? list?.FirstOrDefault() : null;
 
         public static void AddBuiltInFields(this ComplexGraphType<ISearchResults> graphType, IPublishedSnapshotAccessor snapshotAccessor = null, string searcherSafeName = null, IEnumerable<string> fields = null)
         {

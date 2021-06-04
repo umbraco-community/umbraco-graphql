@@ -1,5 +1,6 @@
 using GraphQL;
 using GraphQL.Server;
+using GraphQL.Server.Transports.AspNetCore;
 using GraphQL.Server.Ui.Playground;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -9,8 +10,10 @@ using Microsoft.Extensions.Options;
 using Our.Umbraco.GraphQL.Builders;
 using Our.Umbraco.GraphQL.Types;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Our.Umbraco.GraphQL.Web.Middleware
@@ -22,19 +25,22 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
         private readonly IDocumentWriter _documentWriter;
         private readonly ILogger<GraphQLMiddleware> _logger;
         private readonly ISchemaBuilder _schemaBuilder;
+        private readonly IGraphQLRequestDeserializer _graphQLRequestDeserializer;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         public GraphQLMiddleware(RequestDelegate next,
                                  IDocumentExecuter documentExecuter,
                                  IDocumentWriter documentWriter,
                                  ILogger<GraphQLMiddleware> logger,
-                                 ISchemaBuilder schemaBuilder)
+                                 ISchemaBuilder schemaBuilder,
+                                 IGraphQLRequestDeserializer graphQLRequestDeserializer)
         {
             _next = next;
             _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
             _documentWriter = documentWriter ?? throw new ArgumentNullException(nameof(documentWriter));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _schemaBuilder = schemaBuilder;
+            _graphQLRequestDeserializer = graphQLRequestDeserializer;
             _jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -61,29 +67,19 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
 
             try
             {
-                var request = await JsonSerializer.DeserializeAsync<GraphQLRequest>(context.Request.Body, _jsonSerializerOptions, context.RequestAborted);
-                var result = await _documentExecuter.ExecuteAsync(opts =>
+                var deserialized = await _graphQLRequestDeserializer.DeserializeFromJsonBodyAsync(context.Request, context.RequestAborted);
+                if (!deserialized.IsSuccessful)
                 {
-                    opts.Schema = schema;
-                    opts.Query = request?.Query;
-                    opts.OperationName = request?.OperationName;
-                    opts.Inputs = request?.Inputs;
-                    opts.ValidationRules = DocumentValidator.CoreRules;
-                    opts.EnableMetrics = options.EnableMetrics;
-                    opts.CancellationToken = context.RequestAborted;
-                    opts.ComplexityConfiguration = options.Complexity;
-                });
-
-                if (result.Errors != null && result.Errors.Count > 0)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        _logger.LogError(error.GetBaseException(), "There was an error" + (error.Path == null ? "" :" at [" + string.Join(", ", error.Path) + "]"));
-                    }
+                    context.Response.StatusCode = 400;
+                    return;
                 }
 
+                var requests = (deserialized.Batch ?? new GraphQLRequest[] { deserialized.Single }).Select(x => Execute(schema, options, x, context.RequestAborted)).ToArray();
+                var results = await Task.WhenAll(requests).ConfigureAwait(false);
+
                 context.Response.ContentType = "application/json";
-                await _documentWriter.WriteAsync(context.Response.Body, result);
+                if (deserialized.Batch != null) await _documentWriter.WriteAsync(context.Response.Body, results, context.RequestAborted).ConfigureAwait(false);
+                else await _documentWriter.WriteAsync(context.Response.Body, results.First(), context.RequestAborted).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -91,8 +87,33 @@ namespace Our.Umbraco.GraphQL.Web.Middleware
 
                 context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Internal server error");
+                await context.Response.WriteAsync("Internal server error", context.RequestAborted).ConfigureAwait(false);
             }
+        }
+
+        private async Task<ExecutionResult> Execute(ISchema schema, GraphQLServerOptions options, GraphQLRequest request, CancellationToken cancellationToken)
+        {
+            var result = await _documentExecuter.ExecuteAsync(opts =>
+            {
+                opts.Schema = schema;
+                opts.Query = request?.Query;
+                opts.OperationName = request?.OperationName;
+                opts.Inputs = request?.Inputs;
+                opts.ValidationRules = DocumentValidator.CoreRules;
+                opts.EnableMetrics = options.EnableMetrics;
+                opts.CancellationToken = cancellationToken;
+                opts.ComplexityConfiguration = options.Complexity;
+            }).ConfigureAwait(false);
+
+            if (result.Errors != null && result.Errors.Count > 0)
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogError(error.GetBaseException(), "There was an error" + (error.Path == null ? "" : " at [" + string.Join(", ", error.Path) + "]"));
+                }
+            }
+
+            return result;
         }
 
         private static bool IsGraphQlRequest(HttpContext context, GraphQLServerOptions options) =>
