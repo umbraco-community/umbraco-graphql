@@ -1,6 +1,7 @@
 using Examine;
 using GraphQL.Types;
 using Our.Umbraco.GraphQL.Adapters.PublishedContent.Types;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.PublishedCache;
 
@@ -25,7 +26,15 @@ namespace Our.Umbraco.GraphQL.Adapters.Examine.Types
                     if (field == "__NodeId")
                     {
                         Field<PublishedContentInterfaceGraphType>().Name("_ContentNode").Description("The published content associated with the specified __NodeId value")
-                            .Resolve(ctx => int.TryParse(ctx.Source.Id, out var id) ? snapshotAccessor.PublishedSnapshot.Content.GetById(id) : null);
+                            .Resolve(ctx =>
+                             {
+                                 if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                                 {
+                                     throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                                 }
+
+                                 return int.TryParse(ctx.Source.Id, out var id) ? publishedSnapshot.Content.GetById(id) : null;
+                             });
                     }
                 }
             }

@@ -22,7 +22,12 @@ namespace Our.Umbraco.GraphQL.Types.PublishedContent
 
         private static IPublishedContent GetInternal(IPublishedSnapshotAccessor snapshotAccessor, Func<IPublishedContentCache, IPublishedContent> fetch, string culture)
         {
-            var content = fetch(snapshotAccessor.PublishedSnapshot.Content);
+            if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+
+            var content = fetch(publishedSnapshot.Content);
             if (culture == null || content != null && content.IsInvariantOrHasCulture(culture))
                 return content;
 

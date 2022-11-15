@@ -39,6 +39,6 @@
     <ItemGroup>
         <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
         <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.0.2" />
-        <PackageReference Include="Umbraco.Cms.Web.Common" Version="9.0.0-beta003" />
+        <PackageReference Include="Umbraco.Cms.Web.Common" Version="9.0.0" />
     </ItemGroup>
 </Project>
