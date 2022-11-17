@@ -1,5 +1,7 @@
-﻿@using Umbraco.Cms.Core.PropertyEditors
-@inherits UmbracoViewPage
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Extensions
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
     // Get basic design settings from the homepage
@@ -25,17 +27,17 @@
 <body class="frontpage theme-font-@font theme-color-@colorTheme">
     <div class="mobile-nav">
         <nav class="nav-bar">
-            @Html.Partial("~/views/partials/navigation/topNavigation.cshtml")
+            @await Html.PartialAsync("~/Views/Partials/Navigation/TopNavigation.cshtml")
         </nav>
     </div>
 
     <header class="header">
 
         <div class="logo">
-            @if (home.SiteLogo != null && !string.IsNullOrEmpty(home.SiteLogo.Url))
+            @if (home.SiteLogo != null && !string.IsNullOrEmpty(home.SiteLogo.Url()))
             {
                 <div class="nav-link--home">
-                    <img class="logo-image" src="@home.SiteLogo.Url" alt="@home.Sitename">
+                    <img class="logo-image" src="@home.SiteLogo.Url()" alt="@home.Sitename">
                 </div>
             }
             else
@@ -45,7 +47,7 @@
         </div>
 
         <nav class="nav-bar top-nav">
-            @Html.Partial("~/Views/Partials/Navigation/TopNavigation.cshtml")
+            @await Html.PartialAsync("~/Views/Partials/Navigation/TopNavigation.cshtml")
         </nav>
 
         <div class="mobile-nav-handler">
@@ -69,9 +71,13 @@
             </div>
         </div>
     </footer>
-
-    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
+    
+    @* 
+    Wish not to use JQuery?
+    Insert this method call to load Umbraco Forms client dependencies without JQuery. @Html.RenderUmbracoFormDependencies()
+    *@
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>	
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>	
     <script src="https://ajax.aspnetcdn.com/ajax/mvc/5.2.3/jquery.validate.unobtrusive.min.js"></script>
     <script src="@Url.Content("~/scripts/umbraco-starterkit-app.js")"></script>
 

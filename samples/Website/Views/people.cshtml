@@ -1,15 +1,19 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.People>
-@using ContentModels = Umbraco.Web.PublishedModels;
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<People>
 @{
     Layout = "master.cshtml";
 }
-@helper SocialLink(string content, string service)
-{
-    if (!string.IsNullOrEmpty(content))
+@{
+    void SocialLink(string content, string service)
     {
-        <a class="employee-grid__item__contact-item" href="http://@(service).com/@content">@service</a>
+        if (!string.IsNullOrEmpty(content))
+        {
+            ; //semicolon needed otherwise <a> cannot be resolved
+            <a class="employee-grid__item__contact-item" href="http://@(service).com/@content">@service</a>
+        }
     }
-}       
+}
 
 @Html.Partial("~/Views/Partials/SectionHeader.cshtml")
 
@@ -27,11 +31,11 @@
         </nav>
         -->
         <div class="employee-grid">
-            @foreach (ContentModels.Person person in Model.Children)
+            @foreach (Person person in Model.Children<Person>())
             {
 
                 <div class="employee-grid__item">
-                    <div class="employee-grid__item__image" style="background-image: url('@person.Photo.Url')"></div>
+                    <div class="employee-grid__item__image" style="background-image: url('@person.Photo?.Url()')"></div>
                     <div class="employee-grid__item__details">
                         <h3 class="employee-grid__item__name">@person.Name</h3>
                         @if (!string.IsNullOrEmpty(person.Email))
@@ -39,10 +43,10 @@
                             <a href="mailto:@person.Email" class="employee-grid__item__email">@person.Email</a>
                         }
                         <div class="employee-grid__item__contact">
-                            @SocialLink(person.FacebookUsername, "Facebook")
-                            @SocialLink(person.TwitterUsername, "Twitter")
-                            @SocialLink(person.LinkedInUsername, "LinkedIn")
-                            @SocialLink(person.InstagramUsername, "Instagram")
+                            @{ SocialLink(person.FacebookUsername, "Facebook"); }
+                            @{ SocialLink(person.TwitterUsername, "Twitter"); }
+                            @{ SocialLink(person.LinkedInUsername, "LinkedIn"); }
+                            @{ SocialLink(person.InstagramUsername, "Instagram"); }
                         </div>
                     </div>
                 </div>

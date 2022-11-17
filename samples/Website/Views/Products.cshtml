@@ -1,9 +1,15 @@
-﻿@inherits UmbracoViewPage<ContentModels.Products>
-@using ContentModels = Umbraco.Web.PublishedModels;
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using Umbraco.Extensions
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Products>
+
 @{
     Layout = "master.cshtml";
 }
+
 @Html.Partial("~/Views/Partials/SectionHeader.cshtml")
+
 <section class="section">
 
     <div class="container">
@@ -23,7 +29,7 @@
             {
                 foreach (Product product in Model.FeaturedProducts)
                 {
-                    <a href="@product.Url" class="product-grid__item" style="background-image: url('@product.Photos.Url')">
+                    <a href="@product.Url()" class="product-grid__item" style="background-image: url('@product.Photos?.Url()')">
                         <div class="product-grid__item__overlay">
                             <div class="product-grid__item__name">@product.ProductName</div>
                             <div class="product-grid__item__price">@Model.DefaultCurrency @product.Price.ToString("F")</div>
