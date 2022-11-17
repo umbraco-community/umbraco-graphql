@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>Our.Umbraco.GraphQL</AssemblyName>
         <RootNamespace>Our.Umbraco.GraphQL</RootNamespace>
         <UIRoot>Web\UI\</UIRoot>
@@ -37,8 +37,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.0.2" />
-        <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.0.2" />
-        <PackageReference Include="Umbraco.Cms.Web.Common" Version="9.0.0" />
+        <PackageReference Include="GraphQL.Server.Transports.AspNetCore.SystemTextJson" Version="5.2.2" />
+        <PackageReference Include="GraphQL.Server.Ui.Playground" Version="6.1.1" />
+        <PackageReference Include="Umbraco.Cms.Core" Version="10.3.2" />
+        <PackageReference Include="Umbraco.Cms.Web.BackOffice" Version="10.3.2" />
+        <PackageReference Include="Umbraco.Cms.Web.Website" Version="10.3.2" />
     </ItemGroup>
 </Project>
