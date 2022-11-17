@@ -46,7 +46,7 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddSingleton<IGraphVisitor>(factory => new CompositeGraphVisitor(factory.GetService<GraphVisitorCollection>().ToArray()));
 
             var serverSection = builder.Config.GetSection("GraphQL:Server");
-            var options = serverSection.Get<GraphQLServerOptions>();
+            var options = serverSection.Get<GraphQLServerOptions>() ?? new GraphQLServerOptions();
             builder.Services
                 .AddGraphQL(opts =>
                 {
