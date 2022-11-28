@@ -32,7 +32,11 @@ namespace Our.Umbraco.GraphQL.Tests.Types.PublishedContent
             content.Key.Returns(new Guid("3B1E9E9C-A89E-4FE0-902D-3466D8678E47"));
 
             var snapshotAccessor = Substitute.For<IPublishedSnapshotAccessor>();
-            snapshotAccessor.PublishedSnapshot.Content.GetById(Arg.Is(content.Key))
+            if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            publishedSnapshot.Content.GetById(Arg.Is(content.Key))
                 .Returns(content);
 
             var actual = query.ById(snapshotAccessor, new Id(content.Key.ToString()));
@@ -47,7 +51,11 @@ namespace Our.Umbraco.GraphQL.Tests.Types.PublishedContent
             var id = new Guid("3B1E9E9C-A89E-4FE0-902D-3466D8678E47");
 
             var snapshotAccessor = Substitute.For<IPublishedSnapshotAccessor>();
-            snapshotAccessor.PublishedSnapshot.Content.GetById(Arg.Is(id))
+            if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            publishedSnapshot.Content.GetById(Arg.Is(id))
                 .Returns((IPublishedContent)null);
 
             var actual = query.ById(snapshotAccessor, new Id(id.ToString()));
@@ -74,7 +82,11 @@ namespace Our.Umbraco.GraphQL.Tests.Types.PublishedContent
             content.Key.Returns(new Guid("3B1E9E9C-A89E-4FE0-902D-3466D8678E47"));
 
             var snapshotAccessor = Substitute.For<IPublishedSnapshotAccessor>();
-            snapshotAccessor.PublishedSnapshot.Content.GetByRoute("/")
+            if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            publishedSnapshot.Content.GetByRoute("/")
                 .Returns(content);
 
             var actual = query.ByUrl(snapshotAccessor, "/");
@@ -88,7 +100,11 @@ namespace Our.Umbraco.GraphQL.Tests.Types.PublishedContent
             var query = CreateSUT();
 
             var snapshotAccessor = Substitute.For<IPublishedSnapshotAccessor>();
-            snapshotAccessor.PublishedSnapshot.Content.GetByRoute("/")
+            if (!snapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            publishedSnapshot.Content.GetByRoute("/")
                 .Returns((IPublishedContent)null);
 
             var actual = query.ByUrl(snapshotAccessor, "/");

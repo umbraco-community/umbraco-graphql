@@ -125,7 +125,12 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Visitors
                 .Bidirectional()
                 .Resolve(ctx =>
                 {
-                    var items = fetch(_publishedSnapshotAccessor.PublishedSnapshot.Content,
+                    if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                    {
+                        throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                    }
+
+                    var items = fetch(publishedSnapshot.Content,
                         ctx.GetArgument<string>("culture")).ToList();
 
                     return items.OrderBy(ctx.GetArgument<IEnumerable<OrderBy>>("orderBy"))
