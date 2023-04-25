@@ -32,7 +32,7 @@ namespace Our.Umbraco.GraphQL.Compose
             _typeRegistry.Add<UrlMode, UrlModeGraphType>();
             _typeRegistry.Add<Udi, UdiGraphType>();
             _typeRegistry.Add<Link, LinkGraphType>();
-            _typeRegistry.Add<LinkType, LinkGraphType>();
+            _typeRegistry.Add<LinkType, LinkTypeGraphType>();
             _typeRegistry.Add<JToken, JsonGraphType>();
             _typeRegistry.Add<ISearchResults, SearchResultsInterfaceGraphType>();
             _typeRegistry.Add<ISearchResult, SearchResultInterfaceGraphType>();
