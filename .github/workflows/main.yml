@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ v9/dev ]
+    branches: [v9/dev]
 
 jobs:
   build:
@@ -12,20 +12,20 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
 
-    - name: Add Beta source
-      run: dotnet nuget add source "https://www.myget.org/F/umbracoprereleases/api/v3/index.json" -n "Umbraco Prereleases"
+      - name: Add Beta source
+        run: dotnet nuget add source "https://www.myget.org/F/umbracoprereleases/api/v3/index.json" -n "Umbraco Prereleases"
 
-    - name: Build
-      run: dotnet pack --include-source --include-symbols -p:SymbolPackageFormat=snupkg -c Release src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj -o .
+      - name: Build
+        run: dotnet pack --include-source --include-symbols -p:SymbolPackageFormat=snupkg -c Release src/Our.Umbraco.GraphQL/Our.Umbraco.GraphQL.csproj -o .
 
-    # - name: Test
-    #   run: dotnet test --no-build --verbosity normal
+      # - name: Test
+      #   run: dotnet test --no-build --verbosity normal
 
-    - name: Publish NuGet
-      run: dotnet nuget push *.nupkg -s '${{ env.NUGET_FEED }}' -k '${{ env.NUGET_TOKEN }}'
+      - name: Publish NuGet
+        run: dotnet nuget push *.nupkg -s '${{ env.NUGET_FEED }}' -k '${{ env.NUGET_TOKEN }}'
