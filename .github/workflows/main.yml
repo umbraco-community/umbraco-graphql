@@ -1,7 +1,7 @@
-name: .NET
+name: Build and Publish
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   push:
       branches: [develop]
 
