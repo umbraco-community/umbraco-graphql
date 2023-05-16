@@ -6,10 +6,10 @@
         <description>A GraphQL server for Umbraco</description>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <packageProjectUrl>https://github.com/umbraco-community/umbraco-graphql</packageProjectUrl>
-        <packageTags>umbraco umbracocms graphql</packageTags>
-        <copyright>Copyright © 2021 Rasmus John Pedersen</copyright>
+        <packageTags>umbraco-marketplace umbraco umbracocms graphql</packageTags>
+        <copyright>Copyright © 2023 Rasmus John Pedersen, Andrew McKaskill</copyright>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <versionPrefix>10.0.0-alpha001</versionPrefix>
+        <versionPrefix>10.0.0</versionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>

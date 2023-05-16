@@ -1,8 +1,7 @@
-name: .NET
+name: Build and Publish
 
 on:
-  push:
-    branches: [v9/dev]
+  workflow_dispatch:
 
 jobs:
   build:
