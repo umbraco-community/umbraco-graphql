@@ -2,6 +2,19 @@
 
 [![NuGet release](https://img.shields.io/nuget/v/Our.Umbraco.GraphQL.svg)](https://www.nuget.org/packages/Our.Umbraco.GraphQL)
 
+## LEGACY Version
+
+> **WARNING**
+> This branch is for the legacy version of this plugin that supports Umbraco version **8**.
+
+For other versions, check out:
+
+-   [v7](https://github.com/umbraco-community/umbraco-graphql/blob/v7/dev/README.md)
+-   v8 - THIS BRANCH
+-   [v9](https://github.com/umbraco-community/umbraco-graphql/blob/v9/dev/README.md)
+-   [v10](https://github.com/umbraco-community/umbraco-graphql/blob/v10/dev/README.md)
+-   [develop](https://github.com/umbraco-community/umbraco-graphql/blob/develop/README.md)
+
 ## What is this
 
 An implementation of [GraphQL](https://graphql.org) for Umbraco using [GraphQL for .NET](https://github.com/graphql-dotnet/graphql-dotnet).
