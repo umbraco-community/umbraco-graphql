@@ -7,13 +7,13 @@
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <packageProjectUrl>https://github.com/umbraco-community/umbraco-graphql</packageProjectUrl>
         <packageTags>umbraco umbracocms graphql</packageTags>
-        <copyright>Copyright © 2021 Rasmus John Pedersen</copyright>
+        <copyright>Copyright © 2023 Rasmus John Pedersen, Andrew McKaskill</copyright>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <versionPrefix>10.0.0-alpha001</versionPrefix>
+        <versionPrefix>11.0.0-alpha001</versionPrefix>
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <AssemblyName>Our.Umbraco.GraphQL</AssemblyName>
         <RootNamespace>Our.Umbraco.GraphQL</RootNamespace>
         <UIRoot>Web\UI\</UIRoot>

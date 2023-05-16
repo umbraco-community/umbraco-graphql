@@ -1,8 +1,9 @@
 name: .NET
 
 on:
+  workflow_dispatch
   push:
-    branches: [v9/dev]
+      branches: [develop]
 
 jobs:
   build:
