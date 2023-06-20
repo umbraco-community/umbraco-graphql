@@ -113,7 +113,6 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddTransient<UdiGraphType>();
             builder.Services.AddTransient<LinkGraphType>();
             builder.Services.AddTransient<LinkTypeGraphType>();
-            builder.Services.AddTransient<JsonGraphType>();
             builder.Services.AddTransient<HtmlEncodedStringGraphType>();
             builder.Services.AddTransient<SearchResultsInterfaceGraphType>();
             builder.Services.AddTransient<SearchResultInterfaceGraphType>();
@@ -123,6 +122,17 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddTransient(typeof(ConnectionGraphType<>));
             builder.Services.AddTransient(typeof(OrderByGraphType<>));
             builder.Services.AddTransient<Adapters.Types.IdGraphType>();
+            builder.Services.AddTransient<GridGraphType>();
+            builder.Services.AddTransient<GridSectionGraphType>();
+            builder.Services.AddTransient<GridRowGraphType>();
+            builder.Services.AddTransient<GridAreaGraphType>();
+            builder.Services.AddTransient<GridStylesGraphType>();
+            builder.Services.AddTransient<GridConfigGraphType>();
+            builder.Services.AddTransient<GridControlGraphType>();
+            builder.Services.AddTransient<GridValueGraphType>();
+            builder.Services.AddTransient<GridEditorGraphType>();
+
+
 
             builder.AddNotificationHandler<ContentTypeChangedNotification, SchemaInvalidator>();
             builder.AddNotificationHandler<ContentTypeDeletedNotification, SchemaInvalidator>();

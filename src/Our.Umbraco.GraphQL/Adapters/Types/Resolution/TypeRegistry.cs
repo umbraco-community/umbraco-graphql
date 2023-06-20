@@ -12,6 +12,7 @@ using Our.Umbraco.GraphQL.Types;
 using Our.Umbraco.GraphQL.Types.Relay;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Strings;
+using Newtonsoft.Json.Linq;
 
 namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
 {
@@ -44,6 +45,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<PageInfo, PageInfoGraphType>();
             Add<BlockListItem, BlockListItemGraphType>();
             Add<IHtmlEncodedString, HtmlEncodedStringGraphType>();
+            Add<JToken, GridGraphType>();
+            
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType =>
