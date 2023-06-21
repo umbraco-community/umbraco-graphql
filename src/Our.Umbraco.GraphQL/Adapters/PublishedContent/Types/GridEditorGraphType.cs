@@ -9,22 +9,18 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
         {
             Name = "GridEditor";
 
-            Field<NonNullGraphType<StringGraphType>>(
-                "name",
-                resolve: context => context.Source.Value<string>("name")
-            );
-            Field<NonNullGraphType<StringGraphType>>(
-                "alias",
-                resolve: context => context.Source.Value<string>("alias")
-            );
-            Field<NonNullGraphType<StringGraphType>>(
-                "view",
-                resolve: context => context.Source.Value<string>("view")
-            );
-            Field<NonNullGraphType<GridConfigGraphType>>(
-                "config",
-                resolve: context => context.Source.Value<GridConfigGraphType>("config") ?? new GridConfigGraphType()
-            );
+            Field<NonNullGraphType<StringGraphType>>().Name("name")
+                .Resolve(context => context.Source.Value<string>("name"));
+
+            Field<NonNullGraphType<StringGraphType>>().Name("alias")
+                .Resolve(context => context.Source.Value<string>("alias"));
+
+            Field<NonNullGraphType<StringGraphType>>().Name("view")
+                .Resolve(context => context.Source.Value<string>("view"));
+
+            Field<NonNullGraphType<GridConfigGraphType>>().Name("config")
+                .Resolve(context => context.Source.Value<GridConfigGraphType>("config") ?? new GridConfigGraphType());
+
         }
     }
 }

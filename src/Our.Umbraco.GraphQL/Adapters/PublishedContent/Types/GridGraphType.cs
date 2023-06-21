@@ -8,15 +8,13 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
         public GridGraphType()
         {
             Name = "Grid";
-            
-            Field<NonNullGraphType<StringGraphType>>(
-                "name",
-                resolve: context => context.Source.Value<string>("name")
-            );
-            Field<NonNullGraphType<ListGraphType<GridSectionGraphType>>>(
-                "sections",
-                resolve: context => context.Source["sections"]
-            );
+
+            Field<NonNullGraphType<StringGraphType>>().Name("name")
+                .Resolve(context => context.Source.Value<string>("name"));
+
+            Field<NonNullGraphType<ListGraphType<GridSectionGraphType>>>().Name("sections")
+                .Resolve(context => context.Source["sections"]);
+
 
         }
     }
