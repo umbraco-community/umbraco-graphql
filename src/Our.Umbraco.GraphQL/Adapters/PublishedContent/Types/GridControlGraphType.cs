@@ -57,12 +57,12 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                                 var tempData = tempDataDictionaryFactory.GetTempData(httpContextAccessor.HttpContext);
                                 await result.View.RenderAsync(
                                     new Microsoft.AspNetCore.Mvc.Rendering.ViewContext(
-                                         actionContext,
-                                         result.View,
-                                         viewData,
-                                         tempData,
-                                         writer,
-                                         new HtmlHelperOptions()));
+                                            actionContext,
+                                            result.View,
+                                            viewData,
+                                            tempData,
+                                            writer,
+                                            new HtmlHelperOptions()));
 
                                 return writer.ToString();
                             }
@@ -70,6 +70,51 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                         }
                     }
                 });
+
+            Field<PublishedElementInterfaceGraphType>().Name("content")
+                .Resolve(context =>
+                {
+
+                    // Based on logic in \App_Plugins\DocTypeGridEditor\Render\DocTypeGridEditor.cshtml
+                    if (!(context.Source["value"] is JObject))
+                    {
+                        return null;
+                    }
+
+                    // try to load DTGE helper 
+                    var docTypeGridEditorHelper = TryGetDocTypeGridEditorHelper(serviceProvider);
+                    if (docTypeGridEditorHelper == null)
+                    {
+                        return null;
+                    }
+
+                    string id = context.Source["value"]["id"].ToString();
+                    string editorAlias = context.Source["editor"]["alias"].ToString();
+                    string contentTypeAlias = "";
+                    string value = context.Source["value"]["value"].ToString();
+                    //string viewPath = Model.editor.config.viewPath.ToString();
+
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        try
+                        {
+                            contentTypeAlias = context.Source["value"]["dtgeContentTypeAlias"].ToString();
+                        }
+                        catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+                        {
+                            contentTypeAlias = context.Source["value"]["docType"].ToString();
+                        }
+
+                        if (contentTypeAlias != "")
+                        {
+                            var content = ConvertValueToContent(docTypeGridEditorHelper, id, contentTypeAlias, value);
+                            return content;
+
+                        }
+                    }
+                    return null;
+                }
+           );
 
             Field<StringGraphType>().Name("rawValue")
                 .Description("Raw data value")
@@ -84,5 +129,47 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 .Resolve(context => context.Source["editor"]);
 
         }
+
+
+
+        private static object TryGetDocTypeGridEditorHelper(IServiceProvider serviceProvider)
+        {
+            try
+            {
+                var assembly = System.Reflection.Assembly.Load("Our.Umbraco.DocTypeGridEditor");
+                var helperType = assembly?.GetType("Our.Umbraco.DocTypeGridEditor.Helpers.DocTypeGridEditorHelper");
+                if (helperType == null)
+                    return null;
+                return serviceProvider.GetService(helperType);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static object ConvertValueToContent(object docTypeGridEditorHelper, string id, string contentTypeAlias, string dataJson)
+        {
+            try
+            {
+                if (docTypeGridEditorHelper == null)
+                {
+                    return null;
+                }
+
+                var method = docTypeGridEditorHelper.GetType().GetMethod("ConvertValueToContent");
+                if (method == null)
+                {
+                    return null;
+                }
+
+                return method.Invoke(docTypeGridEditorHelper, new object[] { id, contentTypeAlias, dataJson });
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }
