@@ -131,6 +131,7 @@ namespace Our.Umbraco.GraphQL.Compose
             builder.Services.AddTransient<GridControlGraphType>();
             builder.Services.AddTransient<GridValueGraphType>();
             builder.Services.AddTransient<GridEditorGraphType>();
+            builder.Services.AddTransient<ImageCropperGraphType>();
 
 
 

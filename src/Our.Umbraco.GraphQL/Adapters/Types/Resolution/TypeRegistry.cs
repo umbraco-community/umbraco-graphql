@@ -46,7 +46,8 @@ namespace Our.Umbraco.GraphQL.Adapters.Types.Resolution
             Add<BlockListItem, BlockListItemGraphType>();
             Add<IHtmlEncodedString, HtmlEncodedStringGraphType>();
             Add<JToken, GridGraphType>();
-            
+            Add<global::Umbraco.Cms.Core.PropertyEditors.ValueConverters.ImageCropperValue, ImageCropperGraphType>();
+
         }
 
         public void Add<TType, TGraphType>() where TGraphType : IGraphType =>
