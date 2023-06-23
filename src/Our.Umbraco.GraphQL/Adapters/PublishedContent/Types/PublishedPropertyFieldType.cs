@@ -7,6 +7,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Our.Umbraco.GraphQL.Adapters.Types.Resolution;
@@ -23,7 +24,8 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
     public class PublishedPropertyFieldType : FieldType
     {
         public PublishedPropertyFieldType(IPublishedContentType contentType, IPropertyType propertyType,
-            ITypeRegistry typeRegistry, IUmbracoContextFactory umbracoContextFactory, IPublishedRouter publishedRouter, IHttpContextAccessor httpContextAccessor)
+            ITypeRegistry typeRegistry, IUmbracoContextFactory umbracoContextFactory, IPublishedRouter publishedRouter, IHttpContextAccessor httpContextAccessor,
+            ILogger<PublishedPropertyFieldType> logger)
         {
             var publishedPropertyType = contentType.GetPropertyType(propertyType.Alias);
 
@@ -38,6 +40,11 @@ namespace Our.Umbraco.GraphQL.Adapters.PublishedContent.Types
                 unwrappedTypeInfo = typeof(BlockListItem).GetTypeInfo();
 
             var mappedType = typeRegistry.Get(unwrappedTypeInfo);
+            if (mappedType == null)
+            {
+                logger.LogWarning($"Missing property type for ${unwrappedTypeInfo.FullName}");
+            }
+
             var propertyGraphType = mappedType ?? typeof(StringGraphType).GetTypeInfo();
             // The Grid data type declares its return type as a JToken, but is actually a JObject.  The result is that without this check,
             // it is cast as an IEnumerable<JProperty> which causes problems when trying to serialize the graph to send to the client
